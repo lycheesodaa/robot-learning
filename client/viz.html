@@ -1,0 +1,596 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Robot Run Viewer</title>
+<style>
+:root {
+  --bg: #f5f6f8; --panel: #ffffff; --ink: #1a1d23; --muted: #6b7280; --line: #e2e5ea; --grid: #eef0f3;
+  --accent: #2563eb; --state: #0d9488; --pred: #ea580c; --bad: #dc2626; --ok: #16a34a; --skip: #9ca3af; --warn: #d97706;
+  --band: rgba(37, 99, 235, 0.10);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0e1014; --panel: #161920; --ink: #e5e7eb; --muted: #9aa3af; --line: #272c35; --grid: #1e222a;
+    --accent: #60a5fa; --state: #2dd4bf; --pred: #fb923c; --bad: #f87171; --ok: #4ade80; --skip: #6b7280; --warn: #fbbf24;
+    --band: rgba(96, 165, 250, 0.12);
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0e1014; --panel: #161920; --ink: #e5e7eb; --muted: #9aa3af; --line: #272c35; --grid: #1e222a;
+  --accent: #60a5fa; --state: #2dd4bf; --pred: #fb923c; --bad: #f87171; --ok: #4ade80; --skip: #6b7280; --warn: #fbbf24;
+  --band: rgba(96, 165, 250, 0.12);
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 13px/1.4 system-ui, -apple-system, "Segoe UI", sans-serif; }
+header { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; padding: 10px 16px; border-bottom: 1px solid var(--line); background: var(--panel); position: sticky; top: 0; z-index: 5; }
+header h1 { font-size: 15px; margin: 0; font-weight: 600; }
+.status { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); }
+.dot { width: 8px; height: 8px; border-radius: 50%; background: var(--skip); }
+.dot.live { background: var(--ok); }
+.stats { display: flex; flex-wrap: wrap; gap: 6px; margin-left: auto; }
+.stat { border: 1px solid var(--line); border-radius: 6px; padding: 2px 8px; white-space: nowrap; }
+.stat b { font-variant-numeric: tabular-nums; }
+.stat span { color: var(--muted); }
+main { padding: 12px 16px 24px; display: grid; gap: 12px; }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; min-width: 0; }
+.card h2 { font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); margin: 0 0 8px; font-weight: 600; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.top { display: grid; grid-template-columns: minmax(0, 2fr) minmax(260px, 1fr); gap: 12px; }
+@media (max-width: 900px) { .top { grid-template-columns: 1fr; } }
+.cams { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 8px; }
+.cam { position: relative; background: #000; border-radius: 6px; overflow: hidden; aspect-ratio: 4 / 3; }
+.cam img { width: 100%; height: 100%; object-fit: contain; display: block; }
+.cam .lbl { position: absolute; left: 6px; top: 6px; background: rgba(0,0,0,.6); color: #fff; padding: 1px 6px; border-radius: 4px; font-size: 12px; }
+.cam .none { position: absolute; inset: 0; display: grid; place-items: center; color: #aaa; }
+.details dl { display: grid; grid-template-columns: auto 1fr; gap: 3px 12px; margin: 0; }
+.details dt { color: var(--muted); }
+.details dd { margin: 0; font-variant-numeric: tabular-nums; }
+.verdict { margin: 8px 0; padding: 6px 8px; border-radius: 6px; border-left: 3px solid var(--skip); background: var(--grid); }
+.verdict.ok { border-color: var(--ok); }
+.verdict.skip { border-color: var(--warn); }
+table.state { width: 100%; border-collapse: collapse; margin-top: 8px; font-variant-numeric: tabular-nums; }
+table.state td { padding: 2px 4px; border-top: 1px solid var(--line); }
+table.state td:last-child { text-align: right; }
+.toolbar { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-left: auto; text-transform: none; letter-spacing: 0; font-weight: 400; }
+button, label.chk { font: inherit; color: var(--ink); background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 3px 9px; cursor: pointer; }
+button:hover, label.chk:hover { border-color: var(--accent); }
+button.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+label.chk { display: inline-flex; align-items: center; gap: 4px; }
+canvas { display: block; width: 100%; }
+#timeline { height: 250px; cursor: crosshair; }
+.joints { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 10px; }
+.joints canvas { height: 150px; }
+.legend { display: flex; flex-wrap: wrap; gap: 12px; color: var(--muted); font-size: 12px; text-transform: none; letter-spacing: 0; font-weight: 400; }
+.legend i { display: inline-block; width: 14px; height: 3px; vertical-align: middle; margin-right: 4px; border-radius: 2px; }
+.legend i.dash { background: repeating-linear-gradient(90deg, var(--pred) 0 4px, transparent 4px 7px) !important; }
+.legend i.dotm { width: 7px; height: 7px; border-radius: 50%; }
+#tip { position: fixed; pointer-events: none; background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 5px 8px; font-size: 12px; box-shadow: 0 4px 12px rgba(0,0,0,.15); display: none; z-index: 10; max-width: 320px; white-space: pre-line; }
+.tablewrap { max-height: 320px; overflow: auto; }
+table.chunks { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+table.chunks th, table.chunks td { padding: 3px 8px; text-align: right; border-bottom: 1px solid var(--line); white-space: nowrap; }
+table.chunks th { position: sticky; top: 0; background: var(--panel); color: var(--muted); font-weight: 600; }
+table.chunks tr { cursor: pointer; }
+table.chunks tbody tr:hover { background: var(--grid); }
+table.chunks tr.sel { background: var(--band); }
+.hint { color: var(--muted); font-size: 12px; }
+.empty { color: var(--muted); padding: 40px; text-align: center; }
+</style>
+</head>
+<body>
+<header>
+  <h1 id="title">Robot run</h1>
+  <span class="status"><span class="dot" id="dot"></span><span id="statusText">connecting…</span></span>
+  <span class="hint" id="task"></span>
+  <div class="stats" id="stats"></div>
+</header>
+<main>
+  <div class="top">
+    <section class="card">
+      <h2>Cameras at selected observation <span class="hint" id="camHint"></span></h2>
+      <div class="cams" id="cams"></div>
+    </section>
+    <section class="card details" id="details"><h2>Selected observation</h2><div class="empty">Waiting for data…</div></section>
+  </div>
+
+  <section class="card">
+    <h2>Timeline
+      <span class="toolbar">
+        <button id="btnFollow" class="on" title="Keep the newest 30 s in view and select the newest observation">Follow live</button>
+        <button id="btnFit" title="Show the whole run (double-click the timeline does the same)">Whole run</button>
+        <button id="btnPrev" title="Previous observation (←)">◀ obs</button>
+        <button id="btnNext" title="Next observation (→)">obs ▶</button>
+        <button id="btnTheme" title="Toggle light/dark">◐</button>
+      </span>
+    </h2>
+    <canvas id="timeline"></canvas>
+    <div class="hint">Scroll to zoom, drag to pan, click to select the nearest observation, double-click for the whole run. Observations: filled = answered with a chunk, hollow = skipped by the server, ring = must-go. Inference bars run from observation upload to chunk arrival. Red shading = no action executed for over 2.5 frames.</div>
+  </section>
+
+  <section class="card">
+    <h2>Joints (x = action timestep)
+      <span class="legend">
+        <span><i style="background:var(--accent)"></i>executed (sent)</span>
+        <span><i class="dotm" style="background:var(--bad)"></i>commanded, clamped</span>
+        <span><i class="dotm" style="background:var(--state)"></i>measured state (at obs)</span>
+        <span><i class="dash"></i>selected chunk</span>
+        <span><i style="background:var(--pred);opacity:.35"></i>other chunks</span>
+      </span>
+      <span class="toolbar"><label class="chk"><input type="checkbox" id="chkAll" checked> all chunks</label></span>
+    </h2>
+    <div class="joints" id="joints"></div>
+  </section>
+
+  <section class="card">
+    <h2>Action chunks <span class="hint">(newest first; click a row to select its observation)</span></h2>
+    <div class="tablewrap"><table class="chunks">
+      <thead><tr><th>t (s)</th><th>obs #</th><th>must go</th><th>steps</th><th>obs→chunk ms</th><th>upload ms</th><th>stale</th><th>queue</th></tr></thead>
+      <tbody id="chunkRows"></tbody>
+    </table></div>
+  </section>
+</main>
+<div id="tip"></div>
+
+<script>
+"use strict";
+const S = {
+  meta: null, obs: [], chunks: [], acts: [], loops: [], q: [], next: 0, live: true, ended: false,
+  view: null, follow: true, sel: null, showAll: true, lastT: 0, dirty: true,
+};
+const $ = (id) => document.getElementById(id);
+const css = (n) => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const fmt = (v, d = 1) => (v == null || !isFinite(v)) ? "–" : v.toFixed(d);
+const rel = (t) => t - (S.meta ? S.meta.t0 : 0);
+const shortKey = (k) => k.replace(/\.pos$/, "");
+const median = (a) => { if (!a.length) return null; const b = [...a].sort((x, y) => x - y); return b[b.length >> 1]; };
+
+// ---------- data ----------
+function ingest(events) {
+  for (const e of events) {
+    switch (e.type) {
+      case "meta": S.meta = e; setupMeta(); break;
+      case "obs": e.chunk = null; S.obs[e.i] = e; break;
+      case "chunk":
+        if (e.obs_i != null && S.obs[e.obs_i]) { e.obs = S.obs[e.obs_i]; e.obs.chunk = e; }
+        S.chunks.push(e); S.q.push([e.t, e.queue_after]); break;
+      case "act":
+        e.clamped = e.cmd.map((c, j) => Math.abs(c - e.sent[j]) > 1e-3);
+        e.anyClamp = e.clamped.some(Boolean);
+        S.acts.push(e); S.q.push([e.t, e.queue]); break;
+      case "loop": S.loops.push(e); break;
+      case "end": S.ended = true; break;
+    }
+    if (e.t) S.lastT = Math.max(S.lastT, e.t);
+  }
+  // A chunk can arrive before its obs event is ingested in the same batch; re-link.
+  for (const c of S.chunks) if (!c.obs && c.obs_i != null && S.obs[c.obs_i]) { c.obs = S.obs[c.obs_i]; c.obs.chunk = c; }
+  S.q.sort((a, b) => a[0] - b[0]);
+}
+
+async function poll() {
+  try {
+    const r = await fetch("/api/events?since=" + S.next, { cache: "no-store" });
+    const d = await r.json();
+    S.live = d.live && !S.ended;
+    if (d.events.length) {
+      ingest(d.events);
+      S.next = d.next;
+      if (!S.view) fitAll();
+      if (S.follow && S.live) followNow();
+      if (!S.live && !S.sel) selectObs(firstObsIndex());
+      S.dirty = true;
+    }
+    S.live = d.live && !S.ended;
+    setStatus(S.live ? "live" : (d.live ? "run ended" : "replay"), S.live);
+    if (!S.live && S.follow) { S.follow = false; $("btnFollow").classList.remove("on"); }
+  } catch (err) {
+    setStatus("viewer disconnected (client stopped?)", false);
+    S.live = false;
+  }
+  if (S.live) setTimeout(poll, 400);
+}
+
+function setupMeta() {
+  const m = S.meta;
+  $("title").textContent = "Run " + m.run_id;
+  $("task").textContent = `“${m.task}” · ${m.policy_type} · ${m.fps} fps · chunk ${m.actions_per_chunk} · threshold ${m.chunk_size_threshold} · ${m.aggregate_fn_name} · clamp ${m.max_relative_target ?? "off"}°`;
+  document.title = "Run " + m.run_id;
+  const j = $("joints"); j.innerHTML = "";
+  m.action_keys.forEach((k, idx) => {
+    const c = document.createElement("canvas"); c.dataset.j = idx; j.appendChild(c);
+    c.addEventListener("mousemove", (ev) => jointHover(ev, idx));
+    c.addEventListener("mouseleave", hideTip);
+  });
+  const cams = $("cams"); cams.innerHTML = "";
+  for (const k of m.cam_keys) {
+    cams.insertAdjacentHTML("beforeend",
+      `<div class="cam"><img id="img_${k}" alt="${k} frame"><span class="lbl">${k}</span><span class="none" id="none_${k}">no frame</span></div>`);
+  }
+}
+function setStatus(text, live) { $("statusText").textContent = text; $("dot").classList.toggle("live", live); }
+function firstObsIndex() { const o = S.obs.find(Boolean); return o ? o.i : null; }
+
+// ---------- view / selection ----------
+function runSpan() {
+  const t0 = S.meta ? S.meta.t0 : 0;
+  const first = S.loops.length ? S.loops[0].t : (S.obs.find(Boolean)?.t ?? t0);
+  return [first - 0.5, Math.max(S.lastT, first + 1) + 0.5];
+}
+function fitAll() { S.view = runSpan(); }
+function followNow() {
+  const end = S.lastT + 0.3; const w = S.view ? Math.min(S.view[1] - S.view[0], 30) : 30;
+  S.view = [end - Math.max(w, 5), end];
+  const latest = [...S.obs].reverse().find(Boolean); if (latest) S.sel = latest.i;
+  renderSelection();
+}
+function setFollow(on) { S.follow = on; $("btnFollow").classList.toggle("on", on); if (on && S.live) followNow(); S.dirty = true; }
+function selectObs(i) {
+  if (i == null || !S.obs[i]) return;
+  S.sel = i; renderSelection(); S.dirty = true;
+}
+function stepSel(d) {
+  setFollow(false);
+  let i = S.sel ?? firstObsIndex(); if (i == null) return;
+  do { i += d; } while (i >= 0 && i < S.obs.length && !S.obs[i]);
+  if (S.obs[i]) {
+    selectObs(i);
+    const t = S.obs[i].t, [a, b] = S.view;
+    if (t < a || t > b) { const w = b - a; S.view = [t - w / 2, t + w / 2]; }
+  }
+}
+
+// ---------- canvas helpers ----------
+function prep(canvas) {
+  const dpr = window.devicePixelRatio || 1, w = canvas.clientWidth, h = canvas.clientHeight;
+  if (canvas.width !== Math.round(w * dpr) || canvas.height !== Math.round(h * dpr)) {
+    canvas.width = Math.round(w * dpr); canvas.height = Math.round(h * dpr);
+  }
+  const g = canvas.getContext("2d"); g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, w, h);
+  g.font = "11px system-ui, sans-serif"; g.textBaseline = "middle";
+  return [g, w, h];
+}
+function niceStep(span, target) {
+  const raw = span / target, p = Math.pow(10, Math.floor(Math.log10(raw))), n = raw / p;
+  return (n < 1.5 ? 1 : n < 3 ? 2 : n < 7 ? 5 : 10) * p;
+}
+function alpha(color, a) {
+  const c = document.createElement("canvas").getContext("2d"); c.fillStyle = color;
+  const v = c.fillStyle; // normalized #rrggbb
+  if (v.startsWith("#")) { const n = parseInt(v.slice(1), 16); return `rgba(${n >> 16},${(n >> 8) & 255},${n & 255},${a})`; }
+  return v;
+}
+
+// ---------- timeline ----------
+const GUT = 92;
+let lanes = [];
+function drawTimeline() {
+  const cv = $("timeline"); const [g, W, H] = prep(cv);
+  if (!S.view) return;
+  const C = { ink: css("--ink"), muted: css("--muted"), line: css("--line"), grid: css("--grid"), accent: css("--accent"),
+    ok: css("--ok"), skip: css("--skip"), warn: css("--warn"), bad: css("--bad"), band: css("--band") };
+  const [v0, v1] = S.view, X = (t) => GUT + (t - v0) / (v1 - v0) * (W - GUT - 8);
+  const defs = [["Observations", 30], ["Inference", 50], ["Action queue", 62], ["Loop time", 50], ["Clamps", 22]];
+  let y = 4; lanes = defs.map(([name, h]) => { const l = { name, y, h }; y += h + 4; return l; });
+  const axisY = y + 2;
+  const L = Object.fromEntries(lanes.map((l) => [l.name, l]));
+
+  // lane backgrounds + labels
+  for (const l of lanes) {
+    g.fillStyle = C.grid; g.fillRect(GUT, l.y, W - GUT - 8, l.h);
+    g.fillStyle = C.muted; g.textAlign = "right"; g.fillText(l.name, GUT - 8, l.y + l.h / 2);
+  }
+  // time grid
+  const step = niceStep(v1 - v0, 10); g.textAlign = "center";
+  for (let t = Math.ceil(rel(v0) / step) * step; t <= rel(v1); t += step) {
+    const x = X(t + S.meta.t0); g.strokeStyle = C.line; g.lineWidth = 1;
+    g.beginPath(); g.moveTo(x, 4); g.lineTo(x, axisY - 4); g.stroke();
+    g.fillStyle = C.muted; g.fillText(fmt(t, step < 1 ? 1 : 0) + " s", x, axisY + 6);
+  }
+  g.save(); g.beginPath(); g.rect(GUT, 0, W - GUT - 8, H); g.clip();
+
+  // inference lane: bars obs upload -> chunk arrival (3 staggered rows so overlaps stay visible)
+  const inf = L["Inference"]; let row = 0;
+  for (const c of S.chunks) {
+    if (!c.obs || c.t < v0 || c.obs.t > v1) continue;
+    const x0 = X(c.obs.t), x1 = Math.max(X(c.t), x0 + 2), ry = inf.y + 4 + (row++ % 3) * 14;
+    const sel = c.obs.i === S.sel;
+    g.fillStyle = sel ? C.accent : alpha(C.accent, 0.45); g.fillRect(x0, ry, x1 - x0, 11);
+    if (x1 - x0 > 46) { g.fillStyle = sel ? "#fff" : C.ink; g.textAlign = "left"; g.fillText(Math.round((c.t - c.obs.t) * 1000) + " ms", x0 + 3, ry + 6); }
+  }
+  // observations lane
+  const ol = L["Observations"], oy = ol.y + ol.h / 2;
+  for (const o of S.obs) {
+    if (!o || o.t < v0 || o.t > v1) continue;
+    const x = X(o.t);
+    if (o.must_go) { g.strokeStyle = C.warn; g.lineWidth = 2; g.beginPath(); g.arc(x, oy, 7, 0, 7); g.stroke(); }
+    g.beginPath(); g.arc(x, oy, 3.5, 0, 7);
+    if (o.chunk) { g.fillStyle = C.ok; g.fill(); } else { g.strokeStyle = C.skip; g.lineWidth = 1.5; g.stroke(); }
+  }
+  // queue lane
+  const ql = L["Action queue"], cap = Math.max(S.meta.actions_per_chunk, ...S.q.map((p) => p[1]).slice(-2000), 1);
+  const QY = (v) => ql.y + ql.h - 3 - v / cap * (ql.h - 6);
+  const thr = S.meta.actions_per_chunk * S.meta.chunk_size_threshold;
+  g.setLineDash([4, 3]); g.strokeStyle = C.warn; g.lineWidth = 1;
+  g.beginPath(); g.moveTo(GUT, QY(thr)); g.lineTo(W, QY(thr)); g.stroke(); g.setLineDash([]);
+  g.strokeStyle = C.accent; g.lineWidth = 1.5; g.beginPath(); let started = false, prevY = null;
+  for (const [t, v] of S.q) {
+    if (t < v0 - 5 || t > v1 + 5) continue;
+    const x = X(t), yy = QY(v);
+    if (!started) { g.moveTo(x, yy); started = true; } else { g.lineTo(x, prevY); g.lineTo(x, yy); }
+    prevY = yy;
+  }
+  g.stroke();
+  // queue-empty shading (no action executed for > 2 frames)
+  g.fillStyle = alpha(C.bad, 0.10);
+  for (let k = 1; k < S.acts.length; k++) {
+    const a = S.acts[k - 1].t, b = S.acts[k].t;
+    if (b - a > 2.5 / S.meta.fps && b > v0 && a < v1) g.fillRect(X(a), ql.y, X(b) - X(a), ql.h);
+  }
+  // loop lane: bar per iteration, height ~ duration (cap 300 ms)
+  const ll = L["Loop time"], budget = 1000 / S.meta.fps, LY = (ms) => ll.y + ll.h - Math.min(ms, 300) / 300 * (ll.h - 2);
+  for (const e of S.loops) {
+    if (e.t < v0 || e.t > v1) continue;
+    const x = X(e.t); g.strokeStyle = e.ms > budget * 1.5 ? C.bad : alpha(C.muted, 0.6); g.lineWidth = 1;
+    g.beginPath(); g.moveTo(x, ll.y + ll.h); g.lineTo(x, LY(e.ms)); g.stroke();
+  }
+  g.setLineDash([3, 3]); g.strokeStyle = C.ok; g.beginPath(); g.moveTo(GUT, LY(budget)); g.lineTo(W, LY(budget)); g.stroke(); g.setLineDash([]);
+  // clamps lane
+  const cl = L["Clamps"];
+  g.strokeStyle = C.bad; g.lineWidth = 2;
+  for (const a of S.acts) {
+    if (!a.anyClamp || a.t < v0 || a.t > v1) continue;
+    const x = X(a.t); g.beginPath(); g.moveTo(x, cl.y + 3); g.lineTo(x, cl.y + cl.h - 3); g.stroke();
+  }
+  // selection
+  const so = S.obs[S.sel];
+  if (so) {
+    g.strokeStyle = C.ink; g.lineWidth = 1; g.setLineDash([2, 2]);
+    g.beginPath(); g.moveTo(X(so.t), 2); g.lineTo(X(so.t), axisY - 2); g.stroke(); g.setLineDash([]);
+  }
+  g.restore();
+  // lane scale hints
+  g.fillStyle = C.muted; g.textAlign = "left"; g.font = "10px system-ui, sans-serif";
+  g.fillText(`${cap}`, GUT + 3, ql.y + 7); g.fillText(`threshold ${thr}`, GUT + 3, QY(thr) - 7);
+  g.fillText(`${Math.round(budget)} ms budget · bars cap at 300 ms`, GUT + 3, ll.y + 7);
+}
+
+function timelineHit(px, py) {
+  if (!S.view) return null;
+  const cv = $("timeline"), W = cv.clientWidth, [v0, v1] = S.view;
+  const X = (t) => GUT + (t - v0) / (v1 - v0) * (W - GUT - 8);
+  const lane = lanes.find((l) => py >= l.y && py <= l.y + l.h);
+  const t = v0 + (px - GUT) / (W - GUT - 8) * (v1 - v0);
+  let best = null, bd = 8;
+  const near = (x, item) => { const d = Math.abs(x - px); if (d < bd) { bd = d; best = item; } };
+  if (!lane) return { t };
+  if (lane.name === "Observations") S.obs.forEach((o) => o && near(X(o.t), { kind: "obs", o }));
+  if (lane.name === "Inference") for (const c of S.chunks) if (c.obs && px >= X(c.obs.t) - 3 && px <= X(c.t) + 3) { best = { kind: "chunk", c }; break; }
+  if (lane.name === "Loop time") S.loops.forEach((e) => near(X(e.t), { kind: "loop", e }));
+  if (lane.name === "Clamps") S.acts.forEach((a) => a.anyClamp && near(X(a.t), { kind: "act", a }));
+  if (lane.name === "Action queue") { let v = null; for (const p of S.q) { if (p[0] > t) break; v = p[1]; } best = { kind: "queue", v }; }
+  return { t, lane: lane.name, hit: best };
+}
+function describeHit(h) {
+  if (!h || !h.hit) return null;
+  const x = h.hit;
+  if (x.kind === "obs") { const o = x.o; return `Observation #${o.i} · step ${o.step} · t=${fmt(rel(o.t), 2)} s\n${o.must_go ? "MUST GO · " : ""}queue ${o.queue} · upload ${fmt(o.send_ms, 0)} ms\n${o.chunk ? `answered in ${fmt((o.chunk.t - o.t) * 1000, 0)} ms` : "no chunk (skipped by server)"}`; }
+  if (x.kind === "chunk") { const c = x.c; return `Chunk for obs #${c.obs.i} (steps ${c.step0}–${c.step0 + c.actions.length - 1})\nobs→chunk ${fmt((c.t - c.obs.t) * 1000, 0)} ms · upload ${fmt(c.obs.send_ms, 0)} ms\n${c.stale} stale actions dropped · queue ${c.queue_before}→${c.queue_after}`; }
+  if (x.kind === "loop") { const e = x.e; return `Loop iteration ${fmt(e.ms, 1)} ms\n${e.acted ? "executed an action" : "no action (queue empty)"}${e.sent ? " · sent observation" : ""}`; }
+  if (x.kind === "act") { const a = x.a, k = S.meta.action_keys; return `Step ${a.step} clamped\n` + a.clamped.map((c, j) => c ? `${shortKey(k[j])}: ${fmt(a.cmd[j], 1)} → ${fmt(a.sent[j], 1)}` : null).filter(Boolean).join("\n"); }
+  if (x.kind === "queue") return `queue ${x.v ?? "–"} actions`;
+  return null;
+}
+
+// ---------- joints ----------
+function stepRange() {
+  const [v0, v1] = S.view; let lo = Infinity, hi = -Infinity;
+  for (const a of S.acts) if (a.t >= v0 && a.t <= v1) { lo = Math.min(lo, a.step); hi = Math.max(hi, a.step); }
+  for (const o of S.obs) if (o && o.t >= v0 && o.t <= v1) { lo = Math.min(lo, o.step); hi = Math.max(hi, o.step); }
+  const so = S.obs[S.sel];
+  if (so && so.chunk) hi = Math.max(hi, so.chunk.step0 + so.chunk.actions.length - 1);
+  if (!isFinite(lo)) return [0, S.meta ? S.meta.actions_per_chunk : 30];
+  return [lo - 1, Math.max(hi + 1, lo + 10)];
+}
+let jointGeom = null;
+function drawJoints() {
+  if (!S.meta || !S.view) return;
+  const C = { muted: css("--muted"), line: css("--line"), grid: css("--grid"), accent: css("--accent"), state: css("--state"), pred: css("--pred"), bad: css("--bad"), ink: css("--ink") };
+  const [s0, s1] = stepRange(); const keys = S.meta.action_keys;
+  const so = S.obs[S.sel]; const selChunk = so && so.chunk;
+  const chunksIn = S.showAll ? S.chunks.filter((c) => c.step0 + c.actions.length >= s0 && c.step0 <= s1) : [];
+  const actsIn = S.acts.filter((a) => a.step >= s0 && a.step <= s1);
+  const obsIn = S.obs.filter((o) => o && o.step >= s0 && o.step <= s1);
+  jointGeom = { s0, s1 };
+  document.querySelectorAll("#joints canvas").forEach((cv) => {
+    const j = +cv.dataset.j, key = keys[j], sj = S.meta.state_keys.indexOf(key);
+    const [g, W, H] = prep(cv); const L = 40, R = 6, T = 16, B = 16;
+    // y range
+    let lo = Infinity, hi = -Infinity; const take = (v) => { if (v != null) { lo = Math.min(lo, v); hi = Math.max(hi, v); } };
+    actsIn.forEach((a) => { take(a.sent[j]); take(a.cmd[j]); });
+    if (sj >= 0) obsIn.forEach((o) => take(o.state[sj]));
+    if (selChunk) selChunk.actions.forEach((a) => take(a[j]));
+    chunksIn.forEach((c) => c.actions.forEach((a, k) => { const s = c.step0 + k; if (s >= s0 && s <= s1) take(a[j]); }));
+    if (!isFinite(lo)) { lo = -1; hi = 1; }
+    const pad = Math.max((hi - lo) * 0.08, 0.5); lo -= pad; hi += pad;
+    const X = (s) => L + (s - s0) / (s1 - s0) * (W - L - R), Y = (v) => T + (hi - v) / (hi - lo) * (H - T - B);
+    // grid + axes
+    g.strokeStyle = C.grid; g.lineWidth = 1; g.fillStyle = C.muted; g.textAlign = "right";
+    const ys = niceStep(hi - lo, 4);
+    for (let v = Math.ceil(lo / ys) * ys; v <= hi; v += ys) { g.beginPath(); g.moveTo(L, Y(v)); g.lineTo(W - R, Y(v)); g.stroke(); g.fillText(fmt(v, ys < 1 ? 1 : 0), L - 4, Y(v)); }
+    g.textAlign = "center"; const xs = niceStep(s1 - s0, 6);
+    for (let s = Math.ceil(s0 / xs) * xs; s <= s1; s += xs) g.fillText(s, X(s), H - 7);
+    g.save(); g.beginPath(); g.rect(L, T - 2, W - L - R, H - T - B + 4); g.clip();
+    // other chunks
+    g.strokeStyle = alpha(C.pred, 0.22); g.lineWidth = 1;
+    for (const c of chunksIn) { if (c === selChunk) continue; g.beginPath(); c.actions.forEach((a, k) => { const x = X(c.step0 + k), y = Y(a[j]); k ? g.lineTo(x, y) : g.moveTo(x, y); }); g.stroke(); }
+    // executed (sent)
+    g.strokeStyle = C.accent; g.lineWidth = 1.8; g.beginPath(); let prev = null;
+    for (const a of actsIn) { const x = X(a.step), y = Y(a.sent[j]); (prev != null && a.step === prev + 1) ? g.lineTo(x, y) : g.moveTo(x, y); prev = a.step; }
+    g.stroke();
+    // clamps
+    for (const a of actsIn) if (a.clamped[j]) {
+      const x = X(a.step); g.strokeStyle = alpha(C.bad, 0.6); g.lineWidth = 1;
+      g.beginPath(); g.moveTo(x, Y(a.sent[j])); g.lineTo(x, Y(a.cmd[j])); g.stroke();
+      g.fillStyle = C.bad; g.beginPath(); g.arc(x, Y(a.cmd[j]), 2.5, 0, 7); g.fill();
+    }
+    // measured state
+    if (sj >= 0) { g.fillStyle = C.state; for (const o of obsIn) { g.beginPath(); g.arc(X(o.step), Y(o.state[sj]), 2.2, 0, 7); g.fill(); } }
+    // selected chunk
+    if (selChunk) {
+      g.strokeStyle = C.pred; g.lineWidth = 2; g.setLineDash([5, 3]); g.beginPath();
+      selChunk.actions.forEach((a, k) => { const x = X(selChunk.step0 + k), y = Y(a[j]); k ? g.lineTo(x, y) : g.moveTo(x, y); });
+      g.stroke(); g.setLineDash([]);
+    }
+    if (so) { g.strokeStyle = C.ink; g.lineWidth = 1; g.setLineDash([2, 2]); g.beginPath(); g.moveTo(X(so.step), T); g.lineTo(X(so.step), H - B); g.stroke(); g.setLineDash([]); }
+    g.restore();
+    g.fillStyle = C.ink; g.textAlign = "left"; g.font = "600 12px system-ui, sans-serif";
+    const cur = so && sj >= 0 ? `  state ${fmt(so.state[sj], 1)}°` : "";
+    g.fillText(shortKey(key) + cur, L, 8);
+  });
+}
+function jointHover(ev, j) {
+  if (!jointGeom) return;
+  const cv = ev.currentTarget, r = cv.getBoundingClientRect(), L = 40, R = 6;
+  const s = Math.round(jointGeom.s0 + (ev.clientX - r.left - L) / (cv.clientWidth - L - R) * (jointGeom.s1 - jointGeom.s0));
+  const a = S.acts.find((x) => x.step === s), key = S.meta.action_keys[j], sj = S.meta.state_keys.indexOf(key);
+  const o = S.obs.filter((x) => x && x.step === s);
+  const so = S.obs[S.sel], c = so && so.chunk, k = c ? s - c.step0 : -1;
+  const lines = [`step ${s} · ${shortKey(key)}`];
+  if (a) lines.push(`executed ${fmt(a.sent[j], 2)}` + (a.clamped[j] ? ` (commanded ${fmt(a.cmd[j], 2)}, clamped)` : "") + ` · t=${fmt(rel(a.t), 2)} s`);
+  if (o.length && sj >= 0) lines.push(`state ${o.map((x) => fmt(x.state[sj], 2)).join(", ")} (obs #${o.map((x) => x.i).join(", #")})`);
+  if (c && k >= 0 && k < c.actions.length) lines.push(`selected chunk ${fmt(c.actions[k][j], 2)}`);
+  showTip(ev, lines.join("\n"));
+}
+
+// ---------- side panels ----------
+function renderSelection() {
+  const o = S.obs[S.sel], m = S.meta; if (!m) return;
+  for (const k of m.cam_keys) {
+    const img = $("img_" + k), none = $("none_" + k), name = o && o.frames.find((f) => f.endsWith(`_${k}.jpg`));
+    if (name) { if (!img.src.endsWith("/frames/" + name)) { img.src = "/frames/" + name; } img.style.visibility = "visible"; none.style.display = "none"; }
+    else { img.removeAttribute("src"); img.style.visibility = "hidden"; none.style.display = "grid"; }
+  }
+  if (!o) return;
+  $("camHint").textContent = `obs #${o.i} · step ${o.step} · t=${fmt(rel(o.t), 2)} s`;
+  const c = o.chunk; let verdict;
+  if (c) verdict = `<div class="verdict ok"><b>Answered</b> in ${fmt((c.t - o.t) * 1000, 0)} ms → chunk for steps ${c.step0}–${c.step0 + c.actions.length - 1}; ${c.stale} already-executed steps dropped, queue ${c.queue_before}→${c.queue_after}.</div>`;
+  else if (S.live && S.lastT - o.t < 5) verdict = `<div class="verdict">Waiting for the server…</div>`;
+  else verdict = `<div class="verdict skip"><b>No chunk.</b> The server skipped this observation: its joint state was within 1° (L2) of the last observation it ran inference on, or step ${o.step} had already been predicted. Only a must-go observation bypasses this.</div>`;
+  const rows = m.state_keys.map((k, i) => `<tr><td>${shortKey(k)}</td><td>${fmt(o.state[i], 2)}</td></tr>`).join("");
+  $("details").innerHTML = `<h2>Selected observation</h2>
+    <dl><dt>Observation</dt><dd>#${o.i} · action step ${o.step}</dd>
+    <dt>Time</dt><dd>${fmt(rel(o.t), 3)} s</dd>
+    <dt>Must go</dt><dd>${o.must_go ? "yes (queue was empty)" : "no"}</dd>
+    <dt>Queue at send</dt><dd>${o.queue} / ${m.actions_per_chunk}</dd>
+    <dt>Upload time</dt><dd>${fmt(o.send_ms, 0)} ms${o.ok ? "" : " (failed)"}</dd></dl>
+    ${verdict}<table class="state">${rows}</table>`;
+}
+
+function renderStats() {
+  if (!S.meta) return;
+  const [a, b] = runSpan(), dur = Math.max(b - a - 1, 0.001);
+  const obs = S.obs.filter(Boolean), answered = obs.filter((o) => o.chunk).length;
+  const lat = S.chunks.filter((c) => c.obs).map((c) => (c.t - c.obs.t) * 1000);
+  const ups = obs.map((o) => o.send_ms);
+  // time the arm spent not executing on schedule: gaps between executed actions beyond one frame
+  const dt = 1 / S.meta.fps; let starved = 0;
+  for (let k = 1; k < S.acts.length; k++) { const gap = S.acts[k].t - S.acts[k - 1].t; if (gap > 1.5 * dt) starved += gap - dt; }
+  if (S.acts.length) starved += Math.max(0, S.acts[0].t - a - 0.5);
+  const clamps = S.acts.filter((x) => x.anyClamp).length;
+  const st = [
+    ["duration", fmt(dur, 0) + " s"], ["actions/s", fmt(S.acts.length / dur, 1)], ["behind schedule", fmt(starved, 1) + " s"],
+    ["obs sent", obs.length], ["answered", obs.length ? Math.round(100 * answered / obs.length) + "%" : "–"],
+    ["chunks", S.chunks.length], ["median obs→chunk", fmt(median(lat), 0) + " ms"], ["median upload", fmt(median(ups), 0) + " ms"],
+    ["clamped steps", clamps],
+  ];
+  $("stats").innerHTML = st.map(([k, v]) => `<span class="stat"><span>${k}</span> <b>${v}</b></span>`).join("");
+}
+
+let lastRows = -1, lastRowSel = null;
+function renderChunkTable() {
+  if (S.chunks.length === lastRows && S.sel === lastRowSel) return;
+  lastRows = S.chunks.length; lastRowSel = S.sel;
+  const rows = S.chunks.slice(-400).reverse().map((c) => {
+    const o = c.obs, sel = o && o.i === S.sel ? ' class="sel"' : "";
+    return `<tr${sel} data-i="${o ? o.i : ""}"><td>${fmt(rel(c.t), 2)}</td><td>${o ? o.i : "?"}</td><td>${o && o.must_go ? "●" : ""}</td>
+      <td>${c.step0}–${c.step0 + c.actions.length - 1}</td><td>${o ? fmt((c.t - o.t) * 1000, 0) : "–"}</td><td>${o ? fmt(o.send_ms, 0) : "–"}</td>
+      <td>${c.stale}</td><td>${c.queue_before}→${c.queue_after}</td></tr>`;
+  });
+  $("chunkRows").innerHTML = rows.join("");
+}
+
+// ---------- tooltip ----------
+function showTip(ev, text) {
+  const t = $("tip"); if (!text) return hideTip();
+  t.textContent = text; t.style.display = "block";
+  const x = Math.min(ev.clientX + 14, window.innerWidth - t.offsetWidth - 8);
+  t.style.left = x + "px"; t.style.top = (ev.clientY + 14) + "px";
+}
+function hideTip() { $("tip").style.display = "none"; }
+
+// ---------- interaction ----------
+const tl = $("timeline"); let drag = null;
+tl.addEventListener("wheel", (ev) => {
+  if (!S.view) return; ev.preventDefault(); setFollow(false);
+  const r = tl.getBoundingClientRect(), W = tl.clientWidth, [v0, v1] = S.view;
+  const t = v0 + (ev.clientX - r.left - GUT) / (W - GUT - 8) * (v1 - v0), k = Math.exp(ev.deltaY * 0.0015);
+  S.view = [t - (t - v0) * k, t + (v1 - t) * k]; S.dirty = true;
+}, { passive: false });
+tl.addEventListener("mousedown", (ev) => { drag = { x: ev.clientX, view: S.view && [...S.view], moved: false }; });
+window.addEventListener("mouseup", (ev) => {
+  if (drag && !drag.moved && ev.target === tl) {
+    const r = tl.getBoundingClientRect(), h = timelineHit(ev.clientX - r.left, ev.clientY - r.top);
+    if (h) {
+      setFollow(false);
+      if (h.hit && h.hit.kind === "obs") selectObs(h.hit.o.i);
+      else if (h.hit && h.hit.kind === "chunk") selectObs(h.hit.c.obs.i);
+      else { let best = null, bd = Infinity; for (const o of S.obs) if (o && Math.abs(o.t - h.t) < bd) { bd = Math.abs(o.t - h.t); best = o; } if (best) selectObs(best.i); }
+    }
+  }
+  drag = null;
+});
+window.addEventListener("mousemove", (ev) => {
+  if (drag && drag.view) {
+    const dx = ev.clientX - drag.x; if (Math.abs(dx) > 3) { drag.moved = true; setFollow(false); }
+    if (drag.moved) { const [v0, v1] = drag.view, dt = dx / (tl.clientWidth - GUT - 8) * (v1 - v0); S.view = [v0 - dt, v1 - dt]; S.dirty = true; }
+  }
+});
+tl.addEventListener("mousemove", (ev) => {
+  if (drag && drag.moved) return hideTip();
+  const r = tl.getBoundingClientRect(); showTip(ev, describeHit(timelineHit(ev.clientX - r.left, ev.clientY - r.top)));
+});
+tl.addEventListener("mouseleave", hideTip);
+tl.addEventListener("dblclick", () => { setFollow(false); fitAll(); S.dirty = true; });
+$("btnFollow").onclick = () => setFollow(!S.follow);
+$("btnFit").onclick = () => { setFollow(false); fitAll(); S.dirty = true; };
+$("btnPrev").onclick = () => stepSel(-1);
+$("btnNext").onclick = () => stepSel(1);
+$("chkAll").onchange = (e) => { S.showAll = e.target.checked; S.dirty = true; };
+$("chunkRows").addEventListener("click", (ev) => { const tr = ev.target.closest("tr"); if (tr && tr.dataset.i !== "") { setFollow(false); selectObs(+tr.dataset.i); const t = S.obs[+tr.dataset.i].t, w = S.view[1] - S.view[0]; S.view = [t - w / 2, t + w / 2]; } });
+$("btnTheme").onclick = () => {
+  const root = document.documentElement, dark = matchMedia("(prefers-color-scheme: dark)").matches;
+  const cur = root.dataset.theme || (dark ? "dark" : "light"); root.dataset.theme = cur === "dark" ? "light" : "dark";
+  try { localStorage.setItem("vizTheme", root.dataset.theme); } catch (e) {}
+  S.dirty = true;
+};
+try { const t = localStorage.getItem("vizTheme"); if (t) document.documentElement.dataset.theme = t; } catch (e) {}
+window.addEventListener("keydown", (ev) => {
+  if (ev.key === "ArrowLeft") { stepSel(-1); ev.preventDefault(); }
+  if (ev.key === "ArrowRight") { stepSel(1); ev.preventDefault(); }
+});
+window.addEventListener("resize", () => { S.dirty = true; });
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => { S.dirty = true; });
+
+function frame() {
+  if (S.dirty && S.meta) {
+    S.dirty = false;
+    drawTimeline(); drawJoints(); renderStats(); renderChunkTable();
+    if (S.follow) renderSelection();
+  }
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+poll();
+</script>
+</body>
+</html>
