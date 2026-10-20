@@ -1,0 +1,121 @@
+DEBUG 2026-10-20 14:32:33 formatter.py:57 action type: None, Result: , nargs: 0, default metavar: None
+DEBUG 2026-10-20 14:32:33 formatter.py:57 action type: <class 'str'>, Result: str, nargs: None, default metavar: None
+DEBUG 2026-10-20 14:32:33 _wrapper.py:181 wrapped field at policy_type has a default value of None
+DEBUG 2026-10-20 14:32:33 _wrapper.py:181 wrapped field at pretrained_name_or_path has a default value of None
+DEBUG 2026-10-20 14:32:33 _wrapper.py:181 wrapped field at actions_per_chunk has a default value of None
+DEBUG 2026-10-20 14:32:33 _wrapper.py:181 wrapped field at task has a default value of 
+DEBUG 2026-10-20 14:32:33 _wrapper.py:181 wrapped field at server_address has a default value of localhost:8080
+DEBUG 2026-10-20 14:32:33 _wrapper.py:181 wrapped field at policy_device has a default value of cpu
+DEBUG 2026-10-20 14:32:33 _wrapper.py:181 wrapped field at client_device has a default value of cpu
+DEBUG 2026-10-20 14:32:33 _wrapper.py:181 wrapped field at chunk_size_threshold has a default value of 0.5
+DEBUG 2026-10-20 14:32:33 _wrapper.py:181 wrapped field at fps has a default value of 30
+DEBUG 2026-10-20 14:32:33 _wrapper.py:181 wrapped field at aggregate_fn_name has a default value of weighted_average
+DEBUG 2026-10-20 14:32:33 _wrapper.py:181 wrapped field at debug_visualize_queue_size has a default value of False
+DEBUG 2026-10-20 14:32:33 _wrapper.py:181 wrapped field at robot.port has a default value of None
+DEBUG 2026-10-20 14:32:33 _wrapper.py:181 wrapped field at robot.disable_torque_on_disconnect has a default value of True
+DEBUG 2026-10-20 14:32:33 _wrapper.py:214 wrapped field at robot.max_relative_target has a default value of None
+DEBUG 2026-10-20 14:32:33 _wrapper.py:214 wrapped field at robot.cameras has a default value of {}
+DEBUG 2026-10-20 14:32:33 _wrapper.py:181 wrapped field at robot.use_degrees has a default value of True
+DEBUG 2026-10-20 14:32:33 _wrapper.py:181 wrapped field at robot.position_p_coefficient has a default value of 16
+DEBUG 2026-10-20 14:32:33 _wrapper.py:181 wrapped field at robot.position_i_coefficient has a default value of 0
+DEBUG 2026-10-20 14:32:33 _wrapper.py:181 wrapped field at robot.position_d_coefficient has a default value of 32
+DEBUG 2026-10-20 14:32:33 _wrapper.py:181 wrapped field at robot.num_read_retries has a default value of 2
+DEBUG 2026-10-20 14:32:33 _wrapper.py:214 wrapped field at robot.id has a default value of None
+DEBUG 2026-10-20 14:32:33 _wrapper.py:214 wrapped field at robot.calibration_dir has a default value of None
+DEBUG 2026-10-20 14:32:33 _wrapper.py:181 wrapped field at robot.port has a default value of None
+DEBUG 2026-10-20 14:32:33 _wrapper.py:181 wrapped field at robot.disable_torque_on_disconnect has a default value of True
+DEBUG 2026-10-20 14:32:33 _wrapper.py:214 wrapped field at robot.max_relative_target has a default value of None
+DEBUG 2026-10-20 14:32:33 _wrapper.py:214 wrapped field at robot.cameras has a default value of {}
+DEBUG 2026-10-20 14:32:33 _wrapper.py:181 wrapped field at robot.use_degrees has a default value of True
+DEBUG 2026-10-20 14:32:33 _wrapper.py:181 wrapped field at robot.position_p_coefficient has a default value of 16
+DEBUG 2026-10-20 14:32:33 _wrapper.py:181 wrapped field at robot.position_i_coefficient has a default value of 0
+DEBUG 2026-10-20 14:32:33 _wrapper.py:181 wrapped field at robot.position_d_coefficient has a default value of 32
+DEBUG 2026-10-20 14:32:33 _wrapper.py:181 wrapped field at robot.num_read_retries has a default value of 2
+DEBUG 2026-10-20 14:32:33 _wrapper.py:214 wrapped field at robot.id has a default value of None
+DEBUG 2026-10-20 14:32:33 _wrapper.py:214 wrapped field at robot.calibration_dir has a default value of None
+DEBUG 2026-10-20 14:32:33 _wrapper.py:214 wrapped field at robot.id has a default value of None
+DEBUG 2026-10-20 14:32:33 _wrapper.py:214 wrapped field at robot.calibration_dir has a default value of None
+DEBUG 2026-10-20 14:32:33 _wrapper.py:181 wrapped field at robot.left_arm_config.port has a default value of None
+DEBUG 2026-10-20 14:32:33 _wrapper.py:181 wrapped field at robot.left_arm_config.disable_torque_on_disconnect has a default value of True
+DEBUG 2026-10-20 14:32:33 _wrapper.py:214 wrapped field at robot.left_arm_config.max_relative_target has a default value of None
+DEBUG 2026-10-20 14:32:33 _wrapper.py:214 wrapped field at robot.left_arm_config.cameras has a default value of {}
+DEBUG 2026-10-20 14:32:33 _wrapper.py:181 wrapped field at robot.left_arm_config.use_degrees has a default value of True
+DEBUG 2026-10-20 14:32:33 _wrapper.py:181 wrapped field at robot.left_arm_config.position_p_coefficient has a default value of 16
+DEBUG 2026-10-20 14:32:33 _wrapper.py:181 wrapped field at robot.left_arm_config.position_i_coefficient has a default value of 0
+DEBUG 2026-10-20 14:32:33 _wrapper.py:181 wrapped field at robot.left_arm_config.position_d_coefficient has a default value of 32
+DEBUG 2026-10-20 14:32:33 _wrapper.py:181 wrapped field at robot.left_arm_config.num_read_retries has a default value of 2
+DEBUG 2026-10-20 14:32:33 _wrapper.py:181 wrapped field at robot.right_arm_config.port has a default value of None
+DEBUG 2026-10-20 14:32:33 _wrapper.py:181 wrapped field at robot.right_arm_config.disable_torque_on_disconnect has a default value of True
+DEBUG 2026-10-20 14:32:33 _wrapper.py:214 wrapped field at robot.right_arm_config.max_relative_target has a default value of None
+DEBUG 2026-10-20 14:32:33 _wrapper.py:214 wrapped field at robot.right_arm_config.cameras has a default value of {}
+DEBUG 2026-10-20 14:32:33 _wrapper.py:181 wrapped field at robot.right_arm_config.use_degrees has a default value of True
+DEBUG 2026-10-20 14:32:33 _wrapper.py:181 wrapped field at robot.right_arm_config.position_p_coefficient has a default value of 16
+DEBUG 2026-10-20 14:32:33 _wrapper.py:181 wrapped field at robot.right_arm_config.position_i_coefficient has a default value of 0
+DEBUG 2026-10-20 14:32:33 _wrapper.py:181 wrapped field at robot.right_arm_config.position_d_coefficient has a default value of 32
+DEBUG 2026-10-20 14:32:33 _wrapper.py:181 wrapped field at robot.right_arm_config.num_read_retries has a default value of 2
+DEBUG 2026-10-20 14:32:33 _wrapper.py:214 wrapped field at robot.cameras has a default value of {}
+DEBUG 2026-10-20 14:32:33 _wrapper.py:214 wrapped field at robot.id has a default value of None
+DEBUG 2026-10-20 14:32:33 _wrapper.py:214 wrapped field at robot.calibration_dir has a default value of None
+DEBUG 2026-10-20 14:32:33 _wrapper.py:181 wrapped field at robot.port has a default value of None
+DEBUG 2026-10-20 14:32:33 _wrapper.py:181 wrapped field at robot.disable_torque_on_disconnect has a default value of True
+DEBUG 2026-10-20 14:32:33 _wrapper.py:214 wrapped field at robot.max_relative_target has a default value of None
+DEBUG 2026-10-20 14:32:33 _wrapper.py:214 wrapped field at robot.cameras has a default value of {}
+DEBUG 2026-10-20 14:32:33 _wrapper.py:181 wrapped field at robot.use_degrees has a default value of False
+DEBUG 2026-10-20 14:32:33 _wrapper.py:214 wrapped field at robot.id has a default value of None
+DEBUG 2026-10-20 14:32:33 _wrapper.py:214 wrapped field at robot.calibration_dir has a default value of None
+DEBUG 2026-10-20 14:32:33 _wrapper.py:181 wrapped field at robot.port has a default value of None
+DEBUG 2026-10-20 14:32:33 _wrapper.py:181 wrapped field at robot.disable_torque_on_disconnect has a default value of True
+DEBUG 2026-10-20 14:32:33 _wrapper.py:214 wrapped field at robot.max_relative_target has a default value of None
+DEBUG 2026-10-20 14:32:33 _wrapper.py:214 wrapped field at robot.cameras has a default value of {}
+DEBUG 2026-10-20 14:32:33 _wrapper.py:181 wrapped field at robot.use_degrees has a default value of False
+DEBUG 2026-10-20 14:32:33 formatter.py:57 action type: <class 'str'>, Result: str, nargs: None, default metavar: None
+DEBUG 2026-10-20 14:32:33 docstring.py:65 Couldn't find source: could not find class definition
+DEBUG 2026-10-20 14:32:33 ocstring.py:298 Warning: Unable to parse attribute docstring:     def __post_init__(self):
+DEBUG 2026-10-20 14:32:33 ocstring.py:298 Warning: Unable to parse attribute docstring:     def __post_init__(self):
+DEBUG 2026-10-20 14:32:33 ocstring.py:298 Warning: Unable to parse attribute docstring:     def __post_init__(self):
+DEBUG 2026-10-20 14:32:33 formatter.py:57 action type: <class 'str'>, Result: str, nargs: None, default metavar: None
+DEBUG 2026-10-20 14:32:33 formatter.py:57 action type: <class 'str'>, Result: str, nargs: None, default metavar: None
+DEBUG 2026-10-20 14:32:33 formatter.py:57 action type: <class 'str'>, Result: str, nargs: None, default metavar: None
+DEBUG 2026-10-20 14:32:33 formatter.py:57 action type: <class 'str'>, Result: str, nargs: None, default metavar: None
+DEBUG 2026-10-20 14:32:33 ocstring.py:298 Warning: Unable to parse attribute docstring:     def __post_init__(self):
+DEBUG 2026-10-20 14:32:33 ocstring.py:298 Warning: Unable to parse attribute docstring:     def __post_init__(self):
+DEBUG 2026-10-20 14:32:33 ocstring.py:298 Warning: Unable to parse attribute docstring:         default="cpu",
+DEBUG 2026-10-20 14:32:33 ocstring.py:298 Warning: Unable to parse attribute docstring:         default="weighted_average",
+DEBUG 2026-10-20 14:32:33 ocstring.py:298 Warning: Unable to parse attribute docstring:         default=False, metadata={"help": "Visualize the action queue size"}
+DEBUG 2026-10-20 14:32:33 gparsing.py:152 
+POST PROCESSING
+
+DEBUG 2026-10-20 14:32:33 gparsing.py:153 (raw) parsed args: Namespace(task='pick up the red cube', server_address='127.0.0.1:9000', **{'robot.port': 'COM7'})
+DEBUG 2026-10-20 14:32:33 decoding.py:130 from_dict for <class 'lerobot.async_inference.configs.RobotClientConfig'>
+DEBUG 2026-10-20 14:32:33 decoding.py:150 Decode name = policy_type, type = <class 'str'>
+DEBUG 2026-10-20 14:32:33 decoding.py:150 Decode name = pretrained_name_or_path, type = <class 'str'>
+DEBUG 2026-10-20 14:32:33 decoding.py:150 Decode name = robot, type = <class 'lerobot.robots.config.RobotConfig'>
+DEBUG 2026-10-20 14:32:33 decoding.py:130 from_dict for <class 'lerobot.robots.so_follower.config_so_follower.SOFollowerRobotConfig'>
+DEBUG 2026-10-20 14:32:33 decoding.py:150 Decode name = port, type = <class 'str'>
+DEBUG 2026-10-20 14:32:33 decoding.py:150 Decode name = max_relative_target, type = typing.Union[float, dict[str, float], NoneType]
+DEBUG 2026-10-20 14:32:33 decoding.py:313 Decoding a Union field: typing.Union[float, dict[str, float], NoneType]
+DEBUG 2026-10-20 14:32:33 decoding.py:281 Decoding a Dict field: dict[str, float]
+DEBUG 2026-10-20 14:32:33 decoding.py:150 Decode name = cameras, type = dict[str, lerobot.cameras.configs.CameraConfig]
+DEBUG 2026-10-20 14:32:33 decoding.py:281 Decoding a Dict field: dict[str, lerobot.cameras.configs.CameraConfig]
+DEBUG 2026-10-20 14:32:33 decoding.py:130 from_dict for <class 'lerobot.cameras.opencv.configuration_opencv.OpenCVCameraConfig'>
+DEBUG 2026-10-20 14:32:33 decoding.py:150 Decode name = fps, type = typing.Optional[int]
+DEBUG 2026-10-20 14:32:33 decoding.py:313 Decoding a Union field: typing.Optional[int]
+DEBUG 2026-10-20 14:32:33 decoding.py:150 Decode name = width, type = typing.Optional[int]
+DEBUG 2026-10-20 14:32:33 decoding.py:150 Decode name = height, type = typing.Optional[int]
+DEBUG 2026-10-20 14:32:33 decoding.py:150 Decode name = index_or_path, type = typing.Union[int, pathlib.Path]
+DEBUG 2026-10-20 14:32:33 decoding.py:313 Decoding a Union field: typing.Union[int, pathlib.Path]
+DEBUG 2026-10-20 14:32:33 decoding.py:130 from_dict for <class 'lerobot.cameras.opencv.configuration_opencv.OpenCVCameraConfig'>
+DEBUG 2026-10-20 14:32:33 decoding.py:150 Decode name = fps, type = typing.Optional[int]
+DEBUG 2026-10-20 14:32:33 decoding.py:150 Decode name = width, type = typing.Optional[int]
+DEBUG 2026-10-20 14:32:33 decoding.py:150 Decode name = height, type = typing.Optional[int]
+DEBUG 2026-10-20 14:32:33 decoding.py:150 Decode name = index_or_path, type = typing.Union[int, pathlib.Path]
+DEBUG 2026-10-20 14:32:33 decoding.py:150 Decode name = use_degrees, type = <class 'bool'>
+DEBUG 2026-10-20 14:32:33 decoding.py:150 Decode name = id, type = typing.Optional[str]
+DEBUG 2026-10-20 14:32:33 decoding.py:313 Decoding a Union field: typing.Optional[str]
+DEBUG 2026-10-20 14:32:33 decoding.py:150 Decode name = actions_per_chunk, type = <class 'int'>
+DEBUG 2026-10-20 14:32:33 decoding.py:150 Decode name = task, type = <class 'str'>
+DEBUG 2026-10-20 14:32:33 decoding.py:150 Decode name = server_address, type = <class 'str'>
+DEBUG 2026-10-20 14:32:33 decoding.py:150 Decode name = policy_device, type = <class 'str'>
+DEBUG 2026-10-20 14:32:33 decoding.py:150 Decode name = chunk_size_threshold, type = <class 'float'>
+DEBUG 2026-10-20 14:32:33 decoding.py:150 Decode name = fps, type = <class 'int'>
+DEBUG 2026-10-20 14:32:33 decoding.py:150 Decode name = aggregate_fn_name, type = <class 'str'>

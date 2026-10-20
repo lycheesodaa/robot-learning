@@ -1,0 +1,48 @@
+{
+  "checked_on": "2026-10-05",
+  "automatic_download": false,
+  "sources": [
+    {
+      "name": "SafeLIBERO",
+      "kind": "evaluation_benchmark",
+      "repo_id": "THURCSCT/SafeLIBERO",
+      "url": "https://huggingface.co/datasets/THURCSCT/SafeLIBERO",
+      "priority": 1
+    },
+    {
+      "name": "LIBERO-Safety",
+      "kind": "safe_demonstrations_and_benchmark",
+      "repo_id": "LIBERO-Safety/libero_safety",
+      "url": "https://github.com/LIBERO-SAFETY/LIBERO-Safety",
+      "priority": 2
+    },
+    {
+      "name": "MolmoAct2-LIBERO",
+      "kind": "ordinary_demonstrations",
+      "repo_id": "allenai/MolmoAct2-LIBERO-Dataset",
+      "url": "https://huggingface.co/datasets/allenai/MolmoAct2-LIBERO-Dataset",
+      "priority": 2
+    },
+    {
+      "name": "SO-100/101 collection",
+      "kind": "embodiment_adaptation",
+      "repo_id": null,
+      "url": "https://huggingface.co/collections/allenai/molmoact2-datasets",
+      "priority": 2
+    },
+    {
+      "name": "SafeVLA-Bench",
+      "kind": "evaluation_specifications",
+      "repo_id": null,
+      "url": "https://safevla.org/",
+      "priority": 3
+    },
+    {
+      "name": "Safety-CHORES",
+      "kind": "mobile_manipulation_benchmark",
+      "repo_id": null,
+      "url": "https://safevla.github.io/",
+      "priority": 3
+    }
+  ]
+}

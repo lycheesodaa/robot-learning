@@ -1,0 +1,18 @@
+{
+  "libero": {
+    "repository": "https://github.com/Lifelong-Robot-Learning/LIBERO.git",
+    "revision": "8f1084e3132a39270c3a13ebe37270a43ece2a01"
+  },
+  "safelibero": {
+    "repository": "https://github.com/THU-RCSCT/vlsa-aegis.git",
+    "revision": "2457feed5968ae803926e178c8ce8243b9ecdcf9"
+  },
+  "libero_safety": {
+    "repository": "https://github.com/LIBERO-SAFETY/LIBERO-Safety.git",
+    "revision": "19ec8df23eedfbb9265bafd3e56495fcebfcfcd0"
+  },
+  "lerobot": {
+    "repository": "https://github.com/allenai/lerobot.git",
+    "revision": "28b4f721f931aab554cb176412223f098023705f"
+  }
+}

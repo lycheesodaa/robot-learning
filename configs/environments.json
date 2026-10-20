@@ -1,0 +1,25 @@
+{
+  "libero": {
+    "adapter": "LiberoEnvironment",
+    "camera_order": [
+      "agentview_image",
+      "robot0_eye_in_hand_image"
+    ],
+    "settle_steps": 50,
+    "suite": "libero_goal",
+    "policy_url": "http://127.0.0.1:8000/predict"
+  },
+  "safelibero": {
+    "adapter": "LiberoEnvironment",
+    "suite": "safelibero_spatial",
+    "safety_level": "I",
+    "policy_url": "http://127.0.0.1:8000/predict"
+  },
+  "so101": {
+    "adapter": "SO101Environment",
+    "mode": "recorded_observations",
+    "calibration": null,
+    "cameras": null,
+    "live_execution": false
+  }
+}

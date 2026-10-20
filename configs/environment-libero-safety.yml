@@ -1,0 +1,6 @@
+name: vla-safety-libero-safety
+channels:
+  - conda-forge
+dependencies:
+  - python=3.8.13
+  - pip=24.3.1

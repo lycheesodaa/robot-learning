@@ -1,0 +1,777 @@
+DEBUG 2026-10-20 14:21:14 formatter.py:57 action type: None, Result: , nargs: 0, default metavar: None
+DEBUG 2026-10-20 14:21:14 formatter.py:57 action type: <class 'str'>, Result: str, nargs: None, default metavar: None
+DEBUG 2026-10-20 14:21:14 _wrapper.py:181 wrapped field at host has a default value of localhost
+DEBUG 2026-10-20 14:21:14 _wrapper.py:181 wrapped field at port has a default value of 8080
+DEBUG 2026-10-20 14:21:14 _wrapper.py:181 wrapped field at fps has a default value of 30
+DEBUG 2026-10-20 14:21:14 _wrapper.py:181 wrapped field at inference_latency has a default value of 0.03333333333333333
+DEBUG 2026-10-20 14:21:14 _wrapper.py:181 wrapped field at obs_queue_timeout has a default value of 2
+DEBUG 2026-10-20 14:21:14 ocstring.py:298 Warning: Unable to parse attribute docstring:         default=DEFAULT_INFERENCE_LATENCY, metadata={"help": "Target inference latency in seconds"}
+DEBUG 2026-10-20 14:21:14 ocstring.py:298 Warning: Unable to parse attribute docstring:         default=DEFAULT_OBS_QUEUE_TIMEOUT, metadata={"help": "Timeout for observation queue in seconds"}
+DEBUG 2026-10-20 14:21:14 gparsing.py:152 
+POST PROCESSING
+
+DEBUG 2026-10-20 14:21:14 gparsing.py:153 (raw) parsed args: Namespace(host='127.0.0.1', port='8080', fps='30')
+DEBUG 2026-10-20 14:21:14 decoding.py:130 from_dict for <class 'lerobot.async_inference.configs.PolicyServerConfig'>
+DEBUG 2026-10-20 14:21:14 decoding.py:150 Decode name = host, type = <class 'str'>
+DEBUG 2026-10-20 14:21:14 decoding.py:150 Decode name = port, type = <class 'int'>
+DEBUG 2026-10-20 14:21:14 decoding.py:150 Decode name = fps, type = <class 'int'>
+INFO 2026-10-20 14:21:14 y_server.py:420 {'fps': 30,
+ 'host': '127.0.0.1',
+ 'inference_latency': 0.03333333333333333,
+ 'obs_queue_timeout': 2,
+ 'port': 8080}
+INFO 2026-10-20 14:21:14 y_server.py:430 PolicyServer started on 127.0.0.1:8080
+INFO 2026-10-20 14:57:06 y_server.py:110 Client ipv4:127.0.0.1:50524 connected and ready
+INFO 2026-10-20 14:57:06 y_server.py:136 Receiving policy instructions from ipv4:127.0.0.1:50524 | Policy type: molmoact2 | Pretrained name or path: lerobot/MolmoAct2-SO100_101-LeRobot | Actions per chunk: 30 | Device: cuda
+DEBUG 2026-10-20 14:57:06 re/_trace.py:47 connect_tcp.started host='huggingface.co' port=443 local_address=None timeout=10 socket_options=None
+DEBUG 2026-10-20 14:57:06 re/_trace.py:47 connect_tcp.complete return_value=<httpcore._backends.sync.SyncStream object at 0x7411b7d6c2c0>
+DEBUG 2026-10-20 14:57:06 re/_trace.py:47 start_tls.started ssl_context=<ssl.SSLContext object at 0x7411b7d5d2d0> server_hostname='huggingface.co' timeout=10
+DEBUG 2026-10-20 14:57:06 re/_trace.py:47 start_tls.complete return_value=<httpcore._backends.sync.SyncStream object at 0x7411bc0b5b50>
+DEBUG 2026-10-20 14:57:06 re/_trace.py:47 send_request_headers.started request=<Request [b'HEAD']>
+DEBUG 2026-10-20 14:57:06 re/_trace.py:47 send_request_headers.complete
+DEBUG 2026-10-20 14:57:06 re/_trace.py:47 send_request_body.started request=<Request [b'HEAD']>
+DEBUG 2026-10-20 14:57:06 re/_trace.py:47 send_request_body.complete
+DEBUG 2026-10-20 14:57:06 re/_trace.py:47 receive_response_headers.started request=<Request [b'HEAD']>
+DEBUG 2026-10-20 14:57:07 re/_trace.py:47 receive_response_headers.complete return_value=(b'HTTP/1.1', 307, b'Temporary Redirect', [(b'Content-Type', b'text/plain; charset=utf-8'), (b'Content-Length', b'274'), (b'Connection', b'keep-alive'), (b'Date', b'Tue, 20 Oct 2026 06:57:07 GMT'), (b'Location', b'/api/resolve-cache/models/lerobot/MolmoAct2-SO100_101-LeRobot/a4ab68081b84bb0659d96f454edbce6abbe8a1cd/config.json?%2Flerobot%2FMolmoAct2-SO100_101-LeRobot%2Fresolve%2Fmain%2Fconfig.json=&etag=%220447e5e3d2263d681345171d5d30600ee598b048%22'), (b'X-Powered-By', b'huggingface-moon'), (b'X-Request-Id', b'Root=1-6ad710c3-7bc8bbc73569569335887db1;bdbc2dfc-0400-41e7-a170-f5cc3e6358b5'), (b'RateLimit', b'"resolvers";r=4999;t=68'), (b'RateLimit-Policy', b'"fixed window";"resolvers";q=5000;w=300'), (b'cross-origin-opener-policy', b'same-origin'), (b'Referrer-Policy', b'strict-origin-when-cross-origin'), (b'Access-Control-Max-Age', b'86400'), (b'Access-Control-Allow-Origin', b'https://huggingface.co'), (b'Vary', b'Origin, Accept'), (b'Access-Control-Expose-Headers', b'X-Repo-Commit,X-Request-Id,X-Error-Code,X-Error-Message,X-Total-Count,ETag,Link,Accept-Ranges,Content-Range,X-Linked-Size,X-Linked-ETag,X-Xet-Hash'), (b'X-Repo-Commit', b'a4ab68081b84bb0659d96f454edbce6abbe8a1cd'), (b'Accept-Ranges', b'bytes'), (b'X-Hub-Cache', b'MISS'), (b'Content-Disposition', b'inline; filename*=UTF-8\'\'config.json; filename="config.json";'), (b'Content-Security-Policy', b"default-src 'none'; sandbox"), (b'X-Linked-ETag', b'"0447e5e3d2263d681345171d5d30600ee598b048"'), (b'X-Cache', b'Miss from cloudfront'), (b'Via', b'1.1 dbe822c7520b46f4c49e2849274ac460.cloudfront.net (CloudFront)'), (b'X-Amz-Cf-Pop', b'SIN2-P7'), (b'Alt-Svc', b'h3=":443"; ma=86400'), (b'X-Amz-Cf-Id', b'2VLA3zxzWEzDBiT3ojMFHacHI4LlOOchJdDQiVY8o7A3-Yl88iNP6w=='), (b'Strict-Transport-Security', b'max-age=31536000')])
+DEBUG 2026-10-20 14:57:07 re/_trace.py:47 receive_response_body.started request=<Request [b'HEAD']>
+DEBUG 2026-10-20 14:57:07 re/_trace.py:47 receive_response_body.complete
+DEBUG 2026-10-20 14:57:07 re/_trace.py:47 response_closed.started
+DEBUG 2026-10-20 14:57:07 re/_trace.py:47 response_closed.complete
+DEBUG 2026-10-20 14:57:07 re/_trace.py:47 send_request_headers.started request=<Request [b'HEAD']>
+DEBUG 2026-10-20 14:57:07 re/_trace.py:47 send_request_headers.complete
+DEBUG 2026-10-20 14:57:07 re/_trace.py:47 send_request_body.started request=<Request [b'HEAD']>
+DEBUG 2026-10-20 14:57:07 re/_trace.py:47 send_request_body.complete
+DEBUG 2026-10-20 14:57:07 re/_trace.py:47 receive_response_headers.started request=<Request [b'HEAD']>
+DEBUG 2026-10-20 14:57:07 re/_trace.py:47 receive_response_headers.complete return_value=(b'HTTP/1.1', 200, b'OK', [(b'Content-Type', b'text/plain; charset=utf-8'), (b'Content-Length', b'3435'), (b'Connection', b'keep-alive'), (b'Date', b'Tue, 20 Oct 2026 06:19:18 GMT'), (b'ETag', b'"0447e5e3d2263d681345171d5d30600ee598b048"'), (b'X-Powered-By', b'huggingface-moon'), (b'X-Request-Id', b'Root=1-6ad707e6-5368f35c7ea94f1a1667e75f;ef18048d-bddd-4041-8815-28652d86d812'), (b'RateLimit', b'"resolvers";r=4998;t=237'), (b'RateLimit-Policy', b'"fixed window";"resolvers";q=5000;w=300'), (b'cross-origin-opener-policy', b'same-origin'), (b'Referrer-Policy', b'strict-origin-when-cross-origin'), (b'Access-Control-Max-Age', b'86400'), (b'Access-Control-Allow-Origin', b'https://huggingface.co'), (b'Access-Control-Expose-Headers', b'X-Repo-Commit,X-Request-Id,X-Error-Code,X-Error-Message,X-Total-Count,ETag,Link,Accept-Ranges,Content-Range,X-Linked-Size,X-Linked-ETag,X-Xet-Hash'), (b'X-Repo-Commit', b'a4ab68081b84bb0659d96f454edbce6abbe8a1cd'), (b'Accept-Ranges', b'bytes'), (b'X-Hub-Cache', b'MISS'), (b'Content-Disposition', b'inline; filename*=UTF-8\'\'config.json; filename="config.json";'), (b'Content-Security-Policy', b"default-src 'none'; sandbox"), (b'Vary', b'Origin'), (b'X-Cache', b'Hit from cloudfront'), (b'Via', b'1.1 dbe822c7520b46f4c49e2849274ac460.cloudfront.net (CloudFront)'), (b'X-Amz-Cf-Pop', b'SIN2-P7'), (b'Alt-Svc', b'h3=":443"; ma=86400'), (b'X-Amz-Cf-Id', b'6cWQhwouyOV7sGpSQq_fwaK2whTIJusYROTiY7e8z-BylQ6sGqs2Kw=='), (b'Age', b'2269'), (b'Strict-Transport-Security', b'max-age=31536000')])
+DEBUG 2026-10-20 14:57:07 re/_trace.py:47 receive_response_body.started request=<Request [b'HEAD']>
+DEBUG 2026-10-20 14:57:07 re/_trace.py:47 receive_response_body.complete
+DEBUG 2026-10-20 14:57:07 re/_trace.py:47 response_closed.started
+DEBUG 2026-10-20 14:57:07 re/_trace.py:47 response_closed.complete
+DEBUG 2026-10-20 14:57:07 formatter.py:57 action type: None, Result: , nargs: 0, default metavar: None
+DEBUG 2026-10-20 14:57:07 formatter.py:57 action type: <class 'str'>, Result: str, nargs: None, default metavar: None
+DEBUG 2026-10-20 14:57:07 _wrapper.py:181 wrapped field at n_obs_steps has a default value of 1
+DEBUG 2026-10-20 14:57:07 _wrapper.py:214 wrapped field at input_features has a default value of {}
+DEBUG 2026-10-20 14:57:07 _wrapper.py:214 wrapped field at output_features has a default value of {}
+DEBUG 2026-10-20 14:57:07 _wrapper.py:214 wrapped field at device has a default value of None
+DEBUG 2026-10-20 14:57:07 _wrapper.py:181 wrapped field at use_amp has a default value of False
+DEBUG 2026-10-20 14:57:07 _wrapper.py:181 wrapped field at use_peft has a default value of False
+DEBUG 2026-10-20 14:57:07 _wrapper.py:181 wrapped field at push_to_hub has a default value of True
+DEBUG 2026-10-20 14:57:07 _wrapper.py:214 wrapped field at repo_id has a default value of None
+DEBUG 2026-10-20 14:57:07 _wrapper.py:214 wrapped field at private has a default value of None
+DEBUG 2026-10-20 14:57:07 _wrapper.py:214 wrapped field at tags has a default value of None
+DEBUG 2026-10-20 14:57:07 _wrapper.py:214 wrapped field at license has a default value of None
+DEBUG 2026-10-20 14:57:07 _wrapper.py:214 wrapped field at pretrained_path has a default value of None
+DEBUG 2026-10-20 14:57:07 _wrapper.py:214 wrapped field at pretrained_revision has a default value of None
+DEBUG 2026-10-20 14:57:07 _wrapper.py:181 wrapped field at checkpoint_path has a default value of allenai/MolmoAct2
+DEBUG 2026-10-20 14:57:07 _wrapper.py:214 wrapped field at checkpoint_revision has a default value of None
+DEBUG 2026-10-20 14:57:07 _wrapper.py:181 wrapped field at checkpoint_force_download has a default value of False
+DEBUG 2026-10-20 14:57:07 _wrapper.py:181 wrapped field at chunk_size has a default value of 30
+DEBUG 2026-10-20 14:57:07 _wrapper.py:181 wrapped field at n_action_steps has a default value of 30
+DEBUG 2026-10-20 14:57:07 _wrapper.py:181 wrapped field at action_mode has a default value of both
+DEBUG 2026-10-20 14:57:07 _wrapper.py:214 wrapped field at inference_action_mode has a default value of None
+DEBUG 2026-10-20 14:57:07 _wrapper.py:181 wrapped field at discrete_action_tokenizer has a default value of allenai/MolmoAct2-FAST-Tokenizer
+DEBUG 2026-10-20 14:57:07 _wrapper.py:214 wrapped field at discrete_generation_max_steps has a default value of None
+DEBUG 2026-10-20 14:57:07 _wrapper.py:214 wrapped field at norm_tag has a default value of None
+DEBUG 2026-10-20 14:57:07 _wrapper.py:181 wrapped field at setup_type has a default value of 
+DEBUG 2026-10-20 14:57:07 _wrapper.py:181 wrapped field at control_mode has a default value of 
+DEBUG 2026-10-20 14:57:07 _wrapper.py:214 wrapped field at image_keys has a default value of []
+DEBUG 2026-10-20 14:57:07 _wrapper.py:181 wrapped field at normalize_language has a default value of True
+DEBUG 2026-10-20 14:57:07 _wrapper.py:181 wrapped field at add_setup_tokens has a default value of True
+DEBUG 2026-10-20 14:57:07 _wrapper.py:181 wrapped field at add_control_tokens has a default value of True
+DEBUG 2026-10-20 14:57:07 _wrapper.py:181 wrapped field at normalize_gripper has a default value of False
+DEBUG 2026-10-20 14:57:07 _wrapper.py:181 wrapped field at num_state_tokens has a default value of 256
+DEBUG 2026-10-20 14:57:07 _wrapper.py:214 wrapped field at max_sequence_length has a default value of None
+DEBUG 2026-10-20 14:57:07 _wrapper.py:181 wrapped field at expected_max_action_dim has a default value of 32
+DEBUG 2026-10-20 14:57:07 _wrapper.py:181 wrapped field at num_flow_timesteps has a default value of 8
+DEBUG 2026-10-20 14:57:07 _wrapper.py:181 wrapped field at flow_matching_cutoff has a default value of 1.0
+DEBUG 2026-10-20 14:57:07 _wrapper.py:181 wrapped field at flow_matching_time_offset has a default value of 0.001
+DEBUG 2026-10-20 14:57:07 _wrapper.py:181 wrapped field at flow_matching_time_scale has a default value of 0.999
+DEBUG 2026-10-20 14:57:07 _wrapper.py:181 wrapped field at flow_matching_beta_alpha has a default value of 1.0
+DEBUG 2026-10-20 14:57:07 _wrapper.py:181 wrapped field at flow_matching_beta_beta has a default value of 1.5
+DEBUG 2026-10-20 14:57:07 _wrapper.py:214 wrapped field at num_inference_steps has a default value of None
+DEBUG 2026-10-20 14:57:07 _wrapper.py:181 wrapped field at mask_action_dim_padding has a default value of True
+DEBUG 2026-10-20 14:57:07 _wrapper.py:181 wrapped field at enable_inference_cuda_graph has a default value of True
+DEBUG 2026-10-20 14:57:07 _wrapper.py:181 wrapped field at per_episode_seed has a default value of False
+DEBUG 2026-10-20 14:57:07 _wrapper.py:214 wrapped field at eval_seed has a default value of None
+DEBUG 2026-10-20 14:57:07 _wrapper.py:214 wrapped field at joint_signs has a default value of None
+DEBUG 2026-10-20 14:57:07 _wrapper.py:214 wrapped field at joint_offsets has a default value of None
+DEBUG 2026-10-20 14:57:07 _wrapper.py:181 wrapped field at enable_lora_vlm has a default value of False
+DEBUG 2026-10-20 14:57:07 _wrapper.py:181 wrapped field at lora_rank has a default value of 64
+DEBUG 2026-10-20 14:57:07 _wrapper.py:181 wrapped field at lora_alpha has a default value of 16
+DEBUG 2026-10-20 14:57:07 _wrapper.py:181 wrapped field at lora_dropout has a default value of 0.05
+DEBUG 2026-10-20 14:57:07 _wrapper.py:181 wrapped field at lora_bias has a default value of none
+DEBUG 2026-10-20 14:57:07 _wrapper.py:181 wrapped field at enable_lora_action_expert has a default value of False
+DEBUG 2026-10-20 14:57:07 _wrapper.py:181 wrapped field at enable_knowledge_insulation has a default value of False
+DEBUG 2026-10-20 14:57:07 _wrapper.py:181 wrapped field at freeze_embedding has a default value of True
+DEBUG 2026-10-20 14:57:07 _wrapper.py:181 wrapped field at train_action_expert_only has a default value of False
+DEBUG 2026-10-20 14:57:07 _wrapper.py:181 wrapped field at gradient_checkpointing has a default value of False
+DEBUG 2026-10-20 14:57:07 _wrapper.py:181 wrapped field at model_dtype has a default value of bfloat16
+DEBUG 2026-10-20 14:57:07 _wrapper.py:181 wrapped field at softmax_auxiliary_loss has a default value of True
+DEBUG 2026-10-20 14:57:07 _wrapper.py:181 wrapped field at softmax_auxiliary_loss_scale has a default value of 0.0001
+DEBUG 2026-10-20 14:57:07 _wrapper.py:181 wrapped field at discrete_loss_token_weighting has a default value of root_subsegments_root_tokens
+DEBUG 2026-10-20 14:57:07 _wrapper.py:181 wrapped field at optimizer_lr has a default value of 1e-05
+DEBUG 2026-10-20 14:57:07 _wrapper.py:181 wrapped field at optimizer_vit_lr has a default value of 5e-06
+DEBUG 2026-10-20 14:57:07 _wrapper.py:181 wrapped field at optimizer_connector_lr has a default value of 5e-06
+DEBUG 2026-10-20 14:57:07 _wrapper.py:181 wrapped field at optimizer_action_expert_lr has a default value of 5e-05
+DEBUG 2026-10-20 14:57:07 _wrapper.py:214 wrapped field at optimizer_betas has a default value of (0.9, 0.95)
+DEBUG 2026-10-20 14:57:07 _wrapper.py:181 wrapped field at optimizer_eps has a default value of 1e-06
+DEBUG 2026-10-20 14:57:07 _wrapper.py:181 wrapped field at optimizer_weight_decay has a default value of 0.0
+DEBUG 2026-10-20 14:57:07 _wrapper.py:181 wrapped field at optimizer_grad_clip_norm has a default value of 1.0
+DEBUG 2026-10-20 14:57:07 _wrapper.py:181 wrapped field at scheduler_warmup_steps has a default value of 200
+DEBUG 2026-10-20 14:57:07 _wrapper.py:181 wrapped field at scheduler_decay_steps has a default value of 100000
+DEBUG 2026-10-20 14:57:07 _wrapper.py:181 wrapped field at scheduler_decay_lr has a default value of 1e-06
+DEBUG 2026-10-20 14:57:07 _wrapper.py:214 wrapped field at normalization_mapping has a default value of {'VISUAL': <NormalizationMode.IDENTITY: 'IDENTITY'>, 'STATE': <NormalizationMode.QUANTILES: 'QUANTILES'>, 'ACTION': <NormalizationMode.QUANTILES: 'QUANTILES'>}
+DEBUG 2026-10-20 14:57:07 _wrapper.py:214 wrapped field at dataset_feature_names has a default value of {}
+DEBUG 2026-10-20 14:57:07 ocstring.py:298 Warning: Unable to parse attribute docstring:     def __post_init__(self) -> None:
+DEBUG 2026-10-20 14:57:07 formatter.py:57 action type: <class 'str'>, Result: str, nargs: None, default metavar: None
+DEBUG 2026-10-20 14:57:07 _wrapper.py:181 wrapped field at rtc_config.enabled has a default value of True
+DEBUG 2026-10-20 14:57:07 _wrapper.py:214 wrapped field at rtc_config.prefix_attention_schedule has a default value of RTCAttentionSchedule.LINEAR
+DEBUG 2026-10-20 14:57:07 _wrapper.py:181 wrapped field at rtc_config.max_guidance_weight has a default value of 10.0
+DEBUG 2026-10-20 14:57:07 _wrapper.py:181 wrapped field at rtc_config.execution_horizon has a default value of 10
+DEBUG 2026-10-20 14:57:07 _wrapper.py:181 wrapped field at rtc_config.debug has a default value of False
+DEBUG 2026-10-20 14:57:07 _wrapper.py:181 wrapped field at rtc_config.debug_maxlen has a default value of 100
+DEBUG 2026-10-20 14:57:07 formatter.py:57 action type: <class 'str'>, Result: str, nargs: None, default metavar: None
+DEBUG 2026-10-20 14:57:07 ocstring.py:298 Warning: Unable to parse attribute docstring:     def __post_init__(self):
+DEBUG 2026-10-20 14:57:07 ocstring.py:298 Warning: Unable to parse attribute docstring:         default_factory=lambda: {
+DEBUG 2026-10-20 14:57:07 ocstring.py:298 Warning: Unable to parse attribute docstring:     def __post_init__(self) -> None:
+DEBUG 2026-10-20 14:57:07 gparsing.py:152 
+POST PROCESSING
+
+DEBUG 2026-10-20 14:57:07 gparsing.py:153 (raw) parsed args: Namespace()
+DEBUG 2026-10-20 14:57:07 decoding.py:130 from_dict for <class 'lerobot.policies.molmoact2.configuration_molmoact2.MolmoAct2Config'>
+DEBUG 2026-10-20 14:57:07 decoding.py:150 Decode name = n_obs_steps, type = <class 'int'>
+DEBUG 2026-10-20 14:57:07 decoding.py:150 Decode name = input_features, type = dict[str, lerobot.configs.types.PolicyFeature]
+DEBUG 2026-10-20 14:57:07 decoding.py:281 Decoding a Dict field: dict[str, lerobot.configs.types.PolicyFeature]
+DEBUG 2026-10-20 14:57:07 decoding.py:130 from_dict for <class 'lerobot.configs.types.PolicyFeature'>
+DEBUG 2026-10-20 14:57:07 decoding.py:150 Decode name = type, type = <enum 'FeatureType'>
+DEBUG 2026-10-20 14:57:07 decoding.py:150 Decode name = shape, type = tuple[int, ...]
+DEBUG 2026-10-20 14:57:07 decoding.py:295 Decoding a Tuple field: tuple[int, ...]
+DEBUG 2026-10-20 14:57:07 decoding.py:130 from_dict for <class 'lerobot.configs.types.PolicyFeature'>
+DEBUG 2026-10-20 14:57:07 decoding.py:150 Decode name = type, type = <enum 'FeatureType'>
+DEBUG 2026-10-20 14:57:07 decoding.py:150 Decode name = shape, type = tuple[int, ...]
+DEBUG 2026-10-20 14:57:07 decoding.py:130 from_dict for <class 'lerobot.configs.types.PolicyFeature'>
+DEBUG 2026-10-20 14:57:07 decoding.py:150 Decode name = type, type = <enum 'FeatureType'>
+DEBUG 2026-10-20 14:57:07 decoding.py:150 Decode name = shape, type = tuple[int, ...]
+DEBUG 2026-10-20 14:57:07 decoding.py:150 Decode name = output_features, type = dict[str, lerobot.configs.types.PolicyFeature]
+DEBUG 2026-10-20 14:57:07 decoding.py:130 from_dict for <class 'lerobot.configs.types.PolicyFeature'>
+DEBUG 2026-10-20 14:57:07 decoding.py:150 Decode name = type, type = <enum 'FeatureType'>
+DEBUG 2026-10-20 14:57:07 decoding.py:150 Decode name = shape, type = tuple[int, ...]
+DEBUG 2026-10-20 14:57:07 decoding.py:150 Decode name = device, type = typing.Optional[str]
+DEBUG 2026-10-20 14:57:07 decoding.py:313 Decoding a Union field: typing.Optional[str]
+DEBUG 2026-10-20 14:57:07 decoding.py:150 Decode name = use_amp, type = <class 'bool'>
+DEBUG 2026-10-20 14:57:07 decoding.py:150 Decode name = use_peft, type = <class 'bool'>
+DEBUG 2026-10-20 14:57:07 decoding.py:150 Decode name = push_to_hub, type = <class 'bool'>
+DEBUG 2026-10-20 14:57:07 decoding.py:150 Decode name = repo_id, type = typing.Optional[str]
+DEBUG 2026-10-20 14:57:07 decoding.py:150 Decode name = private, type = typing.Optional[bool]
+DEBUG 2026-10-20 14:57:07 decoding.py:313 Decoding a Union field: typing.Optional[bool]
+DEBUG 2026-10-20 14:57:07 decoding.py:150 Decode name = tags, type = typing.Optional[list[str]]
+DEBUG 2026-10-20 14:57:07 decoding.py:313 Decoding a Union field: typing.Optional[list[str]]
+DEBUG 2026-10-20 14:57:07 decoding.py:302 Decoding a List field: list[str]
+DEBUG 2026-10-20 14:57:07 decoding.py:150 Decode name = license, type = typing.Optional[str]
+DEBUG 2026-10-20 14:57:07 decoding.py:150 Decode name = pretrained_path, type = typing.Optional[pathlib.Path]
+DEBUG 2026-10-20 14:57:07 decoding.py:313 Decoding a Union field: typing.Optional[pathlib.Path]
+DEBUG 2026-10-20 14:57:07 decoding.py:150 Decode name = pretrained_revision, type = typing.Optional[str]
+DEBUG 2026-10-20 14:57:07 decoding.py:150 Decode name = checkpoint_path, type = <class 'str'>
+DEBUG 2026-10-20 14:57:07 decoding.py:150 Decode name = checkpoint_revision, type = typing.Optional[str]
+DEBUG 2026-10-20 14:57:07 decoding.py:150 Decode name = checkpoint_force_download, type = <class 'bool'>
+DEBUG 2026-10-20 14:57:07 decoding.py:150 Decode name = chunk_size, type = <class 'int'>
+DEBUG 2026-10-20 14:57:07 decoding.py:150 Decode name = n_action_steps, type = <class 'int'>
+DEBUG 2026-10-20 14:57:07 decoding.py:150 Decode name = action_mode, type = <class 'str'>
+DEBUG 2026-10-20 14:57:07 decoding.py:150 Decode name = inference_action_mode, type = typing.Optional[str]
+DEBUG 2026-10-20 14:57:07 decoding.py:150 Decode name = discrete_action_tokenizer, type = <class 'str'>
+DEBUG 2026-10-20 14:57:07 decoding.py:150 Decode name = discrete_generation_max_steps, type = typing.Optional[int]
+DEBUG 2026-10-20 14:57:07 decoding.py:313 Decoding a Union field: typing.Optional[int]
+DEBUG 2026-10-20 14:57:07 decoding.py:150 Decode name = norm_tag, type = typing.Optional[str]
+DEBUG 2026-10-20 14:57:07 decoding.py:150 Decode name = setup_type, type = <class 'str'>
+DEBUG 2026-10-20 14:57:07 decoding.py:150 Decode name = control_mode, type = <class 'str'>
+DEBUG 2026-10-20 14:57:07 decoding.py:150 Decode name = image_keys, type = list[str]
+DEBUG 2026-10-20 14:57:07 decoding.py:150 Decode name = normalize_language, type = <class 'bool'>
+DEBUG 2026-10-20 14:57:07 decoding.py:150 Decode name = add_setup_tokens, type = <class 'bool'>
+DEBUG 2026-10-20 14:57:07 decoding.py:150 Decode name = add_control_tokens, type = <class 'bool'>
+DEBUG 2026-10-20 14:57:07 decoding.py:150 Decode name = normalize_gripper, type = <class 'bool'>
+DEBUG 2026-10-20 14:57:07 decoding.py:150 Decode name = num_state_tokens, type = <class 'int'>
+DEBUG 2026-10-20 14:57:07 decoding.py:150 Decode name = max_sequence_length, type = typing.Optional[int]
+DEBUG 2026-10-20 14:57:07 decoding.py:150 Decode name = expected_max_action_dim, type = <class 'int'>
+DEBUG 2026-10-20 14:57:07 decoding.py:150 Decode name = num_flow_timesteps, type = <class 'int'>
+DEBUG 2026-10-20 14:57:07 decoding.py:150 Decode name = flow_matching_cutoff, type = <class 'float'>
+DEBUG 2026-10-20 14:57:07 decoding.py:150 Decode name = flow_matching_time_offset, type = <class 'float'>
+DEBUG 2026-10-20 14:57:07 decoding.py:150 Decode name = flow_matching_time_scale, type = <class 'float'>
+DEBUG 2026-10-20 14:57:07 decoding.py:150 Decode name = flow_matching_beta_alpha, type = <class 'float'>
+DEBUG 2026-10-20 14:57:07 decoding.py:150 Decode name = flow_matching_beta_beta, type = <class 'float'>
+DEBUG 2026-10-20 14:57:07 decoding.py:150 Decode name = num_inference_steps, type = typing.Optional[int]
+DEBUG 2026-10-20 14:57:07 decoding.py:150 Decode name = mask_action_dim_padding, type = <class 'bool'>
+DEBUG 2026-10-20 14:57:07 decoding.py:150 Decode name = enable_inference_cuda_graph, type = <class 'bool'>
+DEBUG 2026-10-20 14:57:07 decoding.py:150 Decode name = per_episode_seed, type = <class 'bool'>
+DEBUG 2026-10-20 14:57:07 decoding.py:150 Decode name = eval_seed, type = typing.Optional[int]
+DEBUG 2026-10-20 14:57:07 decoding.py:150 Decode name = rtc_config, type = typing.Optional[lerobot.policies.rtc.configuration_rtc.RTCConfig]
+DEBUG 2026-10-20 14:57:07 decoding.py:313 Decoding a Union field: typing.Optional[lerobot.policies.rtc.configuration_rtc.RTCConfig]
+DEBUG 2026-10-20 14:57:07 decoding.py:150 Decode name = joint_signs, type = typing.Optional[list[float]]
+DEBUG 2026-10-20 14:57:07 decoding.py:313 Decoding a Union field: typing.Optional[list[float]]
+DEBUG 2026-10-20 14:57:07 decoding.py:302 Decoding a List field: list[float]
+DEBUG 2026-10-20 14:57:07 decoding.py:150 Decode name = joint_offsets, type = typing.Optional[list[float]]
+DEBUG 2026-10-20 14:57:07 decoding.py:150 Decode name = enable_lora_vlm, type = <class 'bool'>
+DEBUG 2026-10-20 14:57:07 decoding.py:150 Decode name = lora_rank, type = <class 'int'>
+DEBUG 2026-10-20 14:57:07 decoding.py:150 Decode name = lora_alpha, type = <class 'int'>
+DEBUG 2026-10-20 14:57:07 decoding.py:150 Decode name = lora_dropout, type = <class 'float'>
+DEBUG 2026-10-20 14:57:07 decoding.py:150 Decode name = lora_bias, type = <class 'str'>
+DEBUG 2026-10-20 14:57:07 decoding.py:150 Decode name = enable_lora_action_expert, type = <class 'bool'>
+DEBUG 2026-10-20 14:57:07 decoding.py:150 Decode name = enable_knowledge_insulation, type = <class 'bool'>
+DEBUG 2026-10-20 14:57:07 decoding.py:150 Decode name = freeze_embedding, type = <class 'bool'>
+DEBUG 2026-10-20 14:57:07 decoding.py:150 Decode name = train_action_expert_only, type = <class 'bool'>
+DEBUG 2026-10-20 14:57:07 decoding.py:150 Decode name = gradient_checkpointing, type = <class 'bool'>
+DEBUG 2026-10-20 14:57:07 decoding.py:150 Decode name = model_dtype, type = <class 'str'>
+DEBUG 2026-10-20 14:57:07 decoding.py:150 Decode name = softmax_auxiliary_loss, type = <class 'bool'>
+DEBUG 2026-10-20 14:57:07 decoding.py:150 Decode name = softmax_auxiliary_loss_scale, type = <class 'float'>
+DEBUG 2026-10-20 14:57:07 decoding.py:150 Decode name = discrete_loss_token_weighting, type = <class 'str'>
+DEBUG 2026-10-20 14:57:07 decoding.py:150 Decode name = optimizer_lr, type = <class 'float'>
+DEBUG 2026-10-20 14:57:07 decoding.py:150 Decode name = optimizer_vit_lr, type = <class 'float'>
+DEBUG 2026-10-20 14:57:07 decoding.py:150 Decode name = optimizer_connector_lr, type = <class 'float'>
+DEBUG 2026-10-20 14:57:07 decoding.py:150 Decode name = optimizer_action_expert_lr, type = <class 'float'>
+DEBUG 2026-10-20 14:57:07 decoding.py:150 Decode name = optimizer_betas, type = tuple[float, float]
+DEBUG 2026-10-20 14:57:07 decoding.py:295 Decoding a Tuple field: tuple[float, float]
+DEBUG 2026-10-20 14:57:07 decoding.py:150 Decode name = optimizer_eps, type = <class 'float'>
+DEBUG 2026-10-20 14:57:07 decoding.py:150 Decode name = optimizer_weight_decay, type = <class 'float'>
+DEBUG 2026-10-20 14:57:07 decoding.py:150 Decode name = optimizer_grad_clip_norm, type = <class 'float'>
+DEBUG 2026-10-20 14:57:07 decoding.py:150 Decode name = scheduler_warmup_steps, type = <class 'int'>
+DEBUG 2026-10-20 14:57:07 decoding.py:150 Decode name = scheduler_decay_steps, type = <class 'int'>
+DEBUG 2026-10-20 14:57:07 decoding.py:150 Decode name = scheduler_decay_lr, type = <class 'float'>
+DEBUG 2026-10-20 14:57:07 decoding.py:150 Decode name = normalization_mapping, type = dict[str, lerobot.configs.types.NormalizationMode]
+DEBUG 2026-10-20 14:57:07 decoding.py:281 Decoding a Dict field: dict[str, lerobot.configs.types.NormalizationMode]
+DEBUG 2026-10-20 14:57:07 decoding.py:150 Decode name = dataset_feature_names, type = dict[str, typing.Any]
+DEBUG 2026-10-20 14:57:07 decoding.py:281 Decoding a Dict field: dict[str, typing.Any]
+DEBUG 2026-10-20 14:57:07 decoding.py:277 Decoding an Any type: typing.Any
+DEBUG 2026-10-20 14:57:07 re/_trace.py:47 send_request_headers.started request=<Request [b'GET']>
+DEBUG 2026-10-20 14:57:07 re/_trace.py:47 send_request_headers.complete
+DEBUG 2026-10-20 14:57:07 re/_trace.py:47 send_request_body.started request=<Request [b'GET']>
+DEBUG 2026-10-20 14:57:07 re/_trace.py:47 send_request_body.complete
+DEBUG 2026-10-20 14:57:07 re/_trace.py:47 receive_response_headers.started request=<Request [b'GET']>
+DEBUG 2026-10-20 14:57:07 re/_trace.py:47 receive_response_headers.complete return_value=(b'HTTP/1.1', 200, b'OK', [(b'Content-Type', b'application/json; charset=utf-8'), (b'Transfer-Encoding', b'chunked'), (b'Connection', b'keep-alive'), (b'Date', b'Tue, 20 Oct 2026 06:57:07 GMT'), (b'content-encoding', b'gzip'), (b'ETag', b'W/"1628-0IUSYsO6MQKR6yVUlvRqG5tnjqA"'), (b'X-Powered-By', b'huggingface-moon'), (b'X-Request-Id', b'Root=1-6ad710c3-1624acf051db8e535722f0fb;d1b87704-57d3-4eb9-b94a-08ee95b1321c'), (b'RateLimit', b'"api";r=999;t=68'), (b'RateLimit-Policy', b'"fixed window";"api";q=1000;w=300'), (b'cross-origin-opener-policy', b'same-origin'), (b'Referrer-Policy', b'strict-origin-when-cross-origin'), (b'Access-Control-Max-Age', b'86400'), (b'Access-Control-Allow-Origin', b'https://huggingface.co'), (b'Vary', b'Origin'), (b'vary', b'Accept-Encoding'), (b'Access-Control-Expose-Headers', b'X-Repo-Commit,X-Request-Id,X-Error-Code,X-Error-Message,X-Total-Count,ETag,Link,Accept-Ranges,Content-Range,X-Linked-Size,X-Linked-ETag,X-Xet-Hash'), (b'X-Cache', b'Miss from cloudfront'), (b'Via', b'1.1 dbe822c7520b46f4c49e2849274ac460.cloudfront.net (CloudFront)'), (b'X-Amz-Cf-Pop', b'SIN2-P7'), (b'Alt-Svc', b'h3=":443"; ma=86400'), (b'X-Amz-Cf-Id', b'm3t4P338RiLaWhmxdLQVQx9bix4ABzWeHTUBI50MFZPWwEpn_zoELw=='), (b'Strict-Transport-Security', b'max-age=31536000')])
+DEBUG 2026-10-20 14:57:07 re/_trace.py:47 receive_response_body.started request=<Request [b'GET']>
+DEBUG 2026-10-20 14:57:07 re/_trace.py:47 receive_response_body.complete
+DEBUG 2026-10-20 14:57:07 re/_trace.py:47 response_closed.started
+DEBUG 2026-10-20 14:57:07 re/_trace.py:47 response_closed.complete
+DEBUG 2026-10-20 14:57:07 re/_trace.py:47 send_request_headers.started request=<Request [b'GET']>
+DEBUG 2026-10-20 14:57:07 re/_trace.py:47 send_request_headers.complete
+DEBUG 2026-10-20 14:57:07 re/_trace.py:47 send_request_body.started request=<Request [b'GET']>
+DEBUG 2026-10-20 14:57:07 re/_trace.py:47 send_request_body.complete
+DEBUG 2026-10-20 14:57:07 re/_trace.py:47 receive_response_headers.started request=<Request [b'GET']>
+DEBUG 2026-10-20 14:57:07 re/_trace.py:47 receive_response_headers.complete return_value=(b'HTTP/1.1', 200, b'OK', [(b'Content-Type', b'application/json; charset=utf-8'), (b'Transfer-Encoding', b'chunked'), (b'Connection', b'keep-alive'), (b'Date', b'Tue, 20 Oct 2026 06:57:07 GMT'), (b'content-encoding', b'gzip'), (b'ETag', b'W/"10f0-RkyrpPMweiIhMrVLGTGPgwWqVis"'), (b'X-Powered-By', b'huggingface-moon'), (b'X-Request-Id', b'Root=1-6ad710c3-18058b472ea925207d9edb41;9379ad97-3330-40d5-88f8-3fafc0679af3'), (b'RateLimit', b'"api";r=998;t=68'), (b'RateLimit-Policy', b'"fixed window";"api";q=1000;w=300'), (b'cross-origin-opener-policy', b'same-origin'), (b'Referrer-Policy', b'strict-origin-when-cross-origin'), (b'Access-Control-Max-Age', b'86400'), (b'Access-Control-Allow-Origin', b'https://huggingface.co'), (b'Vary', b'Origin'), (b'vary', b'Accept-Encoding'), (b'Access-Control-Expose-Headers', b'X-Repo-Commit,X-Request-Id,X-Error-Code,X-Error-Message,X-Total-Count,ETag,Link,Accept-Ranges,Content-Range,X-Linked-Size,X-Linked-ETag,X-Xet-Hash'), (b'X-Cache', b'Miss from cloudfront'), (b'Via', b'1.1 dbe822c7520b46f4c49e2849274ac460.cloudfront.net (CloudFront)'), (b'X-Amz-Cf-Pop', b'SIN2-P7'), (b'Alt-Svc', b'h3=":443"; ma=86400'), (b'X-Amz-Cf-Id', b'3vuobDjAaJ7vNIXZ7M4GBPS4RLPJyFl_vJk3uhLNRrBBB5sFopi0Jw=='), (b'Strict-Transport-Security', b'max-age=31536000')])
+DEBUG 2026-10-20 14:57:07 re/_trace.py:47 receive_response_body.started request=<Request [b'GET']>
+DEBUG 2026-10-20 14:57:07 re/_trace.py:47 receive_response_body.complete
+DEBUG 2026-10-20 14:57:07 re/_trace.py:47 response_closed.started
+DEBUG 2026-10-20 14:57:07 re/_trace.py:47 response_closed.complete
+DEBUG 2026-10-20 14:57:07 ort_utils.py:65 Detected transformers version: 5.5.4
+DEBUG 2026-10-20 14:57:07 re/_trace.py:47 send_request_headers.started request=<Request [b'GET']>
+DEBUG 2026-10-20 14:57:07 re/_trace.py:47 send_request_headers.complete
+DEBUG 2026-10-20 14:57:07 re/_trace.py:47 send_request_body.started request=<Request [b'GET']>
+DEBUG 2026-10-20 14:57:07 re/_trace.py:47 send_request_body.complete
+DEBUG 2026-10-20 14:57:07 re/_trace.py:47 receive_response_headers.started request=<Request [b'GET']>
+DEBUG 2026-10-20 14:57:07 re/_trace.py:47 receive_response_headers.complete return_value=(b'HTTP/1.1', 200, b'OK', [(b'Content-Type', b'application/json; charset=utf-8'), (b'Transfer-Encoding', b'chunked'), (b'Connection', b'keep-alive'), (b'Date', b'Tue, 20 Oct 2026 06:57:07 GMT'), (b'content-encoding', b'gzip'), (b'ETag', b'W/"1628-0IUSYsO6MQKR6yVUlvRqG5tnjqA"'), (b'X-Powered-By', b'huggingface-moon'), (b'X-Request-Id', b'Root=1-6ad710c3-16d2df5f3b1010bc1113c27b;d330cfa6-28b9-41c8-838b-9de4af1bce60'), (b'RateLimit', b'"api";r=997;t=68'), (b'RateLimit-Policy', b'"fixed window";"api";q=1000;w=300'), (b'cross-origin-opener-policy', b'same-origin'), (b'Referrer-Policy', b'strict-origin-when-cross-origin'), (b'Access-Control-Max-Age', b'86400'), (b'Access-Control-Allow-Origin', b'https://huggingface.co'), (b'Vary', b'Origin'), (b'vary', b'Accept-Encoding'), (b'Access-Control-Expose-Headers', b'X-Repo-Commit,X-Request-Id,X-Error-Code,X-Error-Message,X-Total-Count,ETag,Link,Accept-Ranges,Content-Range,X-Linked-Size,X-Linked-ETag,X-Xet-Hash'), (b'X-Cache', b'Miss from cloudfront'), (b'Via', b'1.1 dbe822c7520b46f4c49e2849274ac460.cloudfront.net (CloudFront)'), (b'X-Amz-Cf-Pop', b'SIN2-P7'), (b'Alt-Svc', b'h3=":443"; ma=86400'), (b'X-Amz-Cf-Id', b'GkQeg_fpZ1s2uuhCvkMnJ8hiAnKMbvfR9OALq4wzzIwVR-d4gOj64g=='), (b'Strict-Transport-Security', b'max-age=31536000')])
+DEBUG 2026-10-20 14:57:07 re/_trace.py:47 receive_response_body.started request=<Request [b'GET']>
+DEBUG 2026-10-20 14:57:07 re/_trace.py:47 receive_response_body.complete
+DEBUG 2026-10-20 14:57:07 re/_trace.py:47 response_closed.started
+DEBUG 2026-10-20 14:57:07 re/_trace.py:47 response_closed.complete
+DEBUG 2026-10-20 14:57:29 re/_trace.py:47 close.started
+DEBUG 2026-10-20 14:57:29 re/_trace.py:47 close.complete
+DEBUG 2026-10-20 14:57:29 re/_trace.py:47 connect_tcp.started host='huggingface.co' port=443 local_address=None timeout=10 socket_options=None
+DEBUG 2026-10-20 14:57:29 re/_trace.py:47 connect_tcp.complete return_value=<httpcore._backends.sync.SyncStream object at 0x741138181d30>
+DEBUG 2026-10-20 14:57:29 re/_trace.py:47 start_tls.started ssl_context=<ssl.SSLContext object at 0x7411b7d5d2d0> server_hostname='huggingface.co' timeout=10
+DEBUG 2026-10-20 14:57:29 re/_trace.py:47 start_tls.complete return_value=<httpcore._backends.sync.SyncStream object at 0x741138182600>
+DEBUG 2026-10-20 14:57:29 re/_trace.py:47 send_request_headers.started request=<Request [b'HEAD']>
+DEBUG 2026-10-20 14:57:29 re/_trace.py:47 send_request_headers.complete
+DEBUG 2026-10-20 14:57:29 re/_trace.py:47 send_request_body.started request=<Request [b'HEAD']>
+DEBUG 2026-10-20 14:57:29 re/_trace.py:47 send_request_body.complete
+DEBUG 2026-10-20 14:57:29 re/_trace.py:47 receive_response_headers.started request=<Request [b'HEAD']>
+DEBUG 2026-10-20 14:57:29 re/_trace.py:47 receive_response_headers.complete return_value=(b'HTTP/1.1', 302, b'Found', [(b'Content-Type', b'text/plain; charset=utf-8'), (b'Content-Length', b'1128'), (b'Connection', b'keep-alive'), (b'Date', b'Tue, 20 Oct 2026 06:57:29 GMT'), (b'Location', b'https://us.aws.cdn.hf.co/xet-bridge-us/6a3e9bb8d6f7a065b8419ba1/6ff9258d23017cb198db3757bac65ee469d814b05cf7eb280e70ee4cf9226fe2?xip=eYJTRvZesuE&X-Xet-Cas-Uid=65e7e8ab5a7f0c0eb3a64711&response-content-disposition=inline%3B+filename*%3DUTF-8%27%27model.safetensors%3B+filename%3D%22model.safetensors%22%3B&user_id=65e7e8ab5a7f0c0eb3a64711&Expires=1792483049&Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiaHR0cHM6Ly91cy5hd3MuY2RuLmhmLmNvL3hldC1icmlkZ2UtdXMvNmEzZTliYjhkNmY3YTA2NWI4NDE5YmExLzZmZjkyNThkMjMwMTdjYjE5OGRiMzc1N2JhYzY1ZWU0NjlkODE0YjA1Y2Y3ZWIyODBlNzBlZTRjZjkyMjZmZTJcXD94aXA9ZVlKVFJ2WmVzdUUmWC1YZXQtQ2FzLVVpZD02NWU3ZThhYjVhN2YwYzBlYjNhNjQ3MTEmcmVzcG9uc2UtY29udGVudC1kaXNwb3NpdGlvbj1pbmxpbmUlM0IrZmlsZW5hbWUlMkElM0RVVEYtOCUyNyUyN21vZGVsLnNhZmV0ZW5zb3JzJTNCK2ZpbGVuYW1lJTNEJTIybW9kZWwuc2FmZXRlbnNvcnMlMjIlM0ImdXNlcl9pZD02NWU3ZThhYjVhN2YwYzBlYjNhNjQ3MTEiLCJDb25kaXRpb24iOnsiRGF0ZUxlc3NUaGFuIjp7IkVwb2NoVGltZSI6MTc5MjQ4MzA0OX19fV19&Signature=MEYCIQDfC98W54c%7Eg0Y7c0EV4VE4mx-TjN8%7ExuSMdvzdiKYzOgIhAJ2mhq%7EmcP8boB0sJblZ2Fd6nHrhpmEwi-PTUEQfKodp&Key-Pair-Id=01KXEF4KZ1B6FV465MAWR4M21F&Hash-Algorithm=SHA256'), (b'X-Powered-By', b'huggingface-moon'), (b'X-Request-Id', b'Root=1-6ad710d9-5d3ff47e7c8c284e2c513635;d2bd23e5-ae97-4a64-b740-6371e73bb76e'), (b'RateLimit', b'"resolvers";r=4998;t=46'), (b'RateLimit-Policy', b'"fixed window";"resolvers";q=5000;w=300'), (b'cross-origin-opener-policy', b'same-origin'), (b'Referrer-Policy', b'strict-origin-when-cross-origin'), (b'Access-Control-Max-Age', b'86400'), (b'Access-Control-Allow-Origin', b'https://huggingface.co'), (b'Vary', b'Origin, Accept'), (b'Access-Control-Expose-Headers', b'X-Repo-Commit,X-Request-Id,X-Error-Code,X-Error-Message,X-Total-Count,ETag,Link,Accept-Ranges,Content-Range,X-Linked-Size,X-Linked-ETag,X-Xet-Hash'), (b'X-Repo-Commit', b'a4ab68081b84bb0659d96f454edbce6abbe8a1cd'), (b'Accept-Ranges', b'bytes'), (b'X-Hub-Cache', b'MISS'), (b'X-Linked-Size', b'21768965408'), (b'X-Linked-ETag', b'"77e340c58694560ac6e1b1cb36ce00be0e4f21e71fc1cfacaa8357251876608a"'), (b'Cache-Control', b'no-store'), (b'X-Xet-Hash', b'6ff9258d23017cb198db3757bac65ee469d814b05cf7eb280e70ee4cf9226fe2'), (b'Link', b'<https://huggingface.co/api/models/lerobot/MolmoAct2-SO100_101-LeRobot/xet-read-token/a4ab68081b84bb0659d96f454edbce6abbe8a1cd>; rel="xet-auth", <https://cas-server.xethub.hf.co/v1/reconstructions/6ff9258d23017cb198db3757bac65ee469d814b05cf7eb280e70ee4cf9226fe2>; rel="xet-reconstruction-info"'), (b'X-Cache', b'Miss from cloudfront'), (b'Via', b'1.1 aa20aecedaf45504122399ad5b5c1de8.cloudfront.net (CloudFront)'), (b'X-Amz-Cf-Pop', b'SIN2-P7'), (b'Alt-Svc', b'h3=":443"; ma=86400'), (b'X-Amz-Cf-Id', b'MKk6uh4TGU5v6_ulViz5fAb0K8ZV5ohxHd5uZI80Ga4dtKn0QFo_UA=='), (b'Strict-Transport-Security', b'max-age=31536000')])
+DEBUG 2026-10-20 14:57:29 re/_trace.py:47 receive_response_body.started request=<Request [b'HEAD']>
+DEBUG 2026-10-20 14:57:29 re/_trace.py:47 receive_response_body.complete
+DEBUG 2026-10-20 14:57:29 re/_trace.py:47 response_closed.started
+DEBUG 2026-10-20 14:57:29 re/_trace.py:47 response_closed.complete
+DEBUG 2026-10-20 14:57:33 re/_trace.py:47 send_request_headers.started request=<Request [b'HEAD']>
+DEBUG 2026-10-20 14:57:33 re/_trace.py:47 send_request_headers.complete
+DEBUG 2026-10-20 14:57:33 re/_trace.py:47 send_request_body.started request=<Request [b'HEAD']>
+DEBUG 2026-10-20 14:57:33 re/_trace.py:47 send_request_body.complete
+DEBUG 2026-10-20 14:57:33 re/_trace.py:47 receive_response_headers.started request=<Request [b'HEAD']>
+DEBUG 2026-10-20 14:57:33 re/_trace.py:47 receive_response_headers.complete return_value=(b'HTTP/1.1', 307, b'Temporary Redirect', [(b'Content-Type', b'text/plain; charset=utf-8'), (b'Content-Length', b'300'), (b'Connection', b'keep-alive'), (b'Date', b'Tue, 20 Oct 2026 06:57:33 GMT'), (b'Location', b'/api/resolve-cache/models/lerobot/MolmoAct2-SO100_101-LeRobot/a4ab68081b84bb0659d96f454edbce6abbe8a1cd/policy_preprocessor.json?%2Flerobot%2FMolmoAct2-SO100_101-LeRobot%2Fresolve%2Fmain%2Fpolicy_preprocessor.json=&etag=%229296fe5b17e51883fe434433262caa6fe29064d8%22'), (b'X-Powered-By', b'huggingface-moon'), (b'X-Request-Id', b'Root=1-6ad710dd-43ffa19542b4a327479f5058;caf047a5-0eb1-4742-9e5c-246f61cbdb26'), (b'RateLimit', b'"resolvers";r=4997;t=42'), (b'RateLimit-Policy', b'"fixed window";"resolvers";q=5000;w=300'), (b'cross-origin-opener-policy', b'same-origin'), (b'Referrer-Policy', b'strict-origin-when-cross-origin'), (b'Access-Control-Max-Age', b'86400'), (b'Access-Control-Allow-Origin', b'https://huggingface.co'), (b'Vary', b'Origin, Accept'), (b'Access-Control-Expose-Headers', b'X-Repo-Commit,X-Request-Id,X-Error-Code,X-Error-Message,X-Total-Count,ETag,Link,Accept-Ranges,Content-Range,X-Linked-Size,X-Linked-ETag,X-Xet-Hash'), (b'X-Repo-Commit', b'a4ab68081b84bb0659d96f454edbce6abbe8a1cd'), (b'Accept-Ranges', b'bytes'), (b'X-Hub-Cache', b'MISS'), (b'Content-Disposition', b'inline; filename*=UTF-8\'\'policy_preprocessor.json; filename="policy_preprocessor.json";'), (b'Content-Security-Policy', b"default-src 'none'; sandbox"), (b'X-Linked-ETag', b'"9296fe5b17e51883fe434433262caa6fe29064d8"'), (b'X-Cache', b'Miss from cloudfront'), (b'Via', b'1.1 aa20aecedaf45504122399ad5b5c1de8.cloudfront.net (CloudFront)'), (b'X-Amz-Cf-Pop', b'SIN2-P7'), (b'Alt-Svc', b'h3=":443"; ma=86400'), (b'X-Amz-Cf-Id', b'TZiSa7K3lRg0P4L9gyLteXkpR4tyqcoeuJL5K-fd98bFCmrptinEjQ=='), (b'Strict-Transport-Security', b'max-age=31536000')])
+DEBUG 2026-10-20 14:57:33 re/_trace.py:47 receive_response_body.started request=<Request [b'HEAD']>
+DEBUG 2026-10-20 14:57:33 re/_trace.py:47 receive_response_body.complete
+DEBUG 2026-10-20 14:57:33 re/_trace.py:47 response_closed.started
+DEBUG 2026-10-20 14:57:33 re/_trace.py:47 response_closed.complete
+DEBUG 2026-10-20 14:57:33 re/_trace.py:47 send_request_headers.started request=<Request [b'HEAD']>
+DEBUG 2026-10-20 14:57:33 re/_trace.py:47 send_request_headers.complete
+DEBUG 2026-10-20 14:57:33 re/_trace.py:47 send_request_body.started request=<Request [b'HEAD']>
+DEBUG 2026-10-20 14:57:33 re/_trace.py:47 send_request_body.complete
+DEBUG 2026-10-20 14:57:33 re/_trace.py:47 receive_response_headers.started request=<Request [b'HEAD']>
+DEBUG 2026-10-20 14:57:33 re/_trace.py:47 receive_response_headers.complete return_value=(b'HTTP/1.1', 200, b'OK', [(b'Content-Type', b'text/plain; charset=utf-8'), (b'Content-Length', b'2640'), (b'Connection', b'keep-alive'), (b'Date', b'Tue, 20 Oct 2026 06:57:33 GMT'), (b'ETag', b'"9296fe5b17e51883fe434433262caa6fe29064d8"'), (b'X-Powered-By', b'huggingface-moon'), (b'X-Request-Id', b'Root=1-6ad710dd-50e48a981071c89f256c56be;16a73a32-0445-49cd-9ce8-5d26b8ef05ec'), (b'RateLimit', b'"resolvers";r=4996;t=42'), (b'RateLimit-Policy', b'"fixed window";"resolvers";q=5000;w=300'), (b'cross-origin-opener-policy', b'same-origin'), (b'Referrer-Policy', b'strict-origin-when-cross-origin'), (b'Access-Control-Max-Age', b'86400'), (b'Access-Control-Allow-Origin', b'https://huggingface.co'), (b'Access-Control-Expose-Headers', b'X-Repo-Commit,X-Request-Id,X-Error-Code,X-Error-Message,X-Total-Count,ETag,Link,Accept-Ranges,Content-Range,X-Linked-Size,X-Linked-ETag,X-Xet-Hash'), (b'X-Repo-Commit', b'a4ab68081b84bb0659d96f454edbce6abbe8a1cd'), (b'Accept-Ranges', b'bytes'), (b'X-Hub-Cache', b'MISS'), (b'Content-Disposition', b'inline; filename*=UTF-8\'\'policy_preprocessor.json; filename="policy_preprocessor.json";'), (b'Content-Security-Policy', b"default-src 'none'; sandbox"), (b'Vary', b'Origin'), (b'X-Cache', b'Miss from cloudfront'), (b'Via', b'1.1 aa20aecedaf45504122399ad5b5c1de8.cloudfront.net (CloudFront)'), (b'X-Amz-Cf-Pop', b'SIN2-P7'), (b'Alt-Svc', b'h3=":443"; ma=86400'), (b'X-Amz-Cf-Id', b'iqmpY3jTfxKy9EhE8qeFR5AFX4l_O3rZBECPO46B4szeOeUiLlju_Q=='), (b'Strict-Transport-Security', b'max-age=31536000')])
+DEBUG 2026-10-20 14:57:33 re/_trace.py:47 receive_response_body.started request=<Request [b'HEAD']>
+DEBUG 2026-10-20 14:57:33 re/_trace.py:47 receive_response_body.complete
+DEBUG 2026-10-20 14:57:33 re/_trace.py:47 response_closed.started
+DEBUG 2026-10-20 14:57:33 re/_trace.py:47 response_closed.complete
+DEBUG 2026-10-20 14:57:33 re/_trace.py:47 send_request_headers.started request=<Request [b'GET']>
+DEBUG 2026-10-20 14:57:33 re/_trace.py:47 send_request_headers.complete
+DEBUG 2026-10-20 14:57:33 re/_trace.py:47 send_request_body.started request=<Request [b'GET']>
+DEBUG 2026-10-20 14:57:33 re/_trace.py:47 send_request_body.complete
+DEBUG 2026-10-20 14:57:33 re/_trace.py:47 receive_response_headers.started request=<Request [b'GET']>
+DEBUG 2026-10-20 14:57:34 re/_trace.py:47 receive_response_headers.complete return_value=(b'HTTP/1.1', 200, b'OK', [(b'Content-Type', b'application/json; charset=utf-8'), (b'Transfer-Encoding', b'chunked'), (b'Connection', b'keep-alive'), (b'Date', b'Tue, 20 Oct 2026 06:57:33 GMT'), (b'content-encoding', b'gzip'), (b'ETag', b'W/"1628-0IUSYsO6MQKR6yVUlvRqG5tnjqA"'), (b'X-Powered-By', b'huggingface-moon'), (b'X-Request-Id', b'Root=1-6ad710dd-110922524c1e881328e11752;cb545dc7-1fd3-4a5e-b194-5ae86194e16e'), (b'RateLimit', b'"api";r=996;t=42'), (b'RateLimit-Policy', b'"fixed window";"api";q=1000;w=300'), (b'cross-origin-opener-policy', b'same-origin'), (b'Referrer-Policy', b'strict-origin-when-cross-origin'), (b'Access-Control-Max-Age', b'86400'), (b'Access-Control-Allow-Origin', b'https://huggingface.co'), (b'Vary', b'Origin'), (b'vary', b'Accept-Encoding'), (b'Access-Control-Expose-Headers', b'X-Repo-Commit,X-Request-Id,X-Error-Code,X-Error-Message,X-Total-Count,ETag,Link,Accept-Ranges,Content-Range,X-Linked-Size,X-Linked-ETag,X-Xet-Hash'), (b'X-Cache', b'Miss from cloudfront'), (b'Via', b'1.1 aa20aecedaf45504122399ad5b5c1de8.cloudfront.net (CloudFront)'), (b'X-Amz-Cf-Pop', b'SIN2-P7'), (b'Alt-Svc', b'h3=":443"; ma=86400'), (b'X-Amz-Cf-Id', b'__4SCFlWQoaUe80uKmEpcYkyt6uyOxmTG0VJxx45KtVGgewR0GmFcg=='), (b'Strict-Transport-Security', b'max-age=31536000')])
+DEBUG 2026-10-20 14:57:34 re/_trace.py:47 receive_response_body.started request=<Request [b'GET']>
+DEBUG 2026-10-20 14:57:34 re/_trace.py:47 receive_response_body.complete
+DEBUG 2026-10-20 14:57:34 re/_trace.py:47 response_closed.started
+DEBUG 2026-10-20 14:57:34 re/_trace.py:47 response_closed.complete
+DEBUG 2026-10-20 14:57:34 re/_trace.py:47 send_request_headers.started request=<Request [b'HEAD']>
+DEBUG 2026-10-20 14:57:34 re/_trace.py:47 send_request_headers.complete
+DEBUG 2026-10-20 14:57:34 re/_trace.py:47 send_request_body.started request=<Request [b'HEAD']>
+DEBUG 2026-10-20 14:57:34 re/_trace.py:47 send_request_body.complete
+DEBUG 2026-10-20 14:57:34 re/_trace.py:47 receive_response_headers.started request=<Request [b'HEAD']>
+DEBUG 2026-10-20 14:57:34 re/_trace.py:47 receive_response_headers.complete return_value=(b'HTTP/1.1', 307, b'Temporary Redirect', [(b'Content-Type', b'text/plain; charset=utf-8'), (b'Content-Length', b'302'), (b'Connection', b'keep-alive'), (b'Date', b'Tue, 20 Oct 2026 06:57:34 GMT'), (b'Location', b'/api/resolve-cache/models/lerobot/MolmoAct2-SO100_101-LeRobot/a4ab68081b84bb0659d96f454edbce6abbe8a1cd/policy_postprocessor.json?%2Flerobot%2FMolmoAct2-SO100_101-LeRobot%2Fresolve%2Fmain%2Fpolicy_postprocessor.json=&etag=%22037646391bffe3d4deb39a723b51a7ba1c7f9ee2%22'), (b'X-Powered-By', b'huggingface-moon'), (b'X-Request-Id', b'Root=1-6ad710de-3b6b7dda64f4734c2bbe4f3b;499e23f3-2fa7-4c99-ae8b-b55fa1c8fe73'), (b'RateLimit', b'"resolvers";r=4995;t=41'), (b'RateLimit-Policy', b'"fixed window";"resolvers";q=5000;w=300'), (b'cross-origin-opener-policy', b'same-origin'), (b'Referrer-Policy', b'strict-origin-when-cross-origin'), (b'Access-Control-Max-Age', b'86400'), (b'Access-Control-Allow-Origin', b'https://huggingface.co'), (b'Vary', b'Origin, Accept'), (b'Access-Control-Expose-Headers', b'X-Repo-Commit,X-Request-Id,X-Error-Code,X-Error-Message,X-Total-Count,ETag,Link,Accept-Ranges,Content-Range,X-Linked-Size,X-Linked-ETag,X-Xet-Hash'), (b'X-Repo-Commit', b'a4ab68081b84bb0659d96f454edbce6abbe8a1cd'), (b'Accept-Ranges', b'bytes'), (b'X-Hub-Cache', b'MISS'), (b'Content-Disposition', b'inline; filename*=UTF-8\'\'policy_postprocessor.json; filename="policy_postprocessor.json";'), (b'Content-Security-Policy', b"default-src 'none'; sandbox"), (b'X-Linked-ETag', b'"037646391bffe3d4deb39a723b51a7ba1c7f9ee2"'), (b'X-Cache', b'Miss from cloudfront'), (b'Via', b'1.1 aa20aecedaf45504122399ad5b5c1de8.cloudfront.net (CloudFront)'), (b'X-Amz-Cf-Pop', b'SIN2-P7'), (b'Alt-Svc', b'h3=":443"; ma=86400'), (b'X-Amz-Cf-Id', b'Hzhv6g3n3nuMrS4LkHRBtO1mk0VIOthK8LM9m46UAK3Ou6RFL95xBQ=='), (b'Strict-Transport-Security', b'max-age=31536000')])
+DEBUG 2026-10-20 14:57:34 re/_trace.py:47 receive_response_body.started request=<Request [b'HEAD']>
+DEBUG 2026-10-20 14:57:34 re/_trace.py:47 receive_response_body.complete
+DEBUG 2026-10-20 14:57:34 re/_trace.py:47 response_closed.started
+DEBUG 2026-10-20 14:57:34 re/_trace.py:47 response_closed.complete
+DEBUG 2026-10-20 14:57:34 re/_trace.py:47 send_request_headers.started request=<Request [b'HEAD']>
+DEBUG 2026-10-20 14:57:34 re/_trace.py:47 send_request_headers.complete
+DEBUG 2026-10-20 14:57:34 re/_trace.py:47 send_request_body.started request=<Request [b'HEAD']>
+DEBUG 2026-10-20 14:57:34 re/_trace.py:47 send_request_body.complete
+DEBUG 2026-10-20 14:57:34 re/_trace.py:47 receive_response_headers.started request=<Request [b'HEAD']>
+DEBUG 2026-10-20 14:57:35 re/_trace.py:47 receive_response_headers.complete return_value=(b'HTTP/1.1', 200, b'OK', [(b'Content-Type', b'text/plain; charset=utf-8'), (b'Content-Length', b'1109'), (b'Connection', b'keep-alive'), (b'Date', b'Tue, 20 Oct 2026 06:57:34 GMT'), (b'ETag', b'"037646391bffe3d4deb39a723b51a7ba1c7f9ee2"'), (b'X-Powered-By', b'huggingface-moon'), (b'X-Request-Id', b'Root=1-6ad710de-03245eeb40fbfcf4185f9ba9;76a9ea99-0579-49f7-bbf8-9c267698c2ec'), (b'RateLimit', b'"resolvers";r=4994;t=41'), (b'RateLimit-Policy', b'"fixed window";"resolvers";q=5000;w=300'), (b'cross-origin-opener-policy', b'same-origin'), (b'Referrer-Policy', b'strict-origin-when-cross-origin'), (b'Access-Control-Max-Age', b'86400'), (b'Access-Control-Allow-Origin', b'https://huggingface.co'), (b'Access-Control-Expose-Headers', b'X-Repo-Commit,X-Request-Id,X-Error-Code,X-Error-Message,X-Total-Count,ETag,Link,Accept-Ranges,Content-Range,X-Linked-Size,X-Linked-ETag,X-Xet-Hash'), (b'X-Repo-Commit', b'a4ab68081b84bb0659d96f454edbce6abbe8a1cd'), (b'Accept-Ranges', b'bytes'), (b'X-Hub-Cache', b'MISS'), (b'Content-Disposition', b'inline; filename*=UTF-8\'\'policy_postprocessor.json; filename="policy_postprocessor.json";'), (b'Content-Security-Policy', b"default-src 'none'; sandbox"), (b'Vary', b'Origin'), (b'X-Cache', b'Miss from cloudfront'), (b'Via', b'1.1 aa20aecedaf45504122399ad5b5c1de8.cloudfront.net (CloudFront)'), (b'X-Amz-Cf-Pop', b'SIN2-P7'), (b'Alt-Svc', b'h3=":443"; ma=86400'), (b'X-Amz-Cf-Id', b'bS2ciJ_7p45B6I0xqOL53hF8h2bYZkk_9ohpKWLtUGstL7x79KoTjg=='), (b'Strict-Transport-Security', b'max-age=31536000')])
+DEBUG 2026-10-20 14:57:35 re/_trace.py:47 receive_response_body.started request=<Request [b'HEAD']>
+DEBUG 2026-10-20 14:57:35 re/_trace.py:47 receive_response_body.complete
+DEBUG 2026-10-20 14:57:35 re/_trace.py:47 response_closed.started
+DEBUG 2026-10-20 14:57:35 re/_trace.py:47 response_closed.complete
+INFO 2026-10-20 14:57:35 y_server.py:169 Time taken to put policy on cuda: 28.2026 seconds
+DEBUG 2026-10-20 14:57:35 y_server.py:176 Receiving observations from ipv4:127.0.0.1:50524
+INFO 2026-10-20 14:57:35 ort/utils.py:78 <Logger policy_server (NOTSET)> Starting receiver
+DEBUG 2026-10-20 14:57:35 ort/utils.py:80 <Logger policy_server (NOTSET)> Received item
+DEBUG 2026-10-20 14:57:35 ort/utils.py:97 <Logger policy_server (NOTSET)> Received data at step end size 1843806
+DEBUG 2026-10-20 14:57:35 y_server.py:186 Received observation #0
+DEBUG 2026-10-20 14:57:35 y_server.py:194 Received observation #0 | Avg FPS: 0.00 | Target: 30.00 | One-way latency: 4.19ms
+DEBUG 2026-10-20 14:57:35 y_server.py:201 Server timestamp: 1792479455.140800 | Client timestamp: 1792479455.136608 | Deserialization time: 0.012186s
+DEBUG 2026-10-20 14:57:35 y_server.py:296 Enqueuing observation. Must go: True | Last processed obs: None
+DEBUG 2026-10-20 14:57:35 y_server.py:218 Client ipv4:127.0.0.1:50524 connected for action streaming
+INFO 2026-10-20 14:57:35 y_server.py:224 Running inference for observation #0 (must_go: True)
+INFO 2026-10-20 14:57:36 y_server.py:359 Preprocessing and inference took 1.7071s, action shape: torch.Size([1, 30, 6])
+DEBUG 2026-10-20 14:57:36 y_server.py:380 Postprocessed action shape: torch.Size([30, 6])
+INFO 2026-10-20 14:57:36 y_server.py:391 Observation 0 | Total time: 1736.09ms
+DEBUG 2026-10-20 14:57:36 y_server.py:396 Observation 0 | Prepare time: 1.52ms | Preprocessing time: 12.22ms | Inference time: 1707.07ms | Postprocessing time: 14.22ms | Total time: 1736.09ms
+INFO 2026-10-20 14:57:36 y_server.py:242 Action chunk #0 generated | Total time: 1737.28ms
+DEBUG 2026-10-20 14:57:36 y_server.py:247 Action chunk #0 generated | Inference time: 1.74s |Serialize time: 0.00s |Total time: 1.74s
+DEBUG 2026-10-20 14:57:36 y_server.py:176 Receiving observations from ipv4:127.0.0.1:50524
+INFO 2026-10-20 14:57:36 ort/utils.py:78 <Logger policy_server (NOTSET)> Starting receiver
+DEBUG 2026-10-20 14:57:36 ort/utils.py:80 <Logger policy_server (NOTSET)> Received item
+DEBUG 2026-10-20 14:57:36 ort/utils.py:97 <Logger policy_server (NOTSET)> Received data at step end size 1843806
+DEBUG 2026-10-20 14:57:36 y_server.py:186 Received observation #100
+DEBUG 2026-10-20 14:57:36 y_server.py:194 Received observation #100 | Avg FPS: 0.57 | Target: 30.00 | One-way latency: 1.21ms
+DEBUG 2026-10-20 14:57:36 y_server.py:201 Server timestamp: 1792479456.898932 | Client timestamp: 1792479456.897721 | Deserialization time: 0.010437s
+DEBUG 2026-10-20 14:57:36 y_server.py:296 Enqueuing observation. Must go: True | Last processed obs: 0
+DEBUG 2026-10-20 14:57:36 y_server.py:218 Client ipv4:127.0.0.1:50524 connected for action streaming
+INFO 2026-10-20 14:57:36 y_server.py:224 Running inference for observation #100 (must_go: True)
+INFO 2026-10-20 14:57:37 y_server.py:359 Preprocessing and inference took 0.3217s, action shape: torch.Size([1, 30, 6])
+DEBUG 2026-10-20 14:57:37 y_server.py:380 Postprocessed action shape: torch.Size([30, 6])
+INFO 2026-10-20 14:57:37 y_server.py:391 Observation 100 | Total time: 382.82ms
+DEBUG 2026-10-20 14:57:37 y_server.py:396 Observation 100 | Prepare time: 1.54ms | Preprocessing time: 8.79ms | Inference time: 321.74ms | Postprocessing time: 50.57ms | Total time: 382.82ms
+INFO 2026-10-20 14:57:37 y_server.py:242 Action chunk #100 generated | Total time: 383.92ms
+DEBUG 2026-10-20 14:57:37 y_server.py:247 Action chunk #100 generated | Inference time: 0.38s |Serialize time: 0.00s |Total time: 0.38s
+DEBUG 2026-10-20 14:57:37 y_server.py:176 Receiving observations from ipv4:127.0.0.1:50524
+INFO 2026-10-20 14:57:37 ort/utils.py:78 <Logger policy_server (NOTSET)> Starting receiver
+DEBUG 2026-10-20 14:57:37 ort/utils.py:80 <Logger policy_server (NOTSET)> Received item
+DEBUG 2026-10-20 14:57:37 ort/utils.py:97 <Logger policy_server (NOTSET)> Received data at step end size 1843806
+DEBUG 2026-10-20 14:57:37 y_server.py:186 Received observation #200
+DEBUG 2026-10-20 14:57:37 y_server.py:194 Received observation #200 | Avg FPS: 0.92 | Target: 30.00 | One-way latency: 2.36ms
+DEBUG 2026-10-20 14:57:37 y_server.py:201 Server timestamp: 1792479457.303767 | Client timestamp: 1792479457.301405 | Deserialization time: 0.004014s
+DEBUG 2026-10-20 14:57:37 y_server.py:296 Enqueuing observation. Must go: True | Last processed obs: 100
+DEBUG 2026-10-20 14:57:37 y_server.py:218 Client ipv4:127.0.0.1:50524 connected for action streaming
+INFO 2026-10-20 14:57:37 y_server.py:224 Running inference for observation #200 (must_go: True)
+INFO 2026-10-20 14:57:37 y_server.py:359 Preprocessing and inference took 0.3267s, action shape: torch.Size([1, 30, 6])
+DEBUG 2026-10-20 14:57:37 y_server.py:380 Postprocessed action shape: torch.Size([30, 6])
+INFO 2026-10-20 14:57:37 y_server.py:391 Observation 200 | Total time: 386.26ms
+DEBUG 2026-10-20 14:57:37 y_server.py:396 Observation 200 | Prepare time: 1.10ms | Preprocessing time: 8.02ms | Inference time: 326.67ms | Postprocessing time: 50.30ms | Total time: 386.26ms
+INFO 2026-10-20 14:57:37 y_server.py:242 Action chunk #200 generated | Total time: 387.33ms
+DEBUG 2026-10-20 14:57:37 y_server.py:247 Action chunk #200 generated | Inference time: 0.39s |Serialize time: 0.00s |Total time: 0.39s
+DEBUG 2026-10-20 14:57:37 y_server.py:176 Receiving observations from ipv4:127.0.0.1:50524
+INFO 2026-10-20 14:57:37 ort/utils.py:78 <Logger policy_server (NOTSET)> Starting receiver
+DEBUG 2026-10-20 14:57:37 ort/utils.py:80 <Logger policy_server (NOTSET)> Received item
+DEBUG 2026-10-20 14:57:37 ort/utils.py:97 <Logger policy_server (NOTSET)> Received data at step end size 1843807
+DEBUG 2026-10-20 14:57:37 y_server.py:186 Received observation #300
+DEBUG 2026-10-20 14:57:37 y_server.py:194 Received observation #300 | Avg FPS: 1.17 | Target: 30.00 | One-way latency: 1.21ms
+DEBUG 2026-10-20 14:57:37 y_server.py:201 Server timestamp: 1792479457.703373 | Client timestamp: 1792479457.702164 | Deserialization time: 0.004176s
+DEBUG 2026-10-20 14:57:37 y_server.py:296 Enqueuing observation. Must go: True | Last processed obs: 200
+DEBUG 2026-10-20 14:57:37 y_server.py:218 Client ipv4:127.0.0.1:50524 connected for action streaming
+INFO 2026-10-20 14:57:37 y_server.py:224 Running inference for observation #300 (must_go: True)
+INFO 2026-10-20 14:57:38 y_server.py:359 Preprocessing and inference took 0.3312s, action shape: torch.Size([1, 30, 6])
+DEBUG 2026-10-20 14:57:38 y_server.py:380 Postprocessed action shape: torch.Size([30, 6])
+INFO 2026-10-20 14:57:38 y_server.py:391 Observation 300 | Total time: 389.36ms
+DEBUG 2026-10-20 14:57:38 y_server.py:396 Observation 300 | Prepare time: 1.13ms | Preprocessing time: 8.00ms | Inference time: 331.23ms | Postprocessing time: 48.84ms | Total time: 389.36ms
+INFO 2026-10-20 14:57:38 y_server.py:242 Action chunk #300 generated | Total time: 390.45ms
+DEBUG 2026-10-20 14:57:38 y_server.py:247 Action chunk #300 generated | Inference time: 0.39s |Serialize time: 0.00s |Total time: 0.39s
+DEBUG 2026-10-20 14:57:38 y_server.py:176 Receiving observations from ipv4:127.0.0.1:50524
+INFO 2026-10-20 14:57:38 ort/utils.py:78 <Logger policy_server (NOTSET)> Starting receiver
+DEBUG 2026-10-20 14:57:38 ort/utils.py:80 <Logger policy_server (NOTSET)> Received item
+DEBUG 2026-10-20 14:57:38 ort/utils.py:97 <Logger policy_server (NOTSET)> Received data at step end size 1843807
+DEBUG 2026-10-20 14:57:38 y_server.py:186 Received observation #400
+DEBUG 2026-10-20 14:57:38 y_server.py:194 Received observation #400 | Avg FPS: 1.35 | Target: 30.00 | One-way latency: 1.27ms
+DEBUG 2026-10-20 14:57:38 y_server.py:201 Server timestamp: 1792479458.105922 | Client timestamp: 1792479458.104647 | Deserialization time: 0.005688s
+DEBUG 2026-10-20 14:57:38 y_server.py:296 Enqueuing observation. Must go: True | Last processed obs: 300
+DEBUG 2026-10-20 14:57:38 y_server.py:218 Client ipv4:127.0.0.1:50524 connected for action streaming
+INFO 2026-10-20 14:57:38 y_server.py:224 Running inference for observation #400 (must_go: True)
+INFO 2026-10-20 14:57:38 y_server.py:359 Preprocessing and inference took 0.3373s, action shape: torch.Size([1, 30, 6])
+DEBUG 2026-10-20 14:57:38 y_server.py:380 Postprocessed action shape: torch.Size([30, 6])
+INFO 2026-10-20 14:57:38 y_server.py:391 Observation 400 | Total time: 397.42ms
+DEBUG 2026-10-20 14:57:38 y_server.py:396 Observation 400 | Prepare time: 1.39ms | Preprocessing time: 9.39ms | Inference time: 337.27ms | Postprocessing time: 49.10ms | Total time: 397.42ms
+INFO 2026-10-20 14:57:38 y_server.py:242 Action chunk #400 generated | Total time: 399.05ms
+DEBUG 2026-10-20 14:57:38 y_server.py:247 Action chunk #400 generated | Inference time: 0.40s |Serialize time: 0.00s |Total time: 0.40s
+DEBUG 2026-10-20 14:57:38 y_server.py:176 Receiving observations from ipv4:127.0.0.1:50524
+INFO 2026-10-20 14:57:38 ort/utils.py:78 <Logger policy_server (NOTSET)> Starting receiver
+DEBUG 2026-10-20 14:57:38 ort/utils.py:80 <Logger policy_server (NOTSET)> Received item
+DEBUG 2026-10-20 14:57:38 ort/utils.py:97 <Logger policy_server (NOTSET)> Received data at step end size 1843807
+DEBUG 2026-10-20 14:57:38 y_server.py:186 Received observation #500
+DEBUG 2026-10-20 14:57:38 y_server.py:194 Received observation #500 | Avg FPS: 1.48 | Target: 30.00 | One-way latency: 1.87ms
+DEBUG 2026-10-20 14:57:38 y_server.py:201 Server timestamp: 1792479458.519212 | Client timestamp: 1792479458.517345 | Deserialization time: 0.005309s
+DEBUG 2026-10-20 14:57:38 y_server.py:296 Enqueuing observation. Must go: True | Last processed obs: 400
+DEBUG 2026-10-20 14:57:38 y_server.py:218 Client ipv4:127.0.0.1:50524 connected for action streaming
+INFO 2026-10-20 14:57:38 y_server.py:224 Running inference for observation #500 (must_go: True)
+INFO 2026-10-20 14:57:38 y_server.py:359 Preprocessing and inference took 0.3422s, action shape: torch.Size([1, 30, 6])
+DEBUG 2026-10-20 14:57:38 y_server.py:380 Postprocessed action shape: torch.Size([30, 6])
+INFO 2026-10-20 14:57:38 y_server.py:391 Observation 500 | Total time: 405.18ms
+DEBUG 2026-10-20 14:57:38 y_server.py:396 Observation 500 | Prepare time: 1.61ms | Preprocessing time: 12.11ms | Inference time: 342.19ms | Postprocessing time: 49.03ms | Total time: 405.18ms
+INFO 2026-10-20 14:57:38 y_server.py:242 Action chunk #500 generated | Total time: 406.72ms
+DEBUG 2026-10-20 14:57:38 y_server.py:247 Action chunk #500 generated | Inference time: 0.41s |Serialize time: 0.00s |Total time: 0.41s
+INFO 2026-10-20 14:57:51 y_server.py:110 Client ipv4:127.0.0.1:50588 connected and ready
+INFO 2026-10-20 14:57:51 y_server.py:136 Receiving policy instructions from ipv4:127.0.0.1:50588 | Policy type: molmoact2 | Pretrained name or path: lerobot/MolmoAct2-SO100_101-LeRobot | Actions per chunk: 30 | Device: cuda
+DEBUG 2026-10-20 14:57:51 re/_trace.py:47 close.started
+DEBUG 2026-10-20 14:57:51 re/_trace.py:47 close.complete
+DEBUG 2026-10-20 14:57:51 re/_trace.py:47 connect_tcp.started host='huggingface.co' port=443 local_address=None timeout=10 socket_options=None
+DEBUG 2026-10-20 14:57:51 re/_trace.py:47 connect_tcp.complete return_value=<httpcore._backends.sync.SyncStream object at 0x741140b51880>
+DEBUG 2026-10-20 14:57:51 re/_trace.py:47 start_tls.started ssl_context=<ssl.SSLContext object at 0x7411b7d5d2d0> server_hostname='huggingface.co' timeout=10
+DEBUG 2026-10-20 14:57:51 re/_trace.py:47 start_tls.complete return_value=<httpcore._backends.sync.SyncStream object at 0x741140b515b0>
+DEBUG 2026-10-20 14:57:51 re/_trace.py:47 send_request_headers.started request=<Request [b'HEAD']>
+DEBUG 2026-10-20 14:57:51 re/_trace.py:47 send_request_headers.complete
+DEBUG 2026-10-20 14:57:51 re/_trace.py:47 send_request_body.started request=<Request [b'HEAD']>
+DEBUG 2026-10-20 14:57:51 re/_trace.py:47 send_request_body.complete
+DEBUG 2026-10-20 14:57:51 re/_trace.py:47 receive_response_headers.started request=<Request [b'HEAD']>
+DEBUG 2026-10-20 14:57:51 re/_trace.py:47 receive_response_headers.complete return_value=(b'HTTP/1.1', 307, b'Temporary Redirect', [(b'Content-Type', b'text/plain; charset=utf-8'), (b'Content-Length', b'274'), (b'Connection', b'keep-alive'), (b'Date', b'Tue, 20 Oct 2026 06:57:51 GMT'), (b'Location', b'/api/resolve-cache/models/lerobot/MolmoAct2-SO100_101-LeRobot/a4ab68081b84bb0659d96f454edbce6abbe8a1cd/config.json?%2Flerobot%2FMolmoAct2-SO100_101-LeRobot%2Fresolve%2Fmain%2Fconfig.json=&etag=%220447e5e3d2263d681345171d5d30600ee598b048%22'), (b'X-Powered-By', b'huggingface-moon'), (b'X-Request-Id', b'Root=1-6ad710ef-61c78dd14c77278917b5ab2c;8bfe19d8-cdd1-4a41-8527-2623a6386ae5'), (b'RateLimit', b'"resolvers";r=4993;t=24'), (b'RateLimit-Policy', b'"fixed window";"resolvers";q=5000;w=300'), (b'cross-origin-opener-policy', b'same-origin'), (b'Referrer-Policy', b'strict-origin-when-cross-origin'), (b'Access-Control-Max-Age', b'86400'), (b'Access-Control-Allow-Origin', b'https://huggingface.co'), (b'Vary', b'Origin, Accept'), (b'Access-Control-Expose-Headers', b'X-Repo-Commit,X-Request-Id,X-Error-Code,X-Error-Message,X-Total-Count,ETag,Link,Accept-Ranges,Content-Range,X-Linked-Size,X-Linked-ETag,X-Xet-Hash'), (b'X-Repo-Commit', b'a4ab68081b84bb0659d96f454edbce6abbe8a1cd'), (b'Accept-Ranges', b'bytes'), (b'X-Hub-Cache', b'MISS'), (b'Content-Disposition', b'inline; filename*=UTF-8\'\'config.json; filename="config.json";'), (b'Content-Security-Policy', b"default-src 'none'; sandbox"), (b'X-Linked-ETag', b'"0447e5e3d2263d681345171d5d30600ee598b048"'), (b'X-Cache', b'Miss from cloudfront'), (b'Via', b'1.1 1c4964336b4fc412a86181b6d86b042e.cloudfront.net (CloudFront)'), (b'X-Amz-Cf-Pop', b'SIN2-P7'), (b'Alt-Svc', b'h3=":443"; ma=86400'), (b'X-Amz-Cf-Id', b'iBuGQxxPya0Wo8kYowIX8uHvNc9njl7BZHRXi9kwohCxK04FOYBNGA=='), (b'Strict-Transport-Security', b'max-age=31536000')])
+DEBUG 2026-10-20 14:57:51 re/_trace.py:47 receive_response_body.started request=<Request [b'HEAD']>
+DEBUG 2026-10-20 14:57:51 re/_trace.py:47 receive_response_body.complete
+DEBUG 2026-10-20 14:57:51 re/_trace.py:47 response_closed.started
+DEBUG 2026-10-20 14:57:51 re/_trace.py:47 response_closed.complete
+DEBUG 2026-10-20 14:57:51 re/_trace.py:47 send_request_headers.started request=<Request [b'HEAD']>
+DEBUG 2026-10-20 14:57:51 re/_trace.py:47 send_request_headers.complete
+DEBUG 2026-10-20 14:57:51 re/_trace.py:47 send_request_body.started request=<Request [b'HEAD']>
+DEBUG 2026-10-20 14:57:51 re/_trace.py:47 send_request_body.complete
+DEBUG 2026-10-20 14:57:51 re/_trace.py:47 receive_response_headers.started request=<Request [b'HEAD']>
+DEBUG 2026-10-20 14:57:51 re/_trace.py:47 receive_response_headers.complete return_value=(b'HTTP/1.1', 200, b'OK', [(b'Content-Type', b'text/plain; charset=utf-8'), (b'Content-Length', b'3435'), (b'Connection', b'keep-alive'), (b'Date', b'Tue, 20 Oct 2026 06:19:18 GMT'), (b'ETag', b'"0447e5e3d2263d681345171d5d30600ee598b048"'), (b'X-Powered-By', b'huggingface-moon'), (b'X-Request-Id', b'Root=1-6ad707e6-5368f35c7ea94f1a1667e75f;ef18048d-bddd-4041-8815-28652d86d812'), (b'RateLimit', b'"resolvers";r=4998;t=237'), (b'RateLimit-Policy', b'"fixed window";"resolvers";q=5000;w=300'), (b'cross-origin-opener-policy', b'same-origin'), (b'Referrer-Policy', b'strict-origin-when-cross-origin'), (b'Access-Control-Max-Age', b'86400'), (b'Access-Control-Allow-Origin', b'https://huggingface.co'), (b'Access-Control-Expose-Headers', b'X-Repo-Commit,X-Request-Id,X-Error-Code,X-Error-Message,X-Total-Count,ETag,Link,Accept-Ranges,Content-Range,X-Linked-Size,X-Linked-ETag,X-Xet-Hash'), (b'X-Repo-Commit', b'a4ab68081b84bb0659d96f454edbce6abbe8a1cd'), (b'Accept-Ranges', b'bytes'), (b'X-Hub-Cache', b'MISS'), (b'Content-Disposition', b'inline; filename*=UTF-8\'\'config.json; filename="config.json";'), (b'Content-Security-Policy', b"default-src 'none'; sandbox"), (b'Vary', b'Origin'), (b'X-Cache', b'Hit from cloudfront'), (b'Via', b'1.1 1c4964336b4fc412a86181b6d86b042e.cloudfront.net (CloudFront)'), (b'X-Amz-Cf-Pop', b'SIN2-P7'), (b'Alt-Svc', b'h3=":443"; ma=86400'), (b'X-Amz-Cf-Id', b'DK8-U4cGtuaEvQD2jjtLKZtNtaUmg71G3ZlmOMw1tCY45oW9BcNgBQ=='), (b'Age', b'2313'), (b'Strict-Transport-Security', b'max-age=31536000')])
+DEBUG 2026-10-20 14:57:51 re/_trace.py:47 receive_response_body.started request=<Request [b'HEAD']>
+DEBUG 2026-10-20 14:57:51 re/_trace.py:47 receive_response_body.complete
+DEBUG 2026-10-20 14:57:51 re/_trace.py:47 response_closed.started
+DEBUG 2026-10-20 14:57:51 re/_trace.py:47 response_closed.complete
+DEBUG 2026-10-20 14:57:51 formatter.py:57 action type: None, Result: , nargs: 0, default metavar: None
+DEBUG 2026-10-20 14:57:51 formatter.py:57 action type: <class 'str'>, Result: str, nargs: None, default metavar: None
+DEBUG 2026-10-20 14:57:51 _wrapper.py:181 wrapped field at n_obs_steps has a default value of 1
+DEBUG 2026-10-20 14:57:51 _wrapper.py:214 wrapped field at input_features has a default value of {}
+DEBUG 2026-10-20 14:57:51 _wrapper.py:214 wrapped field at output_features has a default value of {}
+DEBUG 2026-10-20 14:57:51 _wrapper.py:214 wrapped field at device has a default value of None
+DEBUG 2026-10-20 14:57:51 _wrapper.py:181 wrapped field at use_amp has a default value of False
+DEBUG 2026-10-20 14:57:51 _wrapper.py:181 wrapped field at use_peft has a default value of False
+DEBUG 2026-10-20 14:57:51 _wrapper.py:181 wrapped field at push_to_hub has a default value of True
+DEBUG 2026-10-20 14:57:51 _wrapper.py:214 wrapped field at repo_id has a default value of None
+DEBUG 2026-10-20 14:57:51 _wrapper.py:214 wrapped field at private has a default value of None
+DEBUG 2026-10-20 14:57:51 _wrapper.py:214 wrapped field at tags has a default value of None
+DEBUG 2026-10-20 14:57:51 _wrapper.py:214 wrapped field at license has a default value of None
+DEBUG 2026-10-20 14:57:51 _wrapper.py:214 wrapped field at pretrained_path has a default value of None
+DEBUG 2026-10-20 14:57:51 _wrapper.py:214 wrapped field at pretrained_revision has a default value of None
+DEBUG 2026-10-20 14:57:51 _wrapper.py:181 wrapped field at checkpoint_path has a default value of allenai/MolmoAct2
+DEBUG 2026-10-20 14:57:51 _wrapper.py:214 wrapped field at checkpoint_revision has a default value of None
+DEBUG 2026-10-20 14:57:51 _wrapper.py:181 wrapped field at checkpoint_force_download has a default value of False
+DEBUG 2026-10-20 14:57:51 _wrapper.py:181 wrapped field at chunk_size has a default value of 30
+DEBUG 2026-10-20 14:57:51 _wrapper.py:181 wrapped field at n_action_steps has a default value of 30
+DEBUG 2026-10-20 14:57:51 _wrapper.py:181 wrapped field at action_mode has a default value of both
+DEBUG 2026-10-20 14:57:51 _wrapper.py:214 wrapped field at inference_action_mode has a default value of None
+DEBUG 2026-10-20 14:57:51 _wrapper.py:181 wrapped field at discrete_action_tokenizer has a default value of allenai/MolmoAct2-FAST-Tokenizer
+DEBUG 2026-10-20 14:57:51 _wrapper.py:214 wrapped field at discrete_generation_max_steps has a default value of None
+DEBUG 2026-10-20 14:57:51 _wrapper.py:214 wrapped field at norm_tag has a default value of None
+DEBUG 2026-10-20 14:57:51 _wrapper.py:181 wrapped field at setup_type has a default value of 
+DEBUG 2026-10-20 14:57:51 _wrapper.py:181 wrapped field at control_mode has a default value of 
+DEBUG 2026-10-20 14:57:51 _wrapper.py:214 wrapped field at image_keys has a default value of []
+DEBUG 2026-10-20 14:57:51 _wrapper.py:181 wrapped field at normalize_language has a default value of True
+DEBUG 2026-10-20 14:57:51 _wrapper.py:181 wrapped field at add_setup_tokens has a default value of True
+DEBUG 2026-10-20 14:57:51 _wrapper.py:181 wrapped field at add_control_tokens has a default value of True
+DEBUG 2026-10-20 14:57:51 _wrapper.py:181 wrapped field at normalize_gripper has a default value of False
+DEBUG 2026-10-20 14:57:51 _wrapper.py:181 wrapped field at num_state_tokens has a default value of 256
+DEBUG 2026-10-20 14:57:51 _wrapper.py:214 wrapped field at max_sequence_length has a default value of None
+DEBUG 2026-10-20 14:57:51 _wrapper.py:181 wrapped field at expected_max_action_dim has a default value of 32
+DEBUG 2026-10-20 14:57:51 _wrapper.py:181 wrapped field at num_flow_timesteps has a default value of 8
+DEBUG 2026-10-20 14:57:51 _wrapper.py:181 wrapped field at flow_matching_cutoff has a default value of 1.0
+DEBUG 2026-10-20 14:57:51 _wrapper.py:181 wrapped field at flow_matching_time_offset has a default value of 0.001
+DEBUG 2026-10-20 14:57:51 _wrapper.py:181 wrapped field at flow_matching_time_scale has a default value of 0.999
+DEBUG 2026-10-20 14:57:51 _wrapper.py:181 wrapped field at flow_matching_beta_alpha has a default value of 1.0
+DEBUG 2026-10-20 14:57:51 _wrapper.py:181 wrapped field at flow_matching_beta_beta has a default value of 1.5
+DEBUG 2026-10-20 14:57:51 _wrapper.py:214 wrapped field at num_inference_steps has a default value of None
+DEBUG 2026-10-20 14:57:51 _wrapper.py:181 wrapped field at mask_action_dim_padding has a default value of True
+DEBUG 2026-10-20 14:57:51 _wrapper.py:181 wrapped field at enable_inference_cuda_graph has a default value of True
+DEBUG 2026-10-20 14:57:51 _wrapper.py:181 wrapped field at per_episode_seed has a default value of False
+DEBUG 2026-10-20 14:57:51 _wrapper.py:214 wrapped field at eval_seed has a default value of None
+DEBUG 2026-10-20 14:57:51 _wrapper.py:214 wrapped field at joint_signs has a default value of None
+DEBUG 2026-10-20 14:57:51 _wrapper.py:214 wrapped field at joint_offsets has a default value of None
+DEBUG 2026-10-20 14:57:51 _wrapper.py:181 wrapped field at enable_lora_vlm has a default value of False
+DEBUG 2026-10-20 14:57:51 _wrapper.py:181 wrapped field at lora_rank has a default value of 64
+DEBUG 2026-10-20 14:57:51 _wrapper.py:181 wrapped field at lora_alpha has a default value of 16
+DEBUG 2026-10-20 14:57:51 _wrapper.py:181 wrapped field at lora_dropout has a default value of 0.05
+DEBUG 2026-10-20 14:57:51 _wrapper.py:181 wrapped field at lora_bias has a default value of none
+DEBUG 2026-10-20 14:57:51 _wrapper.py:181 wrapped field at enable_lora_action_expert has a default value of False
+DEBUG 2026-10-20 14:57:51 _wrapper.py:181 wrapped field at enable_knowledge_insulation has a default value of False
+DEBUG 2026-10-20 14:57:51 _wrapper.py:181 wrapped field at freeze_embedding has a default value of True
+DEBUG 2026-10-20 14:57:51 _wrapper.py:181 wrapped field at train_action_expert_only has a default value of False
+DEBUG 2026-10-20 14:57:51 _wrapper.py:181 wrapped field at gradient_checkpointing has a default value of False
+DEBUG 2026-10-20 14:57:51 _wrapper.py:181 wrapped field at model_dtype has a default value of bfloat16
+DEBUG 2026-10-20 14:57:51 _wrapper.py:181 wrapped field at softmax_auxiliary_loss has a default value of True
+DEBUG 2026-10-20 14:57:51 _wrapper.py:181 wrapped field at softmax_auxiliary_loss_scale has a default value of 0.0001
+DEBUG 2026-10-20 14:57:51 _wrapper.py:181 wrapped field at discrete_loss_token_weighting has a default value of root_subsegments_root_tokens
+DEBUG 2026-10-20 14:57:51 _wrapper.py:181 wrapped field at optimizer_lr has a default value of 1e-05
+DEBUG 2026-10-20 14:57:51 _wrapper.py:181 wrapped field at optimizer_vit_lr has a default value of 5e-06
+DEBUG 2026-10-20 14:57:51 _wrapper.py:181 wrapped field at optimizer_connector_lr has a default value of 5e-06
+DEBUG 2026-10-20 14:57:51 _wrapper.py:181 wrapped field at optimizer_action_expert_lr has a default value of 5e-05
+DEBUG 2026-10-20 14:57:51 _wrapper.py:214 wrapped field at optimizer_betas has a default value of (0.9, 0.95)
+DEBUG 2026-10-20 14:57:51 _wrapper.py:181 wrapped field at optimizer_eps has a default value of 1e-06
+DEBUG 2026-10-20 14:57:51 _wrapper.py:181 wrapped field at optimizer_weight_decay has a default value of 0.0
+DEBUG 2026-10-20 14:57:51 _wrapper.py:181 wrapped field at optimizer_grad_clip_norm has a default value of 1.0
+DEBUG 2026-10-20 14:57:51 _wrapper.py:181 wrapped field at scheduler_warmup_steps has a default value of 200
+DEBUG 2026-10-20 14:57:51 _wrapper.py:181 wrapped field at scheduler_decay_steps has a default value of 100000
+DEBUG 2026-10-20 14:57:51 _wrapper.py:181 wrapped field at scheduler_decay_lr has a default value of 1e-06
+DEBUG 2026-10-20 14:57:51 _wrapper.py:214 wrapped field at normalization_mapping has a default value of {'VISUAL': <NormalizationMode.IDENTITY: 'IDENTITY'>, 'STATE': <NormalizationMode.QUANTILES: 'QUANTILES'>, 'ACTION': <NormalizationMode.QUANTILES: 'QUANTILES'>}
+DEBUG 2026-10-20 14:57:51 _wrapper.py:214 wrapped field at dataset_feature_names has a default value of {}
+DEBUG 2026-10-20 14:57:51 ocstring.py:298 Warning: Unable to parse attribute docstring:     def __post_init__(self) -> None:
+DEBUG 2026-10-20 14:57:51 formatter.py:57 action type: <class 'str'>, Result: str, nargs: None, default metavar: None
+DEBUG 2026-10-20 14:57:51 _wrapper.py:181 wrapped field at rtc_config.enabled has a default value of True
+DEBUG 2026-10-20 14:57:51 _wrapper.py:214 wrapped field at rtc_config.prefix_attention_schedule has a default value of RTCAttentionSchedule.LINEAR
+DEBUG 2026-10-20 14:57:51 _wrapper.py:181 wrapped field at rtc_config.max_guidance_weight has a default value of 10.0
+DEBUG 2026-10-20 14:57:51 _wrapper.py:181 wrapped field at rtc_config.execution_horizon has a default value of 10
+DEBUG 2026-10-20 14:57:51 _wrapper.py:181 wrapped field at rtc_config.debug has a default value of False
+DEBUG 2026-10-20 14:57:51 _wrapper.py:181 wrapped field at rtc_config.debug_maxlen has a default value of 100
+DEBUG 2026-10-20 14:57:51 formatter.py:57 action type: <class 'str'>, Result: str, nargs: None, default metavar: None
+DEBUG 2026-10-20 14:57:51 ocstring.py:298 Warning: Unable to parse attribute docstring:     def __post_init__(self):
+DEBUG 2026-10-20 14:57:51 ocstring.py:298 Warning: Unable to parse attribute docstring:         default_factory=lambda: {
+DEBUG 2026-10-20 14:57:51 ocstring.py:298 Warning: Unable to parse attribute docstring:     def __post_init__(self) -> None:
+DEBUG 2026-10-20 14:57:51 gparsing.py:152 
+POST PROCESSING
+
+DEBUG 2026-10-20 14:57:51 gparsing.py:153 (raw) parsed args: Namespace()
+DEBUG 2026-10-20 14:57:51 decoding.py:130 from_dict for <class 'lerobot.policies.molmoact2.configuration_molmoact2.MolmoAct2Config'>
+DEBUG 2026-10-20 14:57:51 decoding.py:150 Decode name = n_obs_steps, type = <class 'int'>
+DEBUG 2026-10-20 14:57:51 decoding.py:150 Decode name = input_features, type = dict[str, lerobot.configs.types.PolicyFeature]
+DEBUG 2026-10-20 14:57:51 decoding.py:130 from_dict for <class 'lerobot.configs.types.PolicyFeature'>
+DEBUG 2026-10-20 14:57:51 decoding.py:150 Decode name = type, type = <enum 'FeatureType'>
+DEBUG 2026-10-20 14:57:51 decoding.py:150 Decode name = shape, type = tuple[int, ...]
+DEBUG 2026-10-20 14:57:51 decoding.py:130 from_dict for <class 'lerobot.configs.types.PolicyFeature'>
+DEBUG 2026-10-20 14:57:51 decoding.py:150 Decode name = type, type = <enum 'FeatureType'>
+DEBUG 2026-10-20 14:57:51 decoding.py:150 Decode name = shape, type = tuple[int, ...]
+DEBUG 2026-10-20 14:57:51 decoding.py:130 from_dict for <class 'lerobot.configs.types.PolicyFeature'>
+DEBUG 2026-10-20 14:57:51 decoding.py:150 Decode name = type, type = <enum 'FeatureType'>
+DEBUG 2026-10-20 14:57:51 decoding.py:150 Decode name = shape, type = tuple[int, ...]
+DEBUG 2026-10-20 14:57:51 decoding.py:150 Decode name = output_features, type = dict[str, lerobot.configs.types.PolicyFeature]
+DEBUG 2026-10-20 14:57:51 decoding.py:130 from_dict for <class 'lerobot.configs.types.PolicyFeature'>
+DEBUG 2026-10-20 14:57:51 decoding.py:150 Decode name = type, type = <enum 'FeatureType'>
+DEBUG 2026-10-20 14:57:51 decoding.py:150 Decode name = shape, type = tuple[int, ...]
+DEBUG 2026-10-20 14:57:51 decoding.py:150 Decode name = device, type = typing.Optional[str]
+DEBUG 2026-10-20 14:57:51 decoding.py:150 Decode name = use_amp, type = <class 'bool'>
+DEBUG 2026-10-20 14:57:51 decoding.py:150 Decode name = use_peft, type = <class 'bool'>
+DEBUG 2026-10-20 14:57:51 decoding.py:150 Decode name = push_to_hub, type = <class 'bool'>
+DEBUG 2026-10-20 14:57:51 decoding.py:150 Decode name = repo_id, type = typing.Optional[str]
+DEBUG 2026-10-20 14:57:51 decoding.py:150 Decode name = private, type = typing.Optional[bool]
+DEBUG 2026-10-20 14:57:51 decoding.py:150 Decode name = tags, type = typing.Optional[list[str]]
+DEBUG 2026-10-20 14:57:51 decoding.py:150 Decode name = license, type = typing.Optional[str]
+DEBUG 2026-10-20 14:57:51 decoding.py:150 Decode name = pretrained_path, type = typing.Optional[pathlib.Path]
+DEBUG 2026-10-20 14:57:51 decoding.py:150 Decode name = pretrained_revision, type = typing.Optional[str]
+DEBUG 2026-10-20 14:57:51 decoding.py:150 Decode name = checkpoint_path, type = <class 'str'>
+DEBUG 2026-10-20 14:57:51 decoding.py:150 Decode name = checkpoint_revision, type = typing.Optional[str]
+DEBUG 2026-10-20 14:57:51 decoding.py:150 Decode name = checkpoint_force_download, type = <class 'bool'>
+DEBUG 2026-10-20 14:57:51 decoding.py:150 Decode name = chunk_size, type = <class 'int'>
+DEBUG 2026-10-20 14:57:51 decoding.py:150 Decode name = n_action_steps, type = <class 'int'>
+DEBUG 2026-10-20 14:57:51 decoding.py:150 Decode name = action_mode, type = <class 'str'>
+DEBUG 2026-10-20 14:57:51 decoding.py:150 Decode name = inference_action_mode, type = typing.Optional[str]
+DEBUG 2026-10-20 14:57:51 decoding.py:150 Decode name = discrete_action_tokenizer, type = <class 'str'>
+DEBUG 2026-10-20 14:57:51 decoding.py:150 Decode name = discrete_generation_max_steps, type = typing.Optional[int]
+DEBUG 2026-10-20 14:57:51 decoding.py:150 Decode name = norm_tag, type = typing.Optional[str]
+DEBUG 2026-10-20 14:57:51 decoding.py:150 Decode name = setup_type, type = <class 'str'>
+DEBUG 2026-10-20 14:57:51 decoding.py:150 Decode name = control_mode, type = <class 'str'>
+DEBUG 2026-10-20 14:57:51 decoding.py:150 Decode name = image_keys, type = list[str]
+DEBUG 2026-10-20 14:57:51 decoding.py:150 Decode name = normalize_language, type = <class 'bool'>
+DEBUG 2026-10-20 14:57:51 decoding.py:150 Decode name = add_setup_tokens, type = <class 'bool'>
+DEBUG 2026-10-20 14:57:51 decoding.py:150 Decode name = add_control_tokens, type = <class 'bool'>
+DEBUG 2026-10-20 14:57:51 decoding.py:150 Decode name = normalize_gripper, type = <class 'bool'>
+DEBUG 2026-10-20 14:57:51 decoding.py:150 Decode name = num_state_tokens, type = <class 'int'>
+DEBUG 2026-10-20 14:57:51 decoding.py:150 Decode name = max_sequence_length, type = typing.Optional[int]
+DEBUG 2026-10-20 14:57:51 decoding.py:150 Decode name = expected_max_action_dim, type = <class 'int'>
+DEBUG 2026-10-20 14:57:51 decoding.py:150 Decode name = num_flow_timesteps, type = <class 'int'>
+DEBUG 2026-10-20 14:57:51 decoding.py:150 Decode name = flow_matching_cutoff, type = <class 'float'>
+DEBUG 2026-10-20 14:57:51 decoding.py:150 Decode name = flow_matching_time_offset, type = <class 'float'>
+DEBUG 2026-10-20 14:57:51 decoding.py:150 Decode name = flow_matching_time_scale, type = <class 'float'>
+DEBUG 2026-10-20 14:57:51 decoding.py:150 Decode name = flow_matching_beta_alpha, type = <class 'float'>
+DEBUG 2026-10-20 14:57:51 decoding.py:150 Decode name = flow_matching_beta_beta, type = <class 'float'>
+DEBUG 2026-10-20 14:57:51 decoding.py:150 Decode name = num_inference_steps, type = typing.Optional[int]
+DEBUG 2026-10-20 14:57:51 decoding.py:150 Decode name = mask_action_dim_padding, type = <class 'bool'>
+DEBUG 2026-10-20 14:57:51 decoding.py:150 Decode name = enable_inference_cuda_graph, type = <class 'bool'>
+DEBUG 2026-10-20 14:57:51 decoding.py:150 Decode name = per_episode_seed, type = <class 'bool'>
+DEBUG 2026-10-20 14:57:51 decoding.py:150 Decode name = eval_seed, type = typing.Optional[int]
+DEBUG 2026-10-20 14:57:51 decoding.py:150 Decode name = rtc_config, type = typing.Optional[lerobot.policies.rtc.configuration_rtc.RTCConfig]
+DEBUG 2026-10-20 14:57:51 decoding.py:150 Decode name = joint_signs, type = typing.Optional[list[float]]
+DEBUG 2026-10-20 14:57:51 decoding.py:150 Decode name = joint_offsets, type = typing.Optional[list[float]]
+DEBUG 2026-10-20 14:57:51 decoding.py:150 Decode name = enable_lora_vlm, type = <class 'bool'>
+DEBUG 2026-10-20 14:57:51 decoding.py:150 Decode name = lora_rank, type = <class 'int'>
+DEBUG 2026-10-20 14:57:51 decoding.py:150 Decode name = lora_alpha, type = <class 'int'>
+DEBUG 2026-10-20 14:57:51 decoding.py:150 Decode name = lora_dropout, type = <class 'float'>
+DEBUG 2026-10-20 14:57:51 decoding.py:150 Decode name = lora_bias, type = <class 'str'>
+DEBUG 2026-10-20 14:57:51 decoding.py:150 Decode name = enable_lora_action_expert, type = <class 'bool'>
+DEBUG 2026-10-20 14:57:51 decoding.py:150 Decode name = enable_knowledge_insulation, type = <class 'bool'>
+DEBUG 2026-10-20 14:57:51 decoding.py:150 Decode name = freeze_embedding, type = <class 'bool'>
+DEBUG 2026-10-20 14:57:51 decoding.py:150 Decode name = train_action_expert_only, type = <class 'bool'>
+DEBUG 2026-10-20 14:57:51 decoding.py:150 Decode name = gradient_checkpointing, type = <class 'bool'>
+DEBUG 2026-10-20 14:57:51 decoding.py:150 Decode name = model_dtype, type = <class 'str'>
+DEBUG 2026-10-20 14:57:51 decoding.py:150 Decode name = softmax_auxiliary_loss, type = <class 'bool'>
+DEBUG 2026-10-20 14:57:51 decoding.py:150 Decode name = softmax_auxiliary_loss_scale, type = <class 'float'>
+DEBUG 2026-10-20 14:57:51 decoding.py:150 Decode name = discrete_loss_token_weighting, type = <class 'str'>
+DEBUG 2026-10-20 14:57:51 decoding.py:150 Decode name = optimizer_lr, type = <class 'float'>
+DEBUG 2026-10-20 14:57:51 decoding.py:150 Decode name = optimizer_vit_lr, type = <class 'float'>
+DEBUG 2026-10-20 14:57:51 decoding.py:150 Decode name = optimizer_connector_lr, type = <class 'float'>
+DEBUG 2026-10-20 14:57:51 decoding.py:150 Decode name = optimizer_action_expert_lr, type = <class 'float'>
+DEBUG 2026-10-20 14:57:51 decoding.py:150 Decode name = optimizer_betas, type = tuple[float, float]
+DEBUG 2026-10-20 14:57:51 decoding.py:150 Decode name = optimizer_eps, type = <class 'float'>
+DEBUG 2026-10-20 14:57:51 decoding.py:150 Decode name = optimizer_weight_decay, type = <class 'float'>
+DEBUG 2026-10-20 14:57:51 decoding.py:150 Decode name = optimizer_grad_clip_norm, type = <class 'float'>
+DEBUG 2026-10-20 14:57:51 decoding.py:150 Decode name = scheduler_warmup_steps, type = <class 'int'>
+DEBUG 2026-10-20 14:57:51 decoding.py:150 Decode name = scheduler_decay_steps, type = <class 'int'>
+DEBUG 2026-10-20 14:57:51 decoding.py:150 Decode name = scheduler_decay_lr, type = <class 'float'>
+DEBUG 2026-10-20 14:57:51 decoding.py:150 Decode name = normalization_mapping, type = dict[str, lerobot.configs.types.NormalizationMode]
+DEBUG 2026-10-20 14:57:51 decoding.py:150 Decode name = dataset_feature_names, type = dict[str, typing.Any]
+DEBUG 2026-10-20 14:57:51 re/_trace.py:47 send_request_headers.started request=<Request [b'GET']>
+DEBUG 2026-10-20 14:57:51 re/_trace.py:47 send_request_headers.complete
+DEBUG 2026-10-20 14:57:51 re/_trace.py:47 send_request_body.started request=<Request [b'GET']>
+DEBUG 2026-10-20 14:57:51 re/_trace.py:47 send_request_body.complete
+DEBUG 2026-10-20 14:57:51 re/_trace.py:47 receive_response_headers.started request=<Request [b'GET']>
+DEBUG 2026-10-20 14:57:51 re/_trace.py:47 receive_response_headers.complete return_value=(b'HTTP/1.1', 200, b'OK', [(b'Content-Type', b'application/json; charset=utf-8'), (b'Transfer-Encoding', b'chunked'), (b'Connection', b'keep-alive'), (b'Date', b'Tue, 20 Oct 2026 06:57:51 GMT'), (b'content-encoding', b'gzip'), (b'ETag', b'W/"1628-0IUSYsO6MQKR6yVUlvRqG5tnjqA"'), (b'X-Powered-By', b'huggingface-moon'), (b'X-Request-Id', b'Root=1-6ad710ef-3e46a3bf4d26d0f737ab229b;02d59c76-8110-45b3-b8eb-a43464e98b10'), (b'RateLimit', b'"api";r=995;t=24'), (b'RateLimit-Policy', b'"fixed window";"api";q=1000;w=300'), (b'cross-origin-opener-policy', b'same-origin'), (b'Referrer-Policy', b'strict-origin-when-cross-origin'), (b'Access-Control-Max-Age', b'86400'), (b'Access-Control-Allow-Origin', b'https://huggingface.co'), (b'Vary', b'Origin'), (b'vary', b'Accept-Encoding'), (b'Access-Control-Expose-Headers', b'X-Repo-Commit,X-Request-Id,X-Error-Code,X-Error-Message,X-Total-Count,ETag,Link,Accept-Ranges,Content-Range,X-Linked-Size,X-Linked-ETag,X-Xet-Hash'), (b'X-Cache', b'Miss from cloudfront'), (b'Via', b'1.1 1c4964336b4fc412a86181b6d86b042e.cloudfront.net (CloudFront)'), (b'X-Amz-Cf-Pop', b'SIN2-P7'), (b'Alt-Svc', b'h3=":443"; ma=86400'), (b'X-Amz-Cf-Id', b'6Qh1ujlmKhT439FUN0Aq_2IJo7SOzVh8Hl6_80sfexisnuxJbzuqWQ=='), (b'Strict-Transport-Security', b'max-age=31536000')])
+DEBUG 2026-10-20 14:57:51 re/_trace.py:47 receive_response_body.started request=<Request [b'GET']>
+DEBUG 2026-10-20 14:57:51 re/_trace.py:47 receive_response_body.complete
+DEBUG 2026-10-20 14:57:51 re/_trace.py:47 response_closed.started
+DEBUG 2026-10-20 14:57:51 re/_trace.py:47 response_closed.complete
+DEBUG 2026-10-20 14:57:51 re/_trace.py:47 send_request_headers.started request=<Request [b'GET']>
+DEBUG 2026-10-20 14:57:51 re/_trace.py:47 send_request_headers.complete
+DEBUG 2026-10-20 14:57:51 re/_trace.py:47 send_request_body.started request=<Request [b'GET']>
+DEBUG 2026-10-20 14:57:51 re/_trace.py:47 send_request_body.complete
+DEBUG 2026-10-20 14:57:51 re/_trace.py:47 receive_response_headers.started request=<Request [b'GET']>
+DEBUG 2026-10-20 14:57:51 re/_trace.py:47 receive_response_headers.complete return_value=(b'HTTP/1.1', 200, b'OK', [(b'Content-Type', b'application/json; charset=utf-8'), (b'Transfer-Encoding', b'chunked'), (b'Connection', b'keep-alive'), (b'Date', b'Tue, 20 Oct 2026 06:57:51 GMT'), (b'content-encoding', b'gzip'), (b'ETag', b'W/"1628-0IUSYsO6MQKR6yVUlvRqG5tnjqA"'), (b'X-Powered-By', b'huggingface-moon'), (b'X-Request-Id', b'Root=1-6ad710ef-19038eb25d27b71f49d39c11;806b8fc1-8502-48f1-a286-40bbb39b1694'), (b'RateLimit', b'"api";r=994;t=24'), (b'RateLimit-Policy', b'"fixed window";"api";q=1000;w=300'), (b'cross-origin-opener-policy', b'same-origin'), (b'Referrer-Policy', b'strict-origin-when-cross-origin'), (b'Access-Control-Max-Age', b'86400'), (b'Access-Control-Allow-Origin', b'https://huggingface.co'), (b'Vary', b'Origin'), (b'vary', b'Accept-Encoding'), (b'Access-Control-Expose-Headers', b'X-Repo-Commit,X-Request-Id,X-Error-Code,X-Error-Message,X-Total-Count,ETag,Link,Accept-Ranges,Content-Range,X-Linked-Size,X-Linked-ETag,X-Xet-Hash'), (b'X-Cache', b'Miss from cloudfront'), (b'Via', b'1.1 1c4964336b4fc412a86181b6d86b042e.cloudfront.net (CloudFront)'), (b'X-Amz-Cf-Pop', b'SIN2-P7'), (b'Alt-Svc', b'h3=":443"; ma=86400'), (b'X-Amz-Cf-Id', b'bKYDD9U3UL2tXoUN638X6y1iR1n3P2gSdwRyJqGGWmvrzOlnGBZayw=='), (b'Strict-Transport-Security', b'max-age=31536000')])
+DEBUG 2026-10-20 14:57:51 re/_trace.py:47 receive_response_body.started request=<Request [b'GET']>
+DEBUG 2026-10-20 14:57:51 re/_trace.py:47 receive_response_body.complete
+DEBUG 2026-10-20 14:57:51 re/_trace.py:47 response_closed.started
+DEBUG 2026-10-20 14:57:51 re/_trace.py:47 response_closed.complete
+DEBUG 2026-10-20 14:58:13 re/_trace.py:47 close.started
+DEBUG 2026-10-20 14:58:13 re/_trace.py:47 close.complete
+DEBUG 2026-10-20 14:58:13 re/_trace.py:47 connect_tcp.started host='huggingface.co' port=443 local_address=None timeout=10 socket_options=None
+DEBUG 2026-10-20 14:58:13 re/_trace.py:47 connect_tcp.complete return_value=<httpcore._backends.sync.SyncStream object at 0x741140b9d070>
+DEBUG 2026-10-20 14:58:13 re/_trace.py:47 start_tls.started ssl_context=<ssl.SSLContext object at 0x7411b7d5d2d0> server_hostname='huggingface.co' timeout=10
+DEBUG 2026-10-20 14:58:13 re/_trace.py:47 start_tls.complete return_value=<httpcore._backends.sync.SyncStream object at 0x741140b9f140>
+DEBUG 2026-10-20 14:58:13 re/_trace.py:47 send_request_headers.started request=<Request [b'HEAD']>
+DEBUG 2026-10-20 14:58:13 re/_trace.py:47 send_request_headers.complete
+DEBUG 2026-10-20 14:58:13 re/_trace.py:47 send_request_body.started request=<Request [b'HEAD']>
+DEBUG 2026-10-20 14:58:13 re/_trace.py:47 send_request_body.complete
+DEBUG 2026-10-20 14:58:13 re/_trace.py:47 receive_response_headers.started request=<Request [b'HEAD']>
+DEBUG 2026-10-20 14:58:13 re/_trace.py:47 receive_response_headers.complete return_value=(b'HTTP/1.1', 302, b'Found', [(b'Content-Type', b'text/plain; charset=utf-8'), (b'Content-Length', b'1126'), (b'Connection', b'keep-alive'), (b'Date', b'Tue, 20 Oct 2026 06:58:13 GMT'), (b'Location', b'https://us.aws.cdn.hf.co/xet-bridge-us/6a3e9bb8d6f7a065b8419ba1/6ff9258d23017cb198db3757bac65ee469d814b05cf7eb280e70ee4cf9226fe2?X-Xet-Cas-Uid=65e7e8ab5a7f0c0eb3a64711&response-content-disposition=inline%3B+filename*%3DUTF-8%27%27model.safetensors%3B+filename%3D%22model.safetensors%22%3B&user_id=65e7e8ab5a7f0c0eb3a64711&xip=eYJTRvZesuE&Expires=1792483093&Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiaHR0cHM6Ly91cy5hd3MuY2RuLmhmLmNvL3hldC1icmlkZ2UtdXMvNmEzZTliYjhkNmY3YTA2NWI4NDE5YmExLzZmZjkyNThkMjMwMTdjYjE5OGRiMzc1N2JhYzY1ZWU0NjlkODE0YjA1Y2Y3ZWIyODBlNzBlZTRjZjkyMjZmZTJcXD9YLVhldC1DYXMtVWlkPTY1ZTdlOGFiNWE3ZjBjMGViM2E2NDcxMSZyZXNwb25zZS1jb250ZW50LWRpc3Bvc2l0aW9uPWlubGluZSUzQitmaWxlbmFtZSUyQSUzRFVURi04JTI3JTI3bW9kZWwuc2FmZXRlbnNvcnMlM0IrZmlsZW5hbWUlM0QlMjJtb2RlbC5zYWZldGVuc29ycyUyMiUzQiZ1c2VyX2lkPTY1ZTdlOGFiNWE3ZjBjMGViM2E2NDcxMSZ4aXA9ZVlKVFJ2WmVzdUUiLCJDb25kaXRpb24iOnsiRGF0ZUxlc3NUaGFuIjp7IkVwb2NoVGltZSI6MTc5MjQ4MzA5M319fV19&Signature=MEUCIE9LC1rvYvuRTFIV%7EaKZ7b4f1IkwRKxcgGVfvD41eQiMAiEAu7KxhUL%7ExQmgTZhkSV6Rh37fdvmLKmNl8faNXyp6t-o_&Key-Pair-Id=01KXEF4KZ1B6FV465MAWR4M21F&Hash-Algorithm=SHA256'), (b'X-Powered-By', b'huggingface-moon'), (b'X-Request-Id', b'Root=1-6ad71105-5a19ecea6c1c19f97a353435;e5085a5c-562c-4741-8e2b-96aa91a9ff24'), (b'RateLimit', b'"resolvers";r=4992;t=2'), (b'RateLimit-Policy', b'"fixed window";"resolvers";q=5000;w=300'), (b'cross-origin-opener-policy', b'same-origin'), (b'Referrer-Policy', b'strict-origin-when-cross-origin'), (b'Access-Control-Max-Age', b'86400'), (b'Access-Control-Allow-Origin', b'https://huggingface.co'), (b'Vary', b'Origin, Accept'), (b'Access-Control-Expose-Headers', b'X-Repo-Commit,X-Request-Id,X-Error-Code,X-Error-Message,X-Total-Count,ETag,Link,Accept-Ranges,Content-Range,X-Linked-Size,X-Linked-ETag,X-Xet-Hash'), (b'X-Repo-Commit', b'a4ab68081b84bb0659d96f454edbce6abbe8a1cd'), (b'Accept-Ranges', b'bytes'), (b'X-Hub-Cache', b'MISS'), (b'X-Linked-Size', b'21768965408'), (b'X-Linked-ETag', b'"77e340c58694560ac6e1b1cb36ce00be0e4f21e71fc1cfacaa8357251876608a"'), (b'Cache-Control', b'no-store'), (b'X-Xet-Hash', b'6ff9258d23017cb198db3757bac65ee469d814b05cf7eb280e70ee4cf9226fe2'), (b'Link', b'<https://huggingface.co/api/models/lerobot/MolmoAct2-SO100_101-LeRobot/xet-read-token/a4ab68081b84bb0659d96f454edbce6abbe8a1cd>; rel="xet-auth", <https://cas-server.xethub.hf.co/v1/reconstructions/6ff9258d23017cb198db3757bac65ee469d814b05cf7eb280e70ee4cf9226fe2>; rel="xet-reconstruction-info"'), (b'X-Cache', b'Miss from cloudfront'), (b'Via', b'1.1 723ae979ee5eb2e913f49dec46bbf6dc.cloudfront.net (CloudFront)'), (b'X-Amz-Cf-Pop', b'SIN2-P7'), (b'Alt-Svc', b'h3=":443"; ma=86400'), (b'X-Amz-Cf-Id', b'0qayHxg_1iGNITrXKRxc79K88WbTm84LX3P2DE6HSWkuhl8h2QwXWg=='), (b'Strict-Transport-Security', b'max-age=31536000')])
+DEBUG 2026-10-20 14:58:13 re/_trace.py:47 receive_response_body.started request=<Request [b'HEAD']>
+DEBUG 2026-10-20 14:58:13 re/_trace.py:47 receive_response_body.complete
+DEBUG 2026-10-20 14:58:13 re/_trace.py:47 response_closed.started
+DEBUG 2026-10-20 14:58:13 re/_trace.py:47 response_closed.complete
+DEBUG 2026-10-20 14:58:17 re/_trace.py:47 send_request_headers.started request=<Request [b'HEAD']>
+DEBUG 2026-10-20 14:58:17 re/_trace.py:47 send_request_headers.complete
+DEBUG 2026-10-20 14:58:17 re/_trace.py:47 send_request_body.started request=<Request [b'HEAD']>
+DEBUG 2026-10-20 14:58:17 re/_trace.py:47 send_request_body.complete
+DEBUG 2026-10-20 14:58:17 re/_trace.py:47 receive_response_headers.started request=<Request [b'HEAD']>
+DEBUG 2026-10-20 14:58:17 re/_trace.py:47 receive_response_headers.complete return_value=(b'HTTP/1.1', 307, b'Temporary Redirect', [(b'Content-Type', b'text/plain; charset=utf-8'), (b'Content-Length', b'300'), (b'Connection', b'keep-alive'), (b'Date', b'Tue, 20 Oct 2026 06:58:17 GMT'), (b'Location', b'/api/resolve-cache/models/lerobot/MolmoAct2-SO100_101-LeRobot/a4ab68081b84bb0659d96f454edbce6abbe8a1cd/policy_preprocessor.json?%2Flerobot%2FMolmoAct2-SO100_101-LeRobot%2Fresolve%2Fmain%2Fpolicy_preprocessor.json=&etag=%229296fe5b17e51883fe434433262caa6fe29064d8%22'), (b'X-Powered-By', b'huggingface-moon'), (b'X-Request-Id', b'Root=1-6ad71109-54564df77773afcb13a04e94;66a7355b-bed0-4cfb-a539-46b17e5de6c4'), (b'RateLimit', b'"resolvers";r=4999;t=298'), (b'RateLimit-Policy', b'"fixed window";"resolvers";q=5000;w=300'), (b'cross-origin-opener-policy', b'same-origin'), (b'Referrer-Policy', b'strict-origin-when-cross-origin'), (b'Access-Control-Max-Age', b'86400'), (b'Access-Control-Allow-Origin', b'https://huggingface.co'), (b'Vary', b'Origin, Accept'), (b'Access-Control-Expose-Headers', b'X-Repo-Commit,X-Request-Id,X-Error-Code,X-Error-Message,X-Total-Count,ETag,Link,Accept-Ranges,Content-Range,X-Linked-Size,X-Linked-ETag,X-Xet-Hash'), (b'X-Repo-Commit', b'a4ab68081b84bb0659d96f454edbce6abbe8a1cd'), (b'Accept-Ranges', b'bytes'), (b'X-Hub-Cache', b'MISS'), (b'Content-Disposition', b'inline; filename*=UTF-8\'\'policy_preprocessor.json; filename="policy_preprocessor.json";'), (b'Content-Security-Policy', b"default-src 'none'; sandbox"), (b'X-Linked-ETag', b'"9296fe5b17e51883fe434433262caa6fe29064d8"'), (b'X-Cache', b'Miss from cloudfront'), (b'Via', b'1.1 723ae979ee5eb2e913f49dec46bbf6dc.cloudfront.net (CloudFront)'), (b'X-Amz-Cf-Pop', b'SIN2-P7'), (b'Alt-Svc', b'h3=":443"; ma=86400'), (b'X-Amz-Cf-Id', b'nwgIfVJM18y5Jpl8A1UwOcd4GyQMlgh1FymNJA5CcInMwzSji7lXvg=='), (b'Strict-Transport-Security', b'max-age=31536000')])
+DEBUG 2026-10-20 14:58:17 re/_trace.py:47 receive_response_body.started request=<Request [b'HEAD']>
+DEBUG 2026-10-20 14:58:17 re/_trace.py:47 receive_response_body.complete
+DEBUG 2026-10-20 14:58:17 re/_trace.py:47 response_closed.started
+DEBUG 2026-10-20 14:58:17 re/_trace.py:47 response_closed.complete
+DEBUG 2026-10-20 14:58:17 re/_trace.py:47 send_request_headers.started request=<Request [b'HEAD']>
+DEBUG 2026-10-20 14:58:17 re/_trace.py:47 send_request_headers.complete
+DEBUG 2026-10-20 14:58:17 re/_trace.py:47 send_request_body.started request=<Request [b'HEAD']>
+DEBUG 2026-10-20 14:58:17 re/_trace.py:47 send_request_body.complete
+DEBUG 2026-10-20 14:58:17 re/_trace.py:47 receive_response_headers.started request=<Request [b'HEAD']>
+DEBUG 2026-10-20 14:58:17 re/_trace.py:47 receive_response_headers.complete return_value=(b'HTTP/1.1', 200, b'OK', [(b'Content-Type', b'text/plain; charset=utf-8'), (b'Content-Length', b'2640'), (b'Connection', b'keep-alive'), (b'Date', b'Tue, 20 Oct 2026 06:57:33 GMT'), (b'ETag', b'"9296fe5b17e51883fe434433262caa6fe29064d8"'), (b'X-Powered-By', b'huggingface-moon'), (b'X-Request-Id', b'Root=1-6ad710dd-50e48a981071c89f256c56be;16a73a32-0445-49cd-9ce8-5d26b8ef05ec'), (b'RateLimit', b'"resolvers";r=4996;t=42'), (b'RateLimit-Policy', b'"fixed window";"resolvers";q=5000;w=300'), (b'cross-origin-opener-policy', b'same-origin'), (b'Referrer-Policy', b'strict-origin-when-cross-origin'), (b'Access-Control-Max-Age', b'86400'), (b'Access-Control-Allow-Origin', b'https://huggingface.co'), (b'Access-Control-Expose-Headers', b'X-Repo-Commit,X-Request-Id,X-Error-Code,X-Error-Message,X-Total-Count,ETag,Link,Accept-Ranges,Content-Range,X-Linked-Size,X-Linked-ETag,X-Xet-Hash'), (b'X-Repo-Commit', b'a4ab68081b84bb0659d96f454edbce6abbe8a1cd'), (b'Accept-Ranges', b'bytes'), (b'X-Hub-Cache', b'MISS'), (b'Content-Disposition', b'inline; filename*=UTF-8\'\'policy_preprocessor.json; filename="policy_preprocessor.json";'), (b'Content-Security-Policy', b"default-src 'none'; sandbox"), (b'Vary', b'Origin'), (b'X-Cache', b'Hit from cloudfront'), (b'Via', b'1.1 723ae979ee5eb2e913f49dec46bbf6dc.cloudfront.net (CloudFront)'), (b'X-Amz-Cf-Pop', b'SIN2-P7'), (b'Alt-Svc', b'h3=":443"; ma=86400'), (b'X-Amz-Cf-Id', b'_iH6CRsR8GApObAa92migqQZCltGUN_vOA3Xd1y4Dn-1ZU5dSSFcbA=='), (b'Age', b'44'), (b'Strict-Transport-Security', b'max-age=31536000')])
+DEBUG 2026-10-20 14:58:17 re/_trace.py:47 receive_response_body.started request=<Request [b'HEAD']>
+DEBUG 2026-10-20 14:58:17 re/_trace.py:47 receive_response_body.complete
+DEBUG 2026-10-20 14:58:17 re/_trace.py:47 response_closed.started
+DEBUG 2026-10-20 14:58:17 re/_trace.py:47 response_closed.complete
+DEBUG 2026-10-20 14:58:17 re/_trace.py:47 send_request_headers.started request=<Request [b'GET']>
+DEBUG 2026-10-20 14:58:17 re/_trace.py:47 send_request_headers.complete
+DEBUG 2026-10-20 14:58:17 re/_trace.py:47 send_request_body.started request=<Request [b'GET']>
+DEBUG 2026-10-20 14:58:17 re/_trace.py:47 send_request_body.complete
+DEBUG 2026-10-20 14:58:17 re/_trace.py:47 receive_response_headers.started request=<Request [b'GET']>
+DEBUG 2026-10-20 14:58:17 re/_trace.py:47 receive_response_headers.complete return_value=(b'HTTP/1.1', 200, b'OK', [(b'Content-Type', b'application/json; charset=utf-8'), (b'Transfer-Encoding', b'chunked'), (b'Connection', b'keep-alive'), (b'Date', b'Tue, 20 Oct 2026 06:58:17 GMT'), (b'content-encoding', b'gzip'), (b'ETag', b'W/"1628-0IUSYsO6MQKR6yVUlvRqG5tnjqA"'), (b'X-Powered-By', b'huggingface-moon'), (b'X-Request-Id', b'Root=1-6ad71109-13c2326d6c07082b21753b6b;409f1054-24e9-4dc0-ae61-14f027fcd2ea'), (b'RateLimit', b'"api";r=999;t=298'), (b'RateLimit-Policy', b'"fixed window";"api";q=1000;w=300'), (b'cross-origin-opener-policy', b'same-origin'), (b'Referrer-Policy', b'strict-origin-when-cross-origin'), (b'Access-Control-Max-Age', b'86400'), (b'Access-Control-Allow-Origin', b'https://huggingface.co'), (b'Vary', b'Origin'), (b'vary', b'Accept-Encoding'), (b'Access-Control-Expose-Headers', b'X-Repo-Commit,X-Request-Id,X-Error-Code,X-Error-Message,X-Total-Count,ETag,Link,Accept-Ranges,Content-Range,X-Linked-Size,X-Linked-ETag,X-Xet-Hash'), (b'X-Cache', b'Miss from cloudfront'), (b'Via', b'1.1 723ae979ee5eb2e913f49dec46bbf6dc.cloudfront.net (CloudFront)'), (b'X-Amz-Cf-Pop', b'SIN2-P7'), (b'Alt-Svc', b'h3=":443"; ma=86400'), (b'X-Amz-Cf-Id', b'NiDYpRk_slH1h_dTbRs0ARmk2SoOll4VMuetqIgUHNk8fFns0XT9dw=='), (b'Strict-Transport-Security', b'max-age=31536000')])
+DEBUG 2026-10-20 14:58:17 re/_trace.py:47 receive_response_body.started request=<Request [b'GET']>
+DEBUG 2026-10-20 14:58:17 re/_trace.py:47 receive_response_body.complete
+DEBUG 2026-10-20 14:58:17 re/_trace.py:47 response_closed.started
+DEBUG 2026-10-20 14:58:17 re/_trace.py:47 response_closed.complete
+DEBUG 2026-10-20 14:58:18 re/_trace.py:47 send_request_headers.started request=<Request [b'HEAD']>
+DEBUG 2026-10-20 14:58:18 re/_trace.py:47 send_request_headers.complete
+DEBUG 2026-10-20 14:58:18 re/_trace.py:47 send_request_body.started request=<Request [b'HEAD']>
+DEBUG 2026-10-20 14:58:18 re/_trace.py:47 send_request_body.complete
+DEBUG 2026-10-20 14:58:18 re/_trace.py:47 receive_response_headers.started request=<Request [b'HEAD']>
+DEBUG 2026-10-20 14:58:18 re/_trace.py:47 receive_response_headers.complete return_value=(b'HTTP/1.1', 307, b'Temporary Redirect', [(b'Content-Type', b'text/plain; charset=utf-8'), (b'Content-Length', b'302'), (b'Connection', b'keep-alive'), (b'Date', b'Tue, 20 Oct 2026 06:58:18 GMT'), (b'Location', b'/api/resolve-cache/models/lerobot/MolmoAct2-SO100_101-LeRobot/a4ab68081b84bb0659d96f454edbce6abbe8a1cd/policy_postprocessor.json?%2Flerobot%2FMolmoAct2-SO100_101-LeRobot%2Fresolve%2Fmain%2Fpolicy_postprocessor.json=&etag=%22037646391bffe3d4deb39a723b51a7ba1c7f9ee2%22'), (b'X-Powered-By', b'huggingface-moon'), (b'X-Request-Id', b'Root=1-6ad7110a-46995368741b9f4137a8765a;9622e0d0-cc3c-4f93-848b-021381d3b303'), (b'RateLimit', b'"resolvers";r=4998;t=297'), (b'RateLimit-Policy', b'"fixed window";"resolvers";q=5000;w=300'), (b'cross-origin-opener-policy', b'same-origin'), (b'Referrer-Policy', b'strict-origin-when-cross-origin'), (b'Access-Control-Max-Age', b'86400'), (b'Access-Control-Allow-Origin', b'https://huggingface.co'), (b'Vary', b'Origin, Accept'), (b'Access-Control-Expose-Headers', b'X-Repo-Commit,X-Request-Id,X-Error-Code,X-Error-Message,X-Total-Count,ETag,Link,Accept-Ranges,Content-Range,X-Linked-Size,X-Linked-ETag,X-Xet-Hash'), (b'X-Repo-Commit', b'a4ab68081b84bb0659d96f454edbce6abbe8a1cd'), (b'Accept-Ranges', b'bytes'), (b'X-Hub-Cache', b'MISS'), (b'Content-Disposition', b'inline; filename*=UTF-8\'\'policy_postprocessor.json; filename="policy_postprocessor.json";'), (b'Content-Security-Policy', b"default-src 'none'; sandbox"), (b'X-Linked-ETag', b'"037646391bffe3d4deb39a723b51a7ba1c7f9ee2"'), (b'X-Cache', b'Miss from cloudfront'), (b'Via', b'1.1 723ae979ee5eb2e913f49dec46bbf6dc.cloudfront.net (CloudFront)'), (b'X-Amz-Cf-Pop', b'SIN2-P7'), (b'Alt-Svc', b'h3=":443"; ma=86400'), (b'X-Amz-Cf-Id', b'oJ8lddDBJxEGSiSDtnCObraQFdwRJy3mzMiHxq5HuXm4XsrDCJx1Xw=='), (b'Strict-Transport-Security', b'max-age=31536000')])
+DEBUG 2026-10-20 14:58:18 re/_trace.py:47 receive_response_body.started request=<Request [b'HEAD']>
+DEBUG 2026-10-20 14:58:18 re/_trace.py:47 receive_response_body.complete
+DEBUG 2026-10-20 14:58:18 re/_trace.py:47 response_closed.started
+DEBUG 2026-10-20 14:58:18 re/_trace.py:47 response_closed.complete
+DEBUG 2026-10-20 14:58:18 re/_trace.py:47 send_request_headers.started request=<Request [b'HEAD']>
+DEBUG 2026-10-20 14:58:18 re/_trace.py:47 send_request_headers.complete
+DEBUG 2026-10-20 14:58:18 re/_trace.py:47 send_request_body.started request=<Request [b'HEAD']>
+DEBUG 2026-10-20 14:58:18 re/_trace.py:47 send_request_body.complete
+DEBUG 2026-10-20 14:58:18 re/_trace.py:47 receive_response_headers.started request=<Request [b'HEAD']>
+DEBUG 2026-10-20 14:58:18 re/_trace.py:47 receive_response_headers.complete return_value=(b'HTTP/1.1', 200, b'OK', [(b'Content-Type', b'text/plain; charset=utf-8'), (b'Content-Length', b'1109'), (b'Connection', b'keep-alive'), (b'Date', b'Tue, 20 Oct 2026 06:57:34 GMT'), (b'ETag', b'"037646391bffe3d4deb39a723b51a7ba1c7f9ee2"'), (b'X-Powered-By', b'huggingface-moon'), (b'X-Request-Id', b'Root=1-6ad710de-03245eeb40fbfcf4185f9ba9;76a9ea99-0579-49f7-bbf8-9c267698c2ec'), (b'RateLimit', b'"resolvers";r=4994;t=41'), (b'RateLimit-Policy', b'"fixed window";"resolvers";q=5000;w=300'), (b'cross-origin-opener-policy', b'same-origin'), (b'Referrer-Policy', b'strict-origin-when-cross-origin'), (b'Access-Control-Max-Age', b'86400'), (b'Access-Control-Allow-Origin', b'https://huggingface.co'), (b'Access-Control-Expose-Headers', b'X-Repo-Commit,X-Request-Id,X-Error-Code,X-Error-Message,X-Total-Count,ETag,Link,Accept-Ranges,Content-Range,X-Linked-Size,X-Linked-ETag,X-Xet-Hash'), (b'X-Repo-Commit', b'a4ab68081b84bb0659d96f454edbce6abbe8a1cd'), (b'Accept-Ranges', b'bytes'), (b'X-Hub-Cache', b'MISS'), (b'Content-Disposition', b'inline; filename*=UTF-8\'\'policy_postprocessor.json; filename="policy_postprocessor.json";'), (b'Content-Security-Policy', b"default-src 'none'; sandbox"), (b'Vary', b'Origin'), (b'X-Cache', b'Hit from cloudfront'), (b'Via', b'1.1 723ae979ee5eb2e913f49dec46bbf6dc.cloudfront.net (CloudFront)'), (b'X-Amz-Cf-Pop', b'SIN2-P7'), (b'Alt-Svc', b'h3=":443"; ma=86400'), (b'X-Amz-Cf-Id', b'qkLU-u0wSfIyR-frbAwy8rf-W-dj_-V8yyJMyfm6pdLQyFb47srv5w=='), (b'Age', b'43'), (b'Strict-Transport-Security', b'max-age=31536000')])
+DEBUG 2026-10-20 14:58:18 re/_trace.py:47 receive_response_body.started request=<Request [b'HEAD']>
+DEBUG 2026-10-20 14:58:18 re/_trace.py:47 receive_response_body.complete
+DEBUG 2026-10-20 14:58:18 re/_trace.py:47 response_closed.started
+DEBUG 2026-10-20 14:58:18 re/_trace.py:47 response_closed.complete
+INFO 2026-10-20 14:58:18 y_server.py:169 Time taken to put policy on cuda: 27.2834 seconds
+DEBUG 2026-10-20 14:58:18 y_server.py:176 Receiving observations from ipv4:127.0.0.1:50588
+INFO 2026-10-20 14:58:18 ort/utils.py:78 <Logger policy_server (NOTSET)> Starting receiver
+DEBUG 2026-10-20 14:58:18 ort/utils.py:80 <Logger policy_server (NOTSET)> Received item
+DEBUG 2026-10-20 14:58:18 ort/utils.py:97 <Logger policy_server (NOTSET)> Received data at step end size 1843806
+DEBUG 2026-10-20 14:58:18 y_server.py:186 Received observation #0
+DEBUG 2026-10-20 14:58:18 y_server.py:194 Received observation #0 | Avg FPS: 0.14 | Target: 30.00 | One-way latency: 4.69ms
+DEBUG 2026-10-20 14:58:18 y_server.py:201 Server timestamp: 1792479498.445432 | Client timestamp: 1792479498.440741 | Deserialization time: 0.009854s
+DEBUG 2026-10-20 14:58:18 y_server.py:296 Enqueuing observation. Must go: True | Last processed obs: 500
+DEBUG 2026-10-20 14:58:18 y_server.py:218 Client ipv4:127.0.0.1:50588 connected for action streaming
+INFO 2026-10-20 14:58:18 y_server.py:224 Running inference for observation #0 (must_go: True)
+INFO 2026-10-20 14:58:19 y_server.py:359 Preprocessing and inference took 1.0753s, action shape: torch.Size([1, 30, 6])
+DEBUG 2026-10-20 14:58:19 y_server.py:380 Postprocessed action shape: torch.Size([30, 6])
+INFO 2026-10-20 14:58:19 y_server.py:391 Observation 0 | Total time: 1100.18ms
+DEBUG 2026-10-20 14:58:19 y_server.py:396 Observation 0 | Prepare time: 1.36ms | Preprocessing time: 9.16ms | Inference time: 1075.34ms | Postprocessing time: 13.61ms | Total time: 1100.18ms
+INFO 2026-10-20 14:58:19 y_server.py:242 Action chunk #0 generated | Total time: 1101.24ms
+DEBUG 2026-10-20 14:58:19 y_server.py:247 Action chunk #0 generated | Inference time: 1.10s |Serialize time: 0.00s |Total time: 1.10s
+DEBUG 2026-10-20 14:58:19 y_server.py:176 Receiving observations from ipv4:127.0.0.1:50588
+INFO 2026-10-20 14:58:19 ort/utils.py:78 <Logger policy_server (NOTSET)> Starting receiver
+DEBUG 2026-10-20 14:58:19 ort/utils.py:80 <Logger policy_server (NOTSET)> Received item
+DEBUG 2026-10-20 14:58:19 ort/utils.py:97 <Logger policy_server (NOTSET)> Received data at step end size 1843806
+DEBUG 2026-10-20 14:58:19 y_server.py:186 Received observation #100
+DEBUG 2026-10-20 14:58:19 y_server.py:194 Received observation #100 | Avg FPS: 0.16 | Target: 30.00 | One-way latency: 1.52ms
+DEBUG 2026-10-20 14:58:19 y_server.py:201 Server timestamp: 1792479499.565183 | Client timestamp: 1792479499.563662 | Deserialization time: 0.007771s
+DEBUG 2026-10-20 14:58:19 y_server.py:296 Enqueuing observation. Must go: True | Last processed obs: 0
+DEBUG 2026-10-20 14:58:19 y_server.py:218 Client ipv4:127.0.0.1:50588 connected for action streaming
+INFO 2026-10-20 14:58:19 y_server.py:224 Running inference for observation #100 (must_go: True)
+INFO 2026-10-20 14:58:19 y_server.py:359 Preprocessing and inference took 0.3326s, action shape: torch.Size([1, 30, 6])
+DEBUG 2026-10-20 14:58:19 y_server.py:380 Postprocessed action shape: torch.Size([30, 6])
+INFO 2026-10-20 14:58:19 y_server.py:391 Observation 100 | Total time: 395.17ms
+DEBUG 2026-10-20 14:58:19 y_server.py:396 Observation 100 | Prepare time: 1.54ms | Preprocessing time: 9.34ms | Inference time: 332.61ms | Postprocessing time: 51.43ms | Total time: 395.17ms
+INFO 2026-10-20 14:58:19 y_server.py:242 Action chunk #100 generated | Total time: 396.65ms
+DEBUG 2026-10-20 14:58:19 y_server.py:247 Action chunk #100 generated | Inference time: 0.40s |Serialize time: 0.00s |Total time: 0.40s
+DEBUG 2026-10-20 14:58:19 y_server.py:176 Receiving observations from ipv4:127.0.0.1:50588
+INFO 2026-10-20 14:58:19 ort/utils.py:78 <Logger policy_server (NOTSET)> Starting receiver
+DEBUG 2026-10-20 14:58:19 ort/utils.py:80 <Logger policy_server (NOTSET)> Received item
+DEBUG 2026-10-20 14:58:19 ort/utils.py:97 <Logger policy_server (NOTSET)> Received data at step end size 1843806
+DEBUG 2026-10-20 14:58:19 y_server.py:186 Received observation #200
+DEBUG 2026-10-20 14:58:19 y_server.py:194 Received observation #200 | Avg FPS: 0.18 | Target: 30.00 | One-way latency: 1.92ms
+DEBUG 2026-10-20 14:58:19 y_server.py:201 Server timestamp: 1792479499.977298 | Client timestamp: 1792479499.975376 | Deserialization time: 0.005240s
+DEBUG 2026-10-20 14:58:19 y_server.py:296 Enqueuing observation. Must go: True | Last processed obs: 100
+DEBUG 2026-10-20 14:58:19 y_server.py:218 Client ipv4:127.0.0.1:50588 connected for action streaming
+INFO 2026-10-20 14:58:19 y_server.py:224 Running inference for observation #200 (must_go: True)
+INFO 2026-10-20 14:58:20 y_server.py:359 Preprocessing and inference took 0.3400s, action shape: torch.Size([1, 30, 6])
+DEBUG 2026-10-20 14:58:20 y_server.py:380 Postprocessed action shape: torch.Size([30, 6])
+INFO 2026-10-20 14:58:20 y_server.py:391 Observation 200 | Total time: 404.80ms
+DEBUG 2026-10-20 14:58:20 y_server.py:396 Observation 200 | Prepare time: 1.52ms | Preprocessing time: 11.72ms | Inference time: 339.95ms | Postprocessing time: 51.37ms | Total time: 404.80ms
+INFO 2026-10-20 14:58:20 y_server.py:242 Action chunk #200 generated | Total time: 406.28ms
+DEBUG 2026-10-20 14:58:20 y_server.py:247 Action chunk #200 generated | Inference time: 0.40s |Serialize time: 0.00s |Total time: 0.41s
