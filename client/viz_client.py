@@ -7,6 +7,8 @@ arguments, plus
     --no_browser           don't open the viewer automatically
     --image_size=HxW       shrink camera frames to HxW before sending (see resize_client.py);
                            recorded frames are then what the policy sees. Omit to send full frames.
+    --no_home              leave the arm where it is on exit instead of returning it to its
+                           start pose (see home_on_exit.py)
 
 Recorded per run (see viz_server.py for the on-disk layout):
   obs    every observation sent: joint state, both camera frames, must-go flag, queue size, upload time
@@ -31,6 +33,7 @@ from lerobot.async_inference.configs import RobotClientConfig
 from lerobot.async_inference.robot_client import RobotClient
 from lerobot.utils.import_utils import register_third_party_plugins
 
+import home_on_exit
 import resize_client
 from viz_server import DEFAULT_RUNS_DIR, RunRecorder, serve
 
@@ -218,5 +221,7 @@ def main(cfg: RobotClientConfig):
 if __name__ == "__main__":
     if any(a.startswith("--image_size=") for a in sys.argv[1:]):
         resize_client.install(*resize_client.pop_image_size())
+    if not home_on_exit.pop_no_home():
+        home_on_exit.install()
     register_third_party_plugins()
     main()

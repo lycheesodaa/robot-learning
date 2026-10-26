@@ -3,6 +3,8 @@
 Drop-in replacement for `python -m lerobot.async_inference.robot_client`: takes the same
 arguments, plus
     --image_size=224x224   HxW to send every camera frame at (default: MolmoAct2's 224x224)
+    --no_home              leave the arm where it is on exit instead of returning it to its
+                           start pose (see home_on_exit.py)
 
 The policy server resizes every frame to the policy's input shape anyway
 (helpers.prepare_raw_observation). Doing it here with the same function gives the policy the
@@ -17,6 +19,8 @@ import torch
 from lerobot.async_inference import robot_client
 from lerobot.async_inference.helpers import resize_robot_observation_image
 from lerobot.utils.import_utils import register_third_party_plugins
+
+import home_on_exit
 
 DEFAULT_IMAGE_SIZE = (224, 224)
 
@@ -76,5 +80,7 @@ def pop_image_size() -> tuple[int, int]:
 
 if __name__ == "__main__":
     install(*pop_image_size())
+    if not home_on_exit.pop_no_home():
+        home_on_exit.install()
     register_third_party_plugins()
     robot_client.async_client()
