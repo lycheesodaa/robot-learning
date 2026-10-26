@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "concept": {"id": "fragility", "definition": "Object fragility and conditional avoidance of high releases"},
+  "also_analyse": ["release_height", "release_rule"],
+  "task_profile": {
+    "name": "fragile_release",
+    "max_release_height_m": 0.05,
+    "low_height_m": 0.02,
+    "high_height_m": 0.20,
+    "threshold_basis": "illustrative_experiment_setting",
+    "height_reference": "object_bottom_above_receiving_surface",
+    "interaction": ["fragility", "release_height"]
+  },
+  "model": "so101",
+  "device": "cuda:0",
+  "dtype": "float32",
+  "manifest": "artifacts/concept_inputs/fragile_release/examples.jsonl",
+  "prompt_bank": "artifacts/concept_inputs/fragile_release/prompt_bank.json",
+  "seeds": [1000, 1001, 1002],
+  "num_steps": 10,
+  "components": ["*"],
+  "capture_raw": false,
+  "pooling": "all_emitted_positions_mean",
+  "max_capture_mib": 256,
+  "top_k": 32,
+  "bootstrap": 500,
+  "output_root": "artifacts/concepts",
+  "interventions": {"enabled": true, "group_size": 8, "max_examples": 4, "patch": true}
+}

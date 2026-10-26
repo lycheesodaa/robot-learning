@@ -15,13 +15,11 @@ nvidia-smi
 
 **Checked on 2026-10-19:** the host driver is working: NVIDIA 580.178.04, with two RTX 6000 Ada GPUs exposing 49140 MiB each. The policy environment sees both GPUs and successfully runs the SO-101 sample on `cuda:0` using PyTorch 2.7.1+cu126. The CUDA 13.0 version displayed by `nvidia-smi` is the driver capability; the installed PyTorch runtime is CUDA 12.6.
 
-The restricted sandbox still hides `/dev/nvidia*`, causing `nvidia-smi` and PyTorch CUDA discovery to fail there even though the host is healthy. Run the diagnosis and demo from a host terminal or an execution context permitted to access the GPU devices. The earlier missing-device observations alone cannot establish that the host driver was broken. No driver installation or changes were needed for this check. Host diagnostics are recorded in `artifacts/diagnostics-host-2026-10-19.json`.
+The restricted sandbox still hides `/dev/nvidia*`, causing `nvidia-smi` and PyTorch CUDA discovery to fail there even though the host is healthy. Run the diagnosis and GPU inference from a host terminal or an execution context permitted to access the GPU devices. The earlier missing-device observations alone cannot establish that the host driver was broken. No driver installation or changes were needed for this check. Host diagnostics are recorded in `artifacts/diagnostics-host-2026-10-19.json`.
 
 ```bash
-.envs/policy/bin/python demo_so101.py --device cuda:0
-# Open artifacts/so101_demo/report.html after the command finishes.
+.envs/policy/bin/python scripts/smoke_inference.py --model so101 --device cuda:0
 ```
-
 
 The [checkpoint card](https://huggingface.co/allenai/MolmoAct2-SO100_101) estimates around 24 GB for FP32 without CUDA graphs, 26 GB with them, and under 16 GB for BF16 in its tests. Extra activation capture adds memory. GPU smoke tests validate shapes and finite actions, not closed-loop competence or safety.
 
