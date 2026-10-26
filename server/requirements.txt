@@ -1,0 +1,1 @@
+lerobot[async,molmoact2]==0.6.1

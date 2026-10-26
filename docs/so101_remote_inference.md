@@ -12,14 +12,17 @@ Both sides use **LeRobot 0.6.1 on Python 3.12**.
 
 ## Files
 
+The server files are on this branch. The client files are on the [`client` branch](https://github.com/lycheesodaa/robot-learning/tree/client); run the robot PC commands below from a checkout of that branch.
+
 | File | Purpose |
 | --- | --- |
 | [server/serve_molmoact2.py](../server/serve_molmoact2.py) | Stock LeRobot policy server with `molmoact2` added to its allow-list; takes the same options |
 | [server/smoke_client.py](../server/smoke_client.py) | Robot-free loopback test: sends the official sample images and state, prints the action chunk |
-| [client/so101_molmoact2.yaml](../client/so101_molmoact2.yaml) | All client settings (robot, cameras, checkpoint, chunking); copy it per setup |
-| [client/run_client.ps1](../client/run_client.ps1) | Windows: opens the tunnel, runs the client, closes the tunnel |
-| [client/run_client.sh](../client/run_client.sh) | The same for Linux and macOS |
-| [client/check_torque_hold.py](../client/check_torque_hold.py) | Checks whether turning on torque would make the arm jump (read-only by default); `--probe-firmware` makes a 5° test move; `--sync` removes the risk |
+| [server/requirements.txt](../server/requirements.txt) | Server packages, for a fresh env outside `.envs/lerobot` |
+| [client/so101_molmoact2.yaml](https://github.com/lycheesodaa/robot-learning/blob/client/client/so101_molmoact2.yaml) | All client settings (robot, cameras, checkpoint, chunking); copy it per setup |
+| [client/run_client.ps1](https://github.com/lycheesodaa/robot-learning/blob/client/client/run_client.ps1) | Windows: opens the tunnel, runs the client, closes the tunnel |
+| [client/run_client.sh](https://github.com/lycheesodaa/robot-learning/blob/client/client/run_client.sh) | The same for Linux and macOS |
+| [client/check_torque_hold.py](https://github.com/lycheesodaa/robot-learning/blob/client/client/check_torque_hold.py) | Checks whether turning on torque would make the arm jump (read-only by default); `--probe-firmware` makes a 5° test move; `--sync` removes the risk |
 
 ## 1. Server (GPU machine)
 
@@ -142,6 +145,23 @@ Each inference logs a line like `Chunk #534 (must_go: True) | requested: end-of-
 
 - `--no_similarity_filter`: by default the server skips observations whose joints moved less than 1 (L2) since the last inference. While the arm is still, only must_go observations get through, so the policy re-plans about every 4 s. This flag makes it re-plan on every observation. Continuous MolmoAct2 samples fresh noise on every call, so more inferences give the policy more chances to produce a chunk that commits.
 - `--record_dir=DIR`: saves each inference's camera frames as JPEG, plus a line in `inferences.jsonl` with the task, joint state and returned chunk. Each client connection gets its own subfolder. Expect about 100 KB per inference.
+
+### Smoother motion: real-time chunking
+
+Each chunk is smooth on its own; the jerks come where one chunk hands over to the next. MolmoAct2 samples fresh noise on every call, so consecutive chunks disagree on the timesteps they share, by 2–8° on average in the recorded runs. `--rtc` turns on real-time chunking (Black et al., 2025). The server remembers the last chunk it sent. When it denoises the next one, it pulls the steps the arm will execute before the new chunk arrives onto the old chunk, then fades the pull out over the following steps.
+
+```bash
+# server: add to the usual command
+.envs/lerobot/bin/python server/serve_molmoact2.py ... --rtc
+# client: execute exactly what the server sent, with no blending
+client/run_client.sh weisoon@172.16.163.102 "pick up the pen" --aggregate_fn_name=latest_only
+```
+
+Use `latest_only` on the client with `--rtc`. The server guides each chunk toward the chunk it sent last; the client's blending would make the arm execute something else.
+
+A replay of 80 recorded inferences on 2026-10-25 lowered the jump at each handover from 2.07° to 0.18° on average (90th percentile 8.5° to 0.7°). Each round trip took 0.49 s instead of 0.41 s, because the guided denoising loop runs without CUDA graphs. These are open-loop replays; they have not been run on the arm.
+
+Each inference logs `RTC #<timestep> | prefix <n> steps, delay <d> | client <r> actions/s, estimated latency <s>`. The delay is the number of steps the client executes before the chunk arrives, and those steps follow the old chunk exactly. The server estimates it from the client's action rate (from the client's own timestamps, so clock skew does not matter), the time the observation waited on the server, the inference time, and `--rtc_net_latency` (default 0.25 s, for upload and download). If the arm still jumps when a chunk arrives, raise `--rtc_net_latency` or fix the delay with `--rtc_delay=N`. A delay that is too high costs a little reactivity; one that is too low brings the jump back. `--rtc_horizon` (default 20) sets the step where the guidance has faded to zero.
 
 ## 5. Troubleshooting
 
