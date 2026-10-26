@@ -36,7 +36,7 @@ a local client drives the arm. The two talk over gRPC through an SSH tunnel.
 | | Robot PC | GPU server |
 |---|---|---|
 | Python | 3.12+ (developed on 3.13) | 3.12+ |
-| Packages | [requirements.txt](requirements.txt) | [server/requirements.txt](server/requirements.txt) |
+| Packages | [requirements.txt](requirements.txt) | [server/requirements.txt](https://github.com/lycheesodaa/robot-learning/blob/main/server/requirements.txt) (`main` branch) |
 | Also needs | OpenSSH client (`ssh` on PATH) | NVIDIA driver plus a CUDA build of PyTorch, and access to the Hugging Face Hub (or a local copy of the checkpoint) |
 
 ### Robot PC setup
@@ -58,8 +58,13 @@ Then set up the arm and cameras:
    lerobot-calibrate --robot.type=so101_follower --robot.port=COM3 --robot.id=my_follower
    ```
    The `id` here must match `robot.id` in the YAML, because it picks which saved calibration is loaded.
+5. **Check torque-on behaviour** (once per arm). With the arm resting and torque off, run
+   `python client/check_torque_hold.py --probe-firmware`. If it reports the arm WILL jump to a stale target,
+   run `python client/check_torque_hold.py --sync` before each session.
 
 ### GPU server setup
+
+The server code is on the [`main` branch](https://github.com/lycheesodaa/robot-learning/tree/main); run these from a checkout of it.
 
 ```bash
 python -m venv venv && source venv/bin/activate
@@ -120,4 +125,4 @@ python client/viz_server.py runs/20261020_182433
 | `client/viz_client.py` | Robot client with run recording and the live viewer |
 | `client/viz_server.py`, `client/viz.html` | Viewer and run replay |
 | `client/resize_client.py` | Robot client that resizes frames, without recording |
-| `server/serve_molmoact2.py` | LeRobot policy server with `molmoact2` added to its supported policies |
+| `client/check_torque_hold.py` | Checks whether turning on torque would make the arm jump; `--sync` removes the risk |
