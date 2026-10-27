@@ -28,65 +28,162 @@ index. Freeze selection on discovery data; use selection layouts for tuning and
 held-out layouts for evaluation. Three layouts/three seeds are a pilot, not a
 statistical power claim. Do not infer visual recognition from instruction labels.
 
-## Experiments and gates
+## Experiments and gates (overview)
 
-| Stage | Work and acceptance criterion | Status |
+This table is a summary for visibility. The [checklist](#checklist) below is the
+working record; update the table only after the checklist items behind it are ticked.
+
+| Stage | Acceptance criterion | Status |
 |---|---|---|
-| A. Apparatus | Validate units/order/signs, gripper endpoints, cameras, contact grasp, snapshot replay and scripted placement. Archive previews and telemetry. | Complete: six poses, replay and rendered diagnostics validated |
-| B. Baseline | Unmodified MolmoAct2 on a held object; reproduce an episode with measured release and placement. Retain no-release/slip/failure outcomes. | Complete for one scene/seed; repeated via zero-strength control |
-| C. Controlled behavior | Fragile/durable × high/low × implicit/explicit; identical appearance and physics. Compare release rate within horizon, height, latency, vertical motion, slip and task success. | Implemented; full 72-episode baseline matrix pending |
-| D. Simulator-grounded discovery | Capture pooled activations at each prediction; separately probe fragility, height and interaction using discovery data. Select token/flow detail only where needed. Compare pilot rankings with simulator findings. | Capture validated; simulator probe fitting/selection pending |
-| E. Causal suppression | Baseline, zero-strength, top neuron/group, matched random group and whole component. Hooks act at every prediction. Require selective effects rather than general immobility. | Three-condition pilot validated; broad causal study pending |
-| F. Patching and steering | Start with controlled initial observations. Compare one-time vs repeated interventions. For repeated language counterfactuals, obtain donor activations on recipient's current observation; do not assume independently diverging trajectories align. | Deferred |
-| G. Dissociation/generalization | Separate fragility, height and interaction interventions; held-out layouts/objects and bidirectional steering. | Deferred |
-| H. Visual evidence | Neutral/congruent/conflicting language crossed with visual/material cues; include transparent durable and opaque fragile examples. Material labels need independent metadata. | Deferred |
-| I. Feature decomposition | Consider SAEs/transcoders only after reproducible effects justify the cost. Layer order and circuit structure are hypotheses. | Deferred |
-| J. Applications | Monitoring, steering deployment and targeted fine-tuning require independent validation; outside initial scope. | Deferred |
+| A. Apparatus | Units/order/signs, gripper endpoints, cameras, contact grasp, snapshot replay and scripted placement validated and archived. | Complete |
+| B. Baseline | Unmodified MolmoAct2 on a held object; a reproduced episode with measured release and placement. | Complete (one scene/seed) |
+| C. Controlled behaviour | Fragile/durable × high/low × implicit/explicit with identical appearance and physics; release rate, height, latency, vertical motion, slip and task success compared. | Ready to run |
+| D. Simulator-grounded discovery | Fragility, height and interaction probed separately on simulator discovery data; compared with pilot rankings. | Capture validated; probes pending |
+| E. Causal suppression | Full control set at every prediction; selective effects rather than general immobility. | Pilot only |
+| F. Patching and steering | One-time vs repeated interventions; donors from the recipient's current observation. | Deferred |
+| G. Dissociation/generalization | Separate interventions; held-out layouts/objects; bidirectional steering. | Deferred |
+| H. Visual evidence | Language crossed with visual/material cues, with independent material metadata. | Deferred |
+| I. Feature decomposition | SAEs/transcoders only after reproducible effects justify the cost. | Deferred |
+| J. Applications | Monitoring, steering and targeted fine-tuning with independent validation. | Out of initial scope |
 
-## Implementation sequence
+## Interpretation rules
 
-1. Environment adapter and explicit calibration; no physical-robot API changes.
-2. Validated high/low physical grasps and complete state snapshots.
-3. Receding-horizon rollout, physics-rate telemetry and video.
-4. Debounced observed release with pre-transition height; resting placement score.
-5. CLI diagnostics, individual runs and matched suites with scoped interventions.
-6. Optional simulator activation capture and scene-manifest export for existing probes.
-7. Regression tests, diagnostic runs, then real-policy validation where CUDA is visible.
-
-## Interpretation and next experiments
-
-The three-condition pilot is an integration check. It uses targets from the prior
-fixed-image exploratory archive, not a circuit discovered on simulator evidence.
-Do not tune targets or thresholds on its evaluation outcomes. For the next study:
-
-1. Run the full baseline factorial matrix and inspect release/no-release, slips,
-   arm inactivity, placement, release timing and height distributions. Preserve all
-   outcomes; condition comparisons are paired by layout and inference seed.
-2. Export simulator initial scenes and fit separate fragility, height and
-   interaction probes on discovery groups, with selection/evaluation kept apart.
-   Pooled per-prediction activations also exist for later temporal analyses; define
-   an alignment rule before comparing later observations on diverging trajectories.
-3. Freeze targets and test the full suppression/control set. Check whether changed
-   release height is specific or accompanies impaired movement/task performance.
-4. For patching, first compare matched initial observations. Define donor module,
-   site, selected positions, invocation/flow step and activation shapes explicitly.
-   Reject incompatible donors. Then compare a single patched prediction with
-   repeated counterfactual donors generated on recipient observations.
-5. Add bidirectional steering and separate height/fragility perturbations. Require
-   held-out effects before introducing visual material contrasts or sparse-feature
-   decomposition. Early/middle/late localization is a hypothesis, not an assumption.
+The three-condition pilot is an integration check. Its targets come from the
+fixed-image exploratory archive, not from a circuit discovered on simulator evidence.
+Do not tune targets or thresholds on its evaluation outcomes. Early/middle/late
+localization is a hypothesis, not an assumption.
 
 Configurations and simulator seeds are frozen per run. Three seeds/layouts are an
 engineering pilot; broad conclusions need more independently varied scenes and a
 predeclared evaluation set. The object is currently a box. Camera, scene, mass or
 contact-parameter changes require repeating the apparatus checks. Rendering changes
-can alter policy behavior even when the underlying physics is identical.
+can alter policy behaviour even when the underlying physics is identical.
 
-CLI runs append factual outcomes below when `progress.enabled=true`; they never
-automatically declare a research hypothesis verified. Update the stage table only
-after reviewing the evidence. Each iteration should record its hypothesis, changed
-controls, frozen controls, discovery/selection/evaluation allocation, result, and
-next action. Avoid mixing outputs from different configuration hashes.
+CLI runs append factual outcomes to the progress log when `progress.enabled=true`;
+they never declare a research hypothesis verified. Each iteration records its
+hypothesis, changed controls, frozen controls, discovery/selection/evaluation
+allocation, result and next action. Avoid mixing outputs from different
+configuration hashes.
+
+## Checklist
+
+Tick an item only after reviewing its evidence, and cite that evidence (an artifact
+or a progress-log entry). Items run in order within a stage. The five "next
+experiments" are C, D, E, F and G, in that order.
+
+### 0. Implementation
+
+- [x] Environment adapter with explicit calibration; no physical-robot API changes.
+- [x] Validated high/low physical grasps and complete state snapshots.
+- [x] Receding-horizon rollout, physics-rate telemetry and video.
+- [x] Debounced observed release with pre-transition height; resting placement score.
+- [x] CLI checks, individual runs and matched suites with scoped interventions.
+- [x] Per-prediction activation capture and scene-manifest export for probes.
+- [x] Regression tests pass (55 on 2026-10-27; 49 after the refactor).
+- [x] Repository reduced to this study with behaviour unchanged (2026-10-27 refactor entry).
+
+### A. Apparatus
+
+- [x] Units, joint order, signs and gripper endpoints validated; conversions round-trip.
+- [x] All six held poses (3 layouts × 2 heights) stable: grasp drift 0.163–0.170 mm over 1 s; starts 1.92–1.94 cm and 19.93–19.94 cm.
+- [x] Full-state snapshot replay numerically identical; mismatched scenes rejected.
+- [x] Cameras rendered; coplanar marker flicker fixed (visual-only marker raised 0.5 mm, v2).
+- [x] Scripted releases scored correctly: 1.409 cm (safe) and 19.893 cm (violation), both placed.
+- [x] Previews, telemetry and checks archived ([validation-rendered-v2](../artifacts/simulation/validation-rendered-v2/checks.json)).
+
+### B. Baseline
+
+- [x] First unmodified MolmoAct2 GPU rollout: placed, released at 6.856 cm (v1, before the marker fix).
+- [x] Default configuration: released at 3.167 cm, placed, no rule violation ([baseline-final](../artifacts/simulation/molmoact2-baseline-final/report.html)).
+- [x] Reproduced in a fresh GPU process and by the zero-strength control (byte-identical actions and telemetry).
+
+Scope: one cell only (fragile, high, explicit rule, seed 1000, `center` layout).
+
+### C. Controlled behaviour (next experiment 1)
+
+- [x] Factorial suite implemented: 3 layouts × 3 seeds × 8 cells = 72 episodes; one validated snapshot per layout/height shared by all seeds and prompts.
+- [x] Pre-flight (2026-10-27): default configuration identical to the baseline-final configuration; all four prompt variants reviewed; both GPUs idle; 432 GB free.
+- [x] Suite report for distributions and paired contrasts: `scripts/sim.py report SUITE`.
+- [x] Scripted dry run of all 24 layout/height/prompt cells for one seed completed; report and scene export (12 scenes) checked, and the export is accepted by `probe.py prepare`.
+- [ ] Review and confirm the iteration record below.
+- [ ] Commit the working tree so run provenance records a clean commit.
+- [ ] Run the baseline suite (command below).
+- [ ] Confirm 72/72 valid episodes. If any episode errors, the suite stops: keep it, diagnose, and rerun the whole suite into a new directory.
+- [ ] Generate the report: `scripts/sim.py report artifacts/simulation/baseline-matrix-v1`.
+- [ ] Review per-cell release/no-release, slips, arm inactivity, placement, release timing and height distributions, per split and pooled.
+- [ ] Review paired contrasts (fragile − durable; explicit − implicit) by layout, start height and seed.
+- [ ] Watch videos for at least one episode of each observed outcome type.
+- [ ] Log the result and next action; update the overview table.
+
+**Iteration C1: baseline factorial matrix (prepared, not yet run)**
+
+- *Question:* with appearance and physics identical, do the fragility statement and
+  the explicit rule change release height, timing or placement for the unmodified policy?
+- *What would count as instruction-conditioned handling:* from the high start,
+  fragile releases lower than durable releases in the same layout and seed,
+  especially under the explicit rule. Low starts (about 1.9 cm, already below the
+  limit) are a control: there, release height should not depend on condition. A
+  null or inconsistent result is retained, not tuned away.
+- *Changed controls:* none relative to `molmoact2-baseline-final`; the suite factors vary.
+- *Frozen controls:* `configs/simulation/fragile_release.json` at the committed
+  revision, checkpoint revision in `configs/models.json`, MuJoCo 3.16.0, Menagerie
+  `f3b6013`, inference seeds derived from episode seed and prediction index.
+- *Allocation:* `center` = discovery, `near` = selection, `far` = evaluation. This
+  suite is descriptive: nothing is fitted or selected on it, so all splits are
+  reported. The layouts differ by only ±1 cm, so they are a weak held-out test.
+- *Outcomes:* the suite report's per-cell tables and paired contrasts.
+- *Cost estimate:* about 0.5 s per prediction (pilot). Early releases take about 12
+  predictions; a 20 s timeout takes 120. Expect roughly 20 min (all early releases)
+  to 2.5 h (all timeouts), and under 2 GB of artifacts.
+
+Run from a GPU-visible host terminal, ideally inside `screen` or `tmux`:
+
+```bash
+MUJOCO_GL=egl .envs/policy/bin/python scripts/sim.py suite \
+  --output artifacts/simulation/baseline-matrix-v1
+```
+
+### D. Simulator-grounded discovery (next experiment 2)
+
+- [x] Per-prediction pooled capture validated in rollouts (pilot: 12/12/13 capture files).
+- [x] Fixed-image exploratory probe on the official sample (16 prompts, one scene); its ranking is exploratory and was used only as pilot targets.
+- [ ] Prepare a probe dataset from the complete C1 suite's `scenes.jsonl` (`probe.py prepare --scene-manifest`). The dry run produced 576 rows, of which 384 are `diagnostic` because scene and prompt-family splits differ; review this allocation first.
+- [ ] Fit fragility, height and interaction probes on discovery groups; select on selection; report on evaluation.
+- [ ] Define an alignment rule for later observations on diverging trajectories before any temporal analysis.
+- [ ] Compare simulator rankings with the fixed-image pilot ranking.
+
+### E. Causal suppression (next experiment 3)
+
+- [x] Hooks act at every prediction and flow invocation and are removed on exit (regression tests).
+- [x] Three-condition pilot: baseline and zero-strength 3.167 cm, top group 4.154 cm, all placed ([pilot summary](../artifacts/simulation/molmoact2-paired-pilot-v2/summary.json)).
+- [ ] Freeze targets from D, not from the fixed-image pilot ranking.
+- [ ] Run the six-condition control set (baseline, zero, top neuron, top group, matched random group, whole component); tune on selection layouts, report on the evaluation layout.
+- [ ] Check specificity: does a release-height change come with impaired movement or task performance (inactivity, placement)?
+
+### F. Patching and steering (next experiment 4)
+
+- [ ] Define donor module, site, selected positions, invocation/flow step and activation shapes; reject incompatible donors.
+- [ ] Patch matched initial observations.
+- [ ] Compare a single patched prediction with repeated donors generated on the recipient's current observation.
+
+### G. Dissociation and generalization (next experiment 5)
+
+- [ ] Separate fragility, height and interaction interventions.
+- [ ] Bidirectional steering.
+- [ ] Held-out layouts and objects; require held-out effects before starting H or I.
+
+### H. Visual evidence
+
+- [ ] Obtain independent material metadata.
+- [ ] Neutral/congruent/conflicting language crossed with visual/material cues, including transparent durable and opaque fragile objects.
+
+### I. Feature decomposition
+
+- [ ] Decide on SAEs/transcoders only after reproducible effects in E–G.
+
+### J. Applications
+
+- [ ] Out of initial scope; requires independent validation.
 
 ## Progress log
 
@@ -149,3 +246,10 @@ Never mark the baseline milestone complete using scripted-controller evidence.
   and refactored code. Executed actions, telemetry, release traces and activations were
   byte-identical, and both match the v2 pilot (3.167/3.167/4.154 cm). The rendered
   apparatus checks match `validation-rendered-v2`. Regression suite: `49 passed`.
+- 2026-10-27: Prepared iteration C1 (baseline factorial matrix); not yet run. The default
+  configuration is identical to `molmoact2-baseline-final`. Added `scripts/sim.py report`
+  for per-split cell distributions and paired contrasts. Scripted dry run (CPU, one
+  seed, progress logging off, scratch output): 24/24 episodes completed; fragile and
+  durable paired outcomes were identical, as expected for a prompt-blind controller;
+  12 scenes exported and accepted by `probe.py prepare`. Regression suite: `50 passed`.
+  Next blocker: confirm the C1 record, commit, and run the suite on GPU.

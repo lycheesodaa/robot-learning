@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Closed-loop SO-101 MuJoCo fragile-release rollouts: apparatus checks, single runs and matched suites."""
+"""Closed-loop SO-101 MuJoCo fragile-release rollouts: apparatus checks, single runs, matched suites and suite reports."""
 import argparse
 import json
 import os
@@ -35,7 +35,14 @@ def main():
             p.add_argument('--seed', type=int, default=1000)
             p.add_argument('--layout', help='Layout id from the JSON configuration')
             p.add_argument('--condition', choices=['baseline','zero','top_neuron','top_group','random_group','whole_component'], default='baseline')
+    p = sub.add_parser('report', help='Per-cell distributions and paired contrasts for a finished suite (no model or simulator)')
+    p.add_argument('suite', type=Path)
     args = parser.parse_args()
+    if args.command == 'report':
+        from vla_safety.simulation.report import write_report
+        for path in write_report(args.suite).values():
+            print(path)
+        return
     config = load_config(args.config)
     if args.device:
         config['policy']['device'] = args.device

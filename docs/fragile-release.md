@@ -233,6 +233,25 @@ predictions; partial artifacts are kept. Existing output directories are never
 overwritten. CLI completions append factual outcomes to the Markdown progress log;
 whether a research stage is complete remains an explicit judgement.
 
+`summary.json` pools layouts and reports means only. For distributions and paired
+comparisons, run:
+
+```bash
+.envs/policy/bin/python scripts/sim.py report artifacts/simulation/my-suite
+```
+
+This writes `my-suite-report.md`, `my-suite-episodes.csv` and `my-suite-report.json`
+beside the suite, leaving the sealed suite directory unchanged. It needs no model or
+simulator. The report has two parts:
+
+- **Cell tables**, pooled and for each discovery/selection/evaluation layout. Each
+  shows release rate, release height and time (median and range), placement, rule
+  violations, no-release, slips and arm inactivity.
+- **Paired contrasts**: fragile − durable within each rule, and explicit − implicit
+  within each fragility level. Pairs share the layout, start height, seed and
+  intervention, so both episodes start from the same simulator state. Failed episodes
+  are listed and excluded.
+
 ## Fixed-image probes
 
 The default contrasts are fragile/durable × 20 cm/2 cm × explicit/implicit

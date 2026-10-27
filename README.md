@@ -53,9 +53,10 @@ ignored by Git.
 | `src/vla_safety/release.py` | Release settings, factorial prompt bank, manifest validation and release-trace scoring |
 | `src/vla_safety/simulation/` | MuJoCo environment, closed-loop runner and release tracker |
 | `src/vla_safety/concepts/` | Fixed-image probes: manifests, runner, analysis, offline replay, synthetic fixture |
-| `scripts/sim.py` | `check`, `rollout`, `suite` |
+| `scripts/sim.py` | `check`, `rollout`, `suite`, `report` |
 | `scripts/probe.py` | `prepare`, `run`, `components`, `replay`, `verify` |
 | `configs/simulation/fragile_release.json` | Every simulator control: scene, calibration, task, capture, interventions, suite |
+| `configs/concepts/fragile_release.json` | Fixed-image probe run: threshold, manifest, seeds, capture and intervention settings |
 | `server/` | LeRobot gRPC policy server for the physical arm |
 
 Hooks run eagerly; compilation and CUDA graphs are disabled. Action-expert modules

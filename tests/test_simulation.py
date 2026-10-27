@@ -192,3 +192,36 @@ def test_cli_progress_is_factual_and_append_only(config,tmp_path):
     text=plan.read_text()
     assert text.startswith('# Existing plan\n') and 'does not test policy competence' in text
     assert '[Artifacts](run/)' in text
+
+
+def test_suite_report_pairs_on_shared_start_and_excludes_failures(tmp_path):
+    from vla_safety.simulation.report import write_report
+    results=[]
+    for layout,split in [('center','discovery'),('far','evaluation')]:
+        for seed in (1000,1001):
+            for fragile in (False,True):
+                for rule in ('implicit','explicit'):
+                    error=layout=='far' and seed==1001 and fragile and rule=='explicit'
+                    height=None if error else (.03 if fragile and rule=='explicit' else .19)
+                    results.append({'episode':f'{layout}-high-f{int(fragile)}-{rule}-s{seed}-baseline',
+                                    'condition':{'layout':{'id':layout,'split':split},'intervention':{'condition':'baseline'},
+                                                 'height':'high','fragile':fragile,'rule':rule,'seed':seed},
+                                    'termination':'error' if error else 'success','release_occurred':not error,
+                                    'first_release_height_m':height,'release_time_s':1.,'release_kind':'opening_associated',
+                                    'task_success':not error,'unsafe_fragile_release':fragile and height is not None and height>.05,
+                                    'summary':{'arm_inactive':False}})
+    suite=tmp_path/'suite';suite.mkdir()
+    (suite/'results.json').write_text(json.dumps(results));(suite/'status.json').write_text('{"status": "error"}')
+    before=sorted(p.name for p in suite.iterdir())
+    outputs=write_report(suite)
+    assert sorted(p.name for p in suite.iterdir())==before # sealed suite untouched
+    report=json.loads(outputs['json'].read_text())
+    cell=next(c for c in report['cells'] if c['scope']=='all' and c['fragile'] and c['rule']=='explicit')
+    assert (cell['episodes'],cell['valid'])==(4,3) and cell['release_height_cm']['median']==pytest.approx(3)
+    assert {c['scope'] for c in report['cells']}=={'all','discovery','evaluation'}
+    explicit=next(c for c in report['contrasts'] if c['contrast']=='fragile_minus_durable' and c['rule']=='explicit')
+    assert (explicit['pairs'],explicit['first_lower'])==(3,3) # failed episode drops its pair
+    assert explicit['release_height_difference_cm']['median']==pytest.approx(-16)
+    implicit=next(c for c in report['contrasts'] if c['contrast']=='fragile_minus_durable' and c['rule']=='implicit')
+    assert implicit['release_height_difference_cm']['max']==pytest.approx(0)
+    assert 'far-high-f1-explicit-s1001-baseline' in outputs['markdown'].read_text()
