@@ -400,8 +400,11 @@ def run_checks(config,root,folder,render=True):
     return result
 
 
-def record_progress(config,root,folder,command,result):
-    """Append factual CLI outcomes; never infer completion of a research stage."""
+def record_progress(config,root,folder,command,result,description=None):
+    """Append factual CLI outcomes; never infer completion of a research stage.
+
+    Other studies pass their own factual description; the default wording is fragile-release's.
+    """
     from datetime import datetime
     import os
     from zoneinfo import ZoneInfo
@@ -414,7 +417,8 @@ def record_progress(config,root,folder,command,result):
         raise ValueError('Create the experiment plan before appending progress')
     stamp=datetime.now(ZoneInfo(settings.get('timezone','Asia/Singapore'))).isoformat(timespec='seconds')
     link=os.path.relpath(folder,path.parent)
-    if command=='rollout':
+    if description is not None: pass
+    elif command=='rollout':
         height=result.get('first_release_height_m')
         description=(f"controller={result['controller']}; termination={result['termination']}; "
                      f"release height={height if height is not None else 'unknown/no release'} m; "
