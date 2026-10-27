@@ -157,6 +157,47 @@ MUJOCO_GL=egl .envs/policy/bin/python scripts/sim.py suite \
   --output artifacts/simulation/baseline-matrix-v1
 ```
 
+**Iteration C2: policy pick-and-place (drafted, waits on C1)**
+
+- *Question:* when the policy picks the object up itself, does fragile-instructed
+  handling still lower the object before release? Secondary: does the instruction
+  change the pick-up itself (approach speed, gripper closure, lift height)?
+- *Precondition:* C1 shows the policy can lower on command (explicit rule, high
+  start). If it cannot, C2's release outcomes are uninterpretable; do not start it.
+- *What would count as safe handling:* as C1, scored only on episodes with a
+  successful grasp and carry, plus grasp success that does not differ between
+  fragile and durable prompts. A difference in grasp success is itself a result and
+  is reported before any conditional release comparison.
+- *Changed controls:* a new configuration copy (`configs/simulation/fragile_pick_place.json`);
+  object at rest on the table, gripper open, arm at a fixed home pose; pick-and-place
+  instructions (fragility × rule unchanged otherwise); longer timeout; new scoring
+  phases (grasp, lift, carry, release, placement). Physics, object, cameras and
+  calibration unchanged from C1.
+- *Frozen controls:* as C1, plus one validated at-rest start snapshot per layout
+  shared by all seeds and prompts.
+- *Allocation:* layouts vary the pick position and the receiving square
+  independently, within reach; discovery/selection/evaluation splits by layout as
+  in C1, fixed before any policy run.
+- *Outcomes:* grasp success, lift height, carry slip, release height, placement,
+  and timing per phase; paired contrasts as in C1.
+- *Cost estimate:* to be set after the feasibility check (pick-up adds predictions
+  per episode).
+
+Checklist:
+
+- [ ] C1 complete and logged; precondition above met.
+- [ ] Feasibility check (scratch output, copied config): `x0`, 3 seeds × 4 prompts =
+  12 policy pick-ups. Record grasp success, lift height and slip per prompt. Decide
+  whether the pick-up is reliable enough to proceed.
+- [ ] Write the C2 configuration: at-rest start, home pose, prompts, timeout, layouts.
+- [ ] Implement pick-up phase scoring (grasp detection by jaw contact, lift, carry
+  slip) alongside the existing release tracker; regression tests.
+- [ ] Stage A recheck for the new start: at-rest object stability, snapshot replay,
+  scripted pick-and-place success at every layout.
+- [ ] Extend the suite report with grasp/carry columns and conditional release tables.
+- [ ] Scripted dry run of all cells for one seed; review report and videos.
+- [ ] Review and confirm this record; commit; run; log the result.
+
 ### D. Simulator-grounded discovery (next experiment 2)
 
 - [x] Per-prediction pooled capture validated in rollouts (pilot: 12/12/13 capture files).
