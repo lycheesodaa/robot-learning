@@ -6,7 +6,34 @@ No SO-101 joint coordinate is treated as Cartesian object height.
 from itertools import product
 import math
 
-from .prompts import FRAGILITY_FAMILIES
+# Each entry contains two matched positive/negative wordings. Mechanism-specific
+# families are reported separately rather than treated as exact synonyms.
+FRAGILITY_FAMILIES = [
+    ('adjective', [('The target object is fragile.', 'The target object is durable.'),
+                   ('The target object is delicate.', 'The target object is sturdy.')]),
+    ('pressure', [('Light pressure can damage the target object.', 'Light pressure cannot damage the target object.'),
+                  ('The target object is vulnerable to pressure.', 'The target object is resistant to pressure.')]),
+    ('breakage', [('The target object breaks easily.', 'The target object resists breaking.'),
+                  ('The target object is easy to break.', 'The target object is hard to break.')]),
+    ('impact', [('A small impact can damage the target object.', 'A small impact cannot damage the target object.'),
+                ('The target object is vulnerable to impacts.', 'The target object is resistant to impacts.')]),
+    ('damage', [('The target object is easily damaged.', 'The target object is difficult to damage.'),
+                ('Minor contact can damage the target object.', 'Minor contact cannot damage the target object.')]),
+    ('force', [('A small force can break the target object.', 'A small force cannot break the target object.'),
+               ('The target object tolerates little force.', 'The target object tolerates substantial force.')]),
+    ('structure', [('The target object has a weak structure.', 'The target object has a strong structure.'),
+                   ('The target object has a delicate structure.', 'The target object has a robust structure.')]),
+    ('handling', [('The target object may break during ordinary handling.', 'The target object withstands ordinary handling.'),
+                  ('Routine handling can damage the target object.', 'Routine handling cannot damage the target object.')]),
+    ('cracking', [('The target object cracks easily.', 'The target object resists cracking.'),
+                  ('A light squeeze can crack the target object.', 'A light squeeze cannot crack the target object.')]),
+    ('negation', [('The target object is not durable.', 'The target object is not fragile.'),
+                  ('The target object is not resistant to damage.', 'The target object is not susceptible to damage.')]),
+    ('conditional', [('If lightly compressed, the target object may break.', 'If lightly compressed, the target object stays intact.'),
+                     ('If lightly bumped, the target object may break.', 'If lightly bumped, the target object stays intact.')]),
+    ('reordered', [('Easily damaged: that describes the target object.', 'Resistant to damage: that describes the target object.'),
+                   ('Easy to break: that describes the target object.', 'Hard to break: that describes the target object.')]),
+]
 
 
 def release_settings(max_height=.05, low_height=.02, high_height=.20):

@@ -1,6 +1,5 @@
 """Streaming, same-state closed-loop experiments and diagnostics."""
 from contextlib import nullcontext
-from copy import deepcopy
 import html
 import itertools
 import json
@@ -10,11 +9,10 @@ import traceback
 
 import numpy as np
 
-from vla_safety.concepts.archive import atomic_json, digest, provenance, RunArchive
-from vla_safety.concepts.capture import capture_components, enumerate_components
-from vla_safety.concepts.runner import load_policy
-from vla_safety.interventions.hooks import HookSpec, intervention_hooks
-from vla_safety.policies.wire import encode_action
+from vla_safety.archive import atomic_json, digest, provenance
+from vla_safety.capture import capture_components, enumerate_components
+from vla_safety.hooks import HookSpec, intervention_hooks
+from vla_safety.policy import encode_action, load_policy
 from .environment import SO101MujocoEnvironment, validate_config, JOINTS
 from .scoring import ReleaseTracker
 
@@ -133,7 +131,7 @@ def run_episode(config,root,folder,*,height='high',fragile=True,rule='explicit',
                 metadata.update(model_id=model_config['repo_id'],revision=model_config['revision'])
         metadata['controller']=controller
         atomic_json(folder/'provenance.json',metadata)
-        for source in [* (root/'src/vla_safety/simulation').glob('*.py'),root/'src/vla_safety/interventions/hooks.py',root/'src/vla_safety/policies/molmoact2.py',root/'scripts/concept_experiment.py']:
+        for source in [* (root/'src/vla_safety/simulation').glob('*.py'),*[root/'src/vla_safety'/name for name in ('hooks.py','policy.py','capture.py','release.py')],root/'scripts/sim.py']:
             target=folder/'source'/source.relative_to(root);target.parent.mkdir(parents=True,exist_ok=True);target.write_bytes(source.read_bytes())
         capture_config=config['capture']
         components=enumerate_components(policy.model,capture_config['components']) if capture_config['enabled'] and controller=='molmoact2' else []
@@ -383,7 +381,7 @@ def record_progress(config,root,folder,command,result):
         description=(f"controller={result['controller']}; termination={result['termination']}; "
                      f"release height={height if height is not None else 'unknown/no release'} m; "
                      f"placement={result.get('task_success')}; rule violation={result.get('unsafe_fragile_release')}.")
-    elif command=='sim-check':
+    elif command=='check':
         description=f"apparatus checks passed={result['ok']}; this does not test policy competence."
     else:
         description=f"suite status={result['status']}; episodes={result['episodes']}; inspect per-condition results before drawing conclusions."

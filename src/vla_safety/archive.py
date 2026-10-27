@@ -68,7 +68,7 @@ def read_events(folder):
 
 def provenance(root):
     packages = {}
-    for name in ('numpy', 'Pillow', 'torch', 'transformers', 'scikit-learn', 'streamlit'):
+    for name in ('numpy', 'Pillow', 'torch', 'transformers', 'scikit-learn', 'mujoco'):
         try:
             packages[name] = importlib.metadata.version(name)
         except importlib.metadata.PackageNotFoundError:
@@ -152,7 +152,7 @@ class RunArchive:
         self.seq += 1
         return event
 
-    def prediction(self, example, seed, action, captures, *, elapsed, intervention=None, task_evaluation=None):
+    def prediction(self, example, seed, action, captures, *, elapsed, intervention=None):
         """All channel means per invocation are saved; raw tensors are opt-in."""
         index = self.seq
         stem = f'predictions/{index:06d}'
@@ -171,8 +171,6 @@ class RunArchive:
         detail = {'example_id': example['id'], 'seed': seed, 'input': example,
                   'action': action, 'components': components, 'arrays': array_ref,
                   'inference_seconds': elapsed, 'intervention': intervention}
-        if task_evaluation is not None:
-            detail['task_evaluation'] = task_evaluation
         detail_ref = self.json(stem + '.json', detail)
         self.event('prediction', example_id=example['id'], seed=seed, detail=detail_ref)
         return detail
@@ -184,7 +182,7 @@ class RunArchive:
         self.event('run_finished', status=status, error=error)
         self._status(error=error)
         # A rendering failure must not destroy already committed experiment data.
-        from .replay import export_replay
+        from vla_safety.concepts.replay import export_replay
         export_replay(self.folder)
         seal_archive(self.folder)
 
@@ -193,7 +191,7 @@ def seal_archive(folder):
     folder = Path(folder)
     entries = {}
     for path in sorted(folder.rglob('*')):
-        if path.is_file() and path.name not in ('checksums.json', 'CANCEL') and not path.name.endswith('.tmp'):
+        if path.is_file() and path.name != 'checksums.json' and not path.name.endswith('.tmp'):
             entries[path.relative_to(folder).as_posix()] = {'sha256': digest(path), 'bytes': path.stat().st_size}
     atomic_json(folder / 'checksums.json', {'schema_version': 1, 'files': entries})
 

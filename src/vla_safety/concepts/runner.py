@@ -1,25 +1,17 @@
-"""Recorded concept workflow. Policy imports and loading occur only when running."""
+"""Fixed-image fragile-release workflow. Policy imports and loading occur only when running."""
 import csv
-from dataclasses import replace
 import json
-import os
 from pathlib import Path
 import time
 import traceback
 
 import numpy as np
 
+from vla_safety.archive import RunArchive, digest, provenance
+from vla_safety.capture import capture_components, enumerate_components, inventory
+from vla_safety.release import validate_release_settings, validate_release_rows
 from .analysis import analyse
-from .archive import RunArchive, atomic_json, digest, provenance
-from .capture import Component, capture_components, enumerate_components, inventory
-from .prompts import load_manifest
-from .fragile_release import evaluate_release_trace, validate_release_settings, validate_release_rows
-
-_POLICIES = {}
-
-
-class Cancelled(Exception):
-    pass
+from .manifest import load_manifest
 
 
 def validate_config(config):
@@ -38,7 +30,7 @@ def validate_config(config):
         raise ValueError('Provide nonnegative integer seeds')
     if len(set(config['seeds'])) != len(config['seeds']):
         raise ValueError('Seeds must be unique')
-    if config.get('model') not in ('so101', 'libero', 'synthetic'):
+    if config.get('model') not in ('so101', 'synthetic'):
         raise ValueError('Unknown model')
     if config.get('num_steps', 10) < 1 or config.get('max_capture_mib', 256) <= 0:
         raise ValueError('Flow steps and capture limit must be positive')
@@ -48,41 +40,23 @@ def validate_config(config):
         raise ValueError('Group size and top_k must be positive')
     if config.get('pooling', 'all_emitted_positions_mean') != 'all_emitted_positions_mean':
         raise ValueError('Only all_emitted_positions_mean pooling is currently supported')
-    if config.get('task_profile'):
-        validate_release_settings(config['task_profile'])
+    if not config.get('task_profile'):
+        raise ValueError('A fragile_release task_profile is required')
+    validate_release_settings(config['task_profile'])
 
 
 def load_policy(config, root):
-    """One resident model per worker; model switches release the previous model."""
     if config['model'] == 'synthetic':
-        if config.get('task_profile', {}).get('name') == 'fragile_release':
-            from .release_fixture import synthetic_release_policy
-            return synthetic_release_policy(config['task_profile']), {'model_id': 'synthetic-release-fixture', 'synthetic': True}
-        return synthetic_policy(), {'model_id': 'synthetic-fixture', 'synthetic': True}
-    os.environ.setdefault('HF_HUB_OFFLINE', '1')
-    os.environ.setdefault('HF_HOME', str(root / '.cache/huggingface'))
-    from vla_safety.policies.molmoact2 import MolmoAct2Policy
-    import torch
-    model_config = json.loads((root / 'configs/models.json').read_text())[config['model']]
-    device, dtype = config.get('device', 'cuda:0'), config.get('dtype', 'float32')
-    if device.startswith('cuda') and not torch.cuda.is_available():
-        raise RuntimeError('CUDA is not visible. Use a GPU-visible host, or explicitly choose device=cpu.')
-    snapshot = root / 'artifacts/models' / config['model'] / model_config['revision']
-    key = (str(snapshot), device, dtype)
-    if key not in _POLICIES:
-        _POLICIES.clear()
-        if torch.cuda.is_available():
-            torch.cuda.empty_cache()
-        _POLICIES[key] = MolmoAct2Policy(model_config, snapshot, device, dtype)
-    return _POLICIES[key], {'model_id': model_config['repo_id'], 'revision': model_config['revision'],
-                            'model_config': model_config, 'synthetic': False,
-                            'snapshot_manifest': json.loads((snapshot / 'snapshot-manifest.json').read_text())}
+        from .fixture import synthetic_release_policy
+        return synthetic_release_policy(config['task_profile']), {'model_id': 'synthetic-release-fixture', 'synthetic': True}
+    from vla_safety.policy import load_policy as load_model
+    return load_model(config, root)
 
 
 def _save_sources(archive, root):
     """Keep the exact local implementation, including uncommitted changes."""
     candidates = list((root / 'src/vla_safety').rglob('*.py'))
-    candidates += [root / 'scripts/concept_experiment.py', root / 'scripts/concept_ui.py', root / 'pyproject.toml']
+    candidates += [root / 'scripts/probe.py', root / 'scripts/sim.py', root / 'pyproject.toml']
     for source in candidates:
         if source.is_file():
             destination = archive.folder / 'source' / source.relative_to(root)
@@ -90,12 +64,12 @@ def _save_sources(archive, root):
             destination.write_bytes(source.read_bytes())
 
 
-def run_experiment(config, root, *, output=None, release_trace_provider=None):
+def run_experiment(config, root, *, output=None):
     """All generated files live inside the unique run folder, even on failure."""
     from PIL import Image
     from vla_safety.types import Observation
-    from vla_safety.policies.wire import encode_action
-    from vla_safety.interventions.hooks import HookSpec, intervention_hooks
+    from vla_safety.policy import encode_action
+    from vla_safety.hooks import HookSpec, intervention_hooks
     root = Path(root).resolve()
     config = dict(config)
     validate_config(config)
@@ -107,20 +81,13 @@ def run_experiment(config, root, *, output=None, release_trace_provider=None):
     archive = RunArchive(output, config, provenance(root))
     print(f'Run archive: {archive.folder}', flush=True)
     _save_sources(archive, root)
-    result = None
-
-    def check_cancel():
-        if (archive.folder / 'CANCEL').exists():
-            raise Cancelled('Cancellation requested; last completed prediction was saved')
 
     try:
         manifest = Path(config['manifest'])
         if not manifest.is_absolute():
             manifest = root / manifest
         rows = load_manifest(manifest)
-        task_profile = config.get('task_profile')
-        if task_profile:
-            validate_release_rows(rows, task_profile)
+        validate_release_rows(rows, config['task_profile'])
         if any(row.get('labels', {}).get(concept) not in (0, 1) for row in rows):
             raise ValueError(f'Missing binary labels for {concept}')
         frozen = []
@@ -138,7 +105,6 @@ def run_experiment(config, root, *, output=None, release_trace_provider=None):
             archive.json('inputs/prompt_bank.json', json.loads(bank_path.read_text()))
         archive.event('inputs_frozen', detail=input_ref, examples=len(frozen),
                       source_manifest_sha256=digest(manifest))
-        check_cancel()
         archive.event('model_loading', model=config['model'])
         policy, model_metadata = load_policy(config, root)
         archive.metadata.update(model_metadata)
@@ -152,10 +118,8 @@ def run_experiment(config, root, *, output=None, release_trace_provider=None):
         raw = config.get('capture_raw', False)
         baseline = {}
         baseline_shapes = {}
-        task_predictions = []
 
         def predict(row, seed, intervention=None, specs=(), raw_override=None, selected_components=None):
-            check_cancel()
             images = []
             for path in row['images']:
                 with Image.open(archive.folder / path) as im:
@@ -172,29 +136,18 @@ def run_experiment(config, root, *, output=None, release_trace_provider=None):
             elapsed = time.perf_counter() - started
             if not any(captures.values()):
                 raise RuntimeError('Selected components did not execute')
-            task_evaluation = None
-            if task_profile:
-                trace = (release_trace_provider(row, action, seed, intervention) if release_trace_provider else
-                         policy.release_trace(row, action) if config['model'] == 'synthetic' else None)
-                task_evaluation = evaluate_release_trace(trace, task_profile['max_release_height_m'])
-                task_predictions.append({'example_id': row['id'], 'seed': seed, 'split': row['split'],
-                                         'labels': row['labels'], 'condition': intervention['condition'] if intervention else 'baseline',
-                                         'evaluation': task_evaluation})
-            detail = archive.prediction(row, seed, encode_action(action), captures, elapsed=elapsed,
-                                        intervention=intervention, task_evaluation=task_evaluation)
-            return action.values, captures, detail
+            archive.prediction(row, seed, encode_action(action), captures, elapsed=elapsed, intervention=intervention)
+            return action.values, captures
 
         for row in frozen:
             for seed in config['seeds']:
-                values, captures, _ = predict(row, seed)
+                values, captures = predict(row, seed)
                 baseline[(row['id'], seed)] = values
                 baseline_shapes[(row['id'], seed)] = {
                     name: [r['shape'] for r in records] for name, records in captures.items()}
         archive.event('capture_completed', predictions=len(baseline))
-        check_cancel()
         jobs = [(name, None) for name in [concept, *config.get('also_analyse', [])]]
-        if task_profile:
-            jobs.append(('fragility_height_interaction', ('fragility', 'release_height')))
+        jobs.append(('fragility_height_interaction', ('fragility', 'release_height')))
         for analysis_concept, interaction in jobs:
             archive.event('analysis_started', concept=analysis_concept)
             result, arrays = analyse(archive.folder, analysis_concept,
@@ -210,7 +163,7 @@ def run_experiment(config, root, *, output=None, release_trace_provider=None):
                 writer.writeheader()
                 writer.writerows(result['rankings'])
             archive.event('analysis', concept=analysis_concept, detail=ref)
-            if analysis_concept == concept or interaction:
+            if interaction:
                 main_result = result
 
         settings = config.get('interventions', {})
@@ -227,8 +180,8 @@ def run_experiment(config, root, *, output=None, release_trace_provider=None):
             random_group = tuple(int(n) for n in rng.choice(width, size=len(group), replace=False))
             split = 'evaluation' if main_result['evidence'].startswith('held_out_') else main_result['ranking_split']
             evaluation = [r for r in frozen if r['split'] == split and
-                          (r['labels']['fragility'] == r['labels']['release_height'] == 1 if task_profile else r['labels'][concept] == 1)]
-            donor_factor = 'release_height' if task_profile else concept
+                          r['labels']['fragility'] == r['labels']['release_height'] == 1]
+            donor_factor = 'release_height'
             interventions = []
             for row in evaluation[:settings.get('max_examples', 4)]:
                 donor = next((r for r in frozen if r.get('pair_id') == row.get('pair_id')
@@ -243,12 +196,10 @@ def run_experiment(config, root, *, output=None, release_trace_provider=None):
                         spec = HookSpec(component.module, 'ablate', strength, chosen, site=component.site)
                         descriptor = {'condition': condition, 'component': component.name, 'neurons': list(chosen),
                                       'strength': strength, 'capture_phase': 'before_intervention'}
-                        values, _, detail = predict(row, seed, descriptor, [spec])
+                        values, _ = predict(row, seed, descriptor, [spec])
                         delta = values - base
                         record = {'example_id': row['id'], 'seed': seed, **descriptor,
                                   'mean_absolute_delta_by_dimension': np.abs(delta).mean(axis=0).tolist()}
-                        if task_profile:
-                            record['task_evaluation'] = detail['task_evaluation']
                         if donor:
                             opposite = baseline[(donor['id'], seed)]
                             record['counterpart_distance_reduction_by_dimension'] = (
@@ -263,7 +214,7 @@ def run_experiment(config, root, *, output=None, release_trace_provider=None):
                                           reason='Patch donor/recipient shapes or invocation counts differ')
                             continue
                         # Save donor raw values even when regular capture is pooled.
-                        _, donor_captures, _ = predict(donor, seed, {'condition': 'patch_donor', 'component': component.name},
+                        _, donor_captures = predict(donor, seed, {'condition': 'patch_donor', 'component': component.name},
                                                        raw_override=True, selected_components=[component])
                         records = iter(donor_captures[component.name])
                         consumed = []
@@ -280,12 +231,11 @@ def run_experiment(config, root, *, output=None, release_trace_provider=None):
                         descriptor = {'condition': 'patch', 'component': component.name, 'donor_id': donor['id'],
                                       'neurons': list(group), 'capture_phase': 'before_intervention'}
                         try:
-                            values, _, detail = predict(row, seed, descriptor, [spec])
+                            values, _ = predict(row, seed, descriptor, [spec])
                             if len(consumed) != len(donor_captures[component.name]):
                                 raise ValueError('Patch donor has more invocations')
                             opposite = baseline[(donor['id'], seed)]
                             interventions.append({'example_id': row['id'], 'seed': seed, **descriptor,
-                                                  **({'task_evaluation': detail['task_evaluation']} if task_profile else {}),
                                                   'mean_absolute_delta_by_dimension': np.abs(values-base).mean(axis=0).tolist(),
                                                   'counterpart_distance_reduction_by_dimension': (
                                                       np.abs(base-opposite).mean(axis=0)-np.abs(values-opposite).mean(axis=0)).tolist()})
@@ -294,48 +244,10 @@ def run_experiment(config, root, *, output=None, release_trace_provider=None):
             ref = archive.json('interventions/results.json', {'target_selection': 'discovery_only' if split == 'evaluation' else 'exploratory',
                                                             'results': interventions})
             archive.event('interventions_completed', detail=ref)
-        if task_profile:
-            ref = archive.json('task/results.json', {'profile': task_profile, 'predictions': task_predictions,
-                                                    'intervention_target': 'fragility_height_interaction',
-                                                    'notes': ['Missing trajectory data remains unknown.',
-                                                              'No release is not counted as successful placement.',
-                                                              'Threshold is illustrative; damage is not measured.']})
-            archive.event('task_evaluation', detail=ref)
         archive.finish()
-    except Cancelled as exc:
-        archive.finish('cancelled', str(exc))
     except (Exception, KeyboardInterrupt) as exc:
         archive.json('error.json', {'type': type(exc).__name__, 'message': str(exc), 'traceback': traceback.format_exc()})
         archive.finish('cancelled' if isinstance(exc, KeyboardInterrupt) else 'failed', str(exc))
         raise
     return archive.folder
 
-
-def synthetic_policy():
-    """Small deterministic fixture with known concept channels; never model evidence."""
-    import torch
-    from vla_safety.types import ActionChunk
-    class Fixture:
-        def __init__(self):
-            self.model = torch.nn.Module()
-            self.model.hidden = torch.nn.Identity()
-            self.model.head = torch.nn.Linear(8, 6, bias=False)
-            with torch.no_grad():
-                self.model.head.weight.copy_(torch.arange(48).reshape(6, 8) / 48.)
-            self.components = [Component('hidden:output', 'hidden', 'output', 'synthetic', 'residual_channels'),
-                               Component('head:input', 'head', 'input', 'synthetic', 'mlp_neurons')]
-
-        def predict(self, observation, *, seed=None, num_steps=10):
-            rng = np.random.default_rng(seed)
-            x = rng.normal(0, .02, (1, 4, 8)).astype(np.float32)
-            positive = 'fragile' in observation.instruction
-            gentle = 'gently' in observation.instruction
-            x[..., 0] += 2 if positive else -2
-            x[..., 1] += 1 if positive else -1
-            x[..., 2] += 1 if gentle else -1
-            with torch.inference_mode():
-                y = None
-                for i in range(num_steps):
-                    y = self.model.head(self.model.hidden(torch.from_numpy(x) * (1 + i/num_steps)))
-            return ActionChunk(y[0].numpy(), 'so101', 'synthetic', 'synthetic', ('synthetic',)*6, 'synthetic-v1')
-    return Fixture()

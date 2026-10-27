@@ -2,9 +2,12 @@
 
 from contextlib import nullcontext
 import json
+import os
 from pathlib import Path
 import numpy as np
 from vla_safety.types import ActionChunk, Observation
+
+_POLICIES = {}
 
 
 class MolmoAct2Policy:
@@ -98,3 +101,30 @@ class MolmoAct2Policy:
             tuple(c["units"]),
             f"{c['repo_id']}@{c['revision']}:{c['norm_tag']}",
         )
+
+
+def load_policy(config, root):
+    """One resident model per process; switching device/dtype releases the previous model."""
+    os.environ.setdefault('HF_HUB_OFFLINE', '1')
+    os.environ.setdefault('HF_HOME', str(root / '.cache/huggingface'))
+    import torch
+    model_config = json.loads((root / 'configs/models.json').read_text())[config['model']]
+    device, dtype = config.get('device', 'cuda:0'), config.get('dtype', 'float32')
+    if device.startswith('cuda') and not torch.cuda.is_available():
+        raise RuntimeError('CUDA is not visible. Use a GPU-visible host, or explicitly choose device=cpu.')
+    snapshot = root / 'artifacts/models' / config['model'] / model_config['revision']
+    key = (str(snapshot), device, dtype)
+    if key not in _POLICIES:
+        _POLICIES.clear()
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
+        _POLICIES[key] = MolmoAct2Policy(model_config, snapshot, device, dtype)
+    return _POLICIES[key], {'model_id': model_config['repo_id'], 'revision': model_config['revision'],
+                            'model_config': model_config, 'synthetic': False,
+                            'snapshot_manifest': json.loads((snapshot / 'snapshot-manifest.json').read_text())}
+
+
+def encode_action(action):
+    return {'version': 1, 'values': action.values.tolist(), 'embodiment': action.embodiment,
+            'control_mode': action.control_mode, 'frame': action.frame,
+            'units': list(action.units), 'normalization': action.normalization}

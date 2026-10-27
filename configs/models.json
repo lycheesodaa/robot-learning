@@ -1,38 +1,4 @@
 {
-  "libero": {
-    "repo_id": "allenai/MolmoAct2-LIBERO",
-    "revision": "0d24a92bd1faf321ef497c3bbd5681af97c65aa2",
-    "norm_tag": "libero",
-    "embodiment": "libero_franka",
-    "control_mode": "delta_end_effector_pose",
-    "frame": "robosuite_controller",
-    "units": [
-      "controller_scaled_delta",
-      "controller_scaled_delta",
-      "controller_scaled_delta",
-      "controller_scaled_delta",
-      "controller_scaled_delta",
-      "controller_scaled_delta",
-      "gripper_command"
-    ],
-    "action_dim": 7,
-    "state_dim": 8,
-    "sample_images": [
-      "sample_agentview_rgb.png",
-      "sample_wrist_rgb.png"
-    ],
-    "sample_instruction": "put the white mug on the left plate and put the yellow and white mug on the right plate",
-    "sample_state": [
-      -0.05338004603981972,
-      0.007029631175100803,
-      0.6783280968666077,
-      3.1407692432403564,
-      0.0017593271331861615,
-      -0.08994418382644653,
-      0.03878866136074066,
-      -0.03878721222281456
-    ]
-  },
   "so101": {
     "repo_id": "allenai/MolmoAct2-SO100_101",
     "revision": "152569fe57914d97be91055800035f54e250d009",

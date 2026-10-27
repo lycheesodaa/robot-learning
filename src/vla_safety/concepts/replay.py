@@ -2,11 +2,10 @@
 import base64
 import json
 from pathlib import Path
-import zipfile
 
 import numpy as np
 
-from .archive import archive_path, read_events, verify_archive
+from vla_safety.archive import archive_path, read_events
 
 
 def replay_data(folder):
@@ -51,21 +50,6 @@ def export_replay(folder, output=None):
     tmp = output.with_name(output.name + '.tmp')
     tmp.write_text(HTML.replace('__ARCHIVE_DATA__', data), encoding='utf-8')
     tmp.replace(output)
-    return output
-
-
-def bundle_archive(folder, output):
-    folder, output = Path(folder).resolve(), Path(output).resolve()
-    if output.is_relative_to(folder):
-        raise ValueError('Write the ZIP outside the run directory')
-    result = verify_archive(folder)
-    if not result['ok']:
-        raise ValueError('Cannot bundle an unverified archive: ' + '; '.join(result['errors']))
-    output.parent.mkdir(parents=True, exist_ok=True)
-    with zipfile.ZipFile(output, 'x', compression=zipfile.ZIP_DEFLATED) as z:
-        for relative in json.loads((folder / 'checksums.json').read_text())['files']:
-            z.write(archive_path(folder, relative), f'{folder.name}/{relative}')
-        z.write(folder / 'checksums.json', f'{folder.name}/checksums.json')
     return output
 
 

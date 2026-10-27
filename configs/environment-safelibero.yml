@@ -1,6 +1,0 @@
-name: vla-safety-safelibero
-channels:
-  - conda-forge
-dependencies:
-  - python=3.8.13
-  - pip=24.3.1

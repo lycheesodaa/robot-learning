@@ -137,3 +137,15 @@ Never mark the baseline milestone complete using scripted-controller evidence.
   [Final baseline report](../artifacts/simulation/molmoact2-baseline-final/report.html)
   and [video](../artifacts/simulation/molmoact2-baseline-final/rollout.mp4).
   Configuration, seeds, state, exact observations and source snapshot are archived.
+- 2026-10-27: Refactored the repository to this study only. Removed the LIBERO/
+  SafeLIBERO stubs, the external-constraint and four-condition scaffolding, the HTTP
+  policy server, the generic fragility/gentle-handling profile and the Streamlit UI.
+  Fixed-image runs no longer write `task/results.json`; release outcomes come from the
+  simulator. The CLI is now `scripts/sim.py check|rollout|suite` (was
+  `concept_experiment.py sim-check|rollout|rollout-suite`) and
+  `scripts/probe.py prepare|run|components|replay|verify`. Archive and config formats
+  are unchanged. Behaviour check: the paired-pilot configuration (with the later
+  `task.inactivity_joint_displacement_rad`) was run on `cuda:0` with the pre-refactor
+  and refactored code. Executed actions, telemetry, release traces and activations were
+  byte-identical, and both match the v2 pilot (3.167/3.167/4.154 cm). The rendered
+  apparatus checks match `validation-rendered-v2`. Regression suite: `49 passed`.

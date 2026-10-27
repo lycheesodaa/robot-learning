@@ -1,5 +1,4 @@
 """Simulation contracts and physical evidence; no model weights required."""
-from copy import deepcopy
 import json
 from pathlib import Path
 
@@ -120,9 +119,9 @@ def test_scripted_low_and_high_release_score_differ(config,tmp_path,env):
 def test_model_feedback_hooks_capture_and_cleanup(config,tmp_path,env,monkeypatch):
     torch=pytest.importorskip('torch')
     from vla_safety.simulation import runner
-    from vla_safety.concepts.capture import Component
+    from vla_safety.capture import Component
     from vla_safety.types import ActionChunk
-    from vla_safety.interventions.hooks import HookSpec
+    from vla_safety.hooks import HookSpec
     config['control']['duration_s']=.4
     config['capture']['enabled']=True
     class Policy:
@@ -189,7 +188,7 @@ def test_cli_progress_is_factual_and_append_only(config,tmp_path):
     from vla_safety.simulation.runner import record_progress
     plan=tmp_path/'plan.md';plan.write_text('# Existing plan\n')
     config['progress'].update(markdown_path='plan.md')
-    record_progress(config,tmp_path,tmp_path/'run','sim-check',{'ok':True})
+    record_progress(config,tmp_path,tmp_path/'run','check',{'ok':True})
     text=plan.read_text()
     assert text.startswith('# Existing plan\n') and 'does not test policy competence' in text
     assert '[Artifacts](run/)' in text

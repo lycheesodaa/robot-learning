@@ -36,13 +36,10 @@ def verify(folder, manifest):
 
 def main():
     p = argparse.ArgumentParser(description=__doc__)
-    p.add_argument('--model', choices=['all', 'libero', 'so101'], default='all')
     p.add_argument('--verify-only', action='store_true')
     args = p.parse_args()
     configs = json.loads((ROOT / 'configs/models.json').read_text())
     for name, config in configs.items():
-        if args.model not in ('all', name):
-            continue
         folder = ROOT / 'artifacts/models' / name / config['revision']
         manifest_path = folder / 'snapshot-manifest.json'
         if args.verify_only:

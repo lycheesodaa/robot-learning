@@ -4,11 +4,10 @@ Seeds are averaged within examples. Discovery rankings never use evaluation
 labels. Bootstrap units are scenes/sessions and prompt families, not tokens.
 """
 import json
-from pathlib import Path
 
 import numpy as np
 
-from .archive import archive_path, read_events
+from vla_safety.archive import archive_path, read_events
 
 
 def load_features(folder):

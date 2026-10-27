@@ -1,6 +1,6 @@
 """Physics-sampled release detection. Events are backdated before separation."""
 import numpy as np
-from vla_safety.concepts.fragile_release import evaluate_release_trace
+from vla_safety.release import evaluate_release_trace
 
 
 class ReleaseTracker:

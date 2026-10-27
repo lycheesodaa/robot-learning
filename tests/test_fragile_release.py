@@ -1,16 +1,13 @@
 import copy
-import importlib.util
 import json
 from pathlib import Path
-from types import SimpleNamespace
 
 import numpy as np
-from PIL import Image
 import pytest
 
 from vla_safety.concepts.analysis import factorial_differences, paired_differences
-from vla_safety.concepts.archive import read_events, verify_archive
-from vla_safety.concepts.fragile_release import (
+from vla_safety.archive import read_events, verify_archive
+from vla_safety.release import (
     evaluate_release_trace, expand_release_scenes, release_bank, release_settings, validate_release_rows,
 )
 from vla_safety.concepts.runner import run_experiment
@@ -113,48 +110,20 @@ def test_grounded_scenes_withhold_object_labels_from_prompts():
         expand_release_scenes(missing, release_bank(settings), settings, grounded=True)
 
 
-@pytest.fixture
-def prepared_release(tmp_path):
-    spec = importlib.util.spec_from_file_location('concept_cli', ROOT/'scripts/concept_experiment.py')
-    module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
-    args = SimpleNamespace(output=tmp_path/'inputs', profile='fragile-release', max_release_height_m=.05,
-                           low_height_m=.02, high_height_m=.2, synthetic=True, model='so101', small=False,
-                           recordings=None, scene_manifest=None, stride=30)
-    path = module.prepare(args)
-    config = json.loads(path.read_text())
-    config['bootstrap'] = 5
-    config['output_root'] = str(tmp_path / 'runs')
-    return config
-
-
 def test_complete_release_workflow(prepared_release):
     folder = run_experiment(prepared_release, ROOT)
     assert verify_archive(folder)['ok']
     interaction = json.loads((folder / 'analysis/fragility_height_interaction/results.json').read_text())
     assert interaction['rankings'][0]['channel'] == 3
     assert interaction['evidence'] == 'held_out_interaction'
-    results = json.loads((folder / 'task/results.json').read_text())['predictions']
-    assert all(r['evaluation']['source'] == 'synthetic' for r in results)
-    assert all(r['evaluation']['unsafe_fragile_release'] is False for r in results if r['condition'] == 'baseline')
-    top = next(r for r in results if r['condition'] == 'top_neuron')
-    zero = next(r for r in results if r['condition'] == 'zero')
-    assert top['evaluation']['unsafe_fragile_release'] is True
-    assert zero['evaluation']['safe_completion'] is True
+    interventions = json.loads((folder / 'interventions/results.json').read_text())['results']
+    zero = next(r for r in interventions if r['condition'] == 'zero')
+    top = next(r for r in interventions if r['condition'] == 'top_neuron')
+    assert max(zero['mean_absolute_delta_by_dimension']) == 0
+    # Ablating the toy interaction channel removes lowering: release height changes.
+    assert top['mean_absolute_delta_by_dimension'][0] > 0
+    assert any(r['condition'] == 'patch' for r in interventions)
     assert 'Fragile-object release' in (folder / 'replay.html').read_text()
     prediction_event = next(e for e in read_events(folder) if e['kind'] == 'prediction')
     detail = json.loads((folder / prediction_event['detail']['path']).read_text())
-    assert 'task_evaluation' in detail
-
-
-def test_trace_provider_is_aligned_and_archived(prepared_release):
-    prepared_release['interventions']['enabled'] = False
-    calls = []
-    def provider(row, action, seed, intervention):
-        calls.append((row['id'], seed, intervention))
-        return trace(height=None, fragile=bool(row['labels']['fragility']))
-    folder = run_experiment(prepared_release, ROOT, release_trace_provider=provider)
-    results = json.loads((folder / 'task/results.json').read_text())['predictions']
-    assert len(calls) == len(results)
-    assert all(r['evaluation']['source'] == 'simulator' for r in results)
-    assert all(r['evaluation']['unsafe_fragile_release'] is None for r in results if r['labels']['fragility'])
+    assert detail['input']['task_context']['profile'] == 'fragile_release'

@@ -1,6 +1,6 @@
 import pytest
 import torch
-from vla_safety.interventions.hooks import HookSpec, intervention_hooks
+from vla_safety.hooks import HookSpec, intervention_hooks
 
 
 def test_zero_strength_capture_and_cleanup():

@@ -3,7 +3,7 @@ import re
 
 import numpy as np
 
-from .capture import Component
+from vla_safety.capture import Component
 
 
 def synthetic_release_policy(settings):
@@ -41,14 +41,4 @@ def synthetic_release_policy(settings):
             values = [[height, 0.], [release_height, 1.], [release_height, 1.]]
             return ActionChunk(values, observation.embodiment, 'synthetic_release', 'object_bottom_above_receiving_surface',
                                ('metres', 'synthetic_open_flag'), 'synthetic-release-v1')
-
-        def release_trace(self, row, action):
-            holding = True
-            steps = []
-            for i, (height, opening) in enumerate(action.values):
-                release = bool(opening >= .5 and holding)
-                steps.append({'time_s': i * .1, 'height_m': float(height), 'holding': holding, 'release': release})
-                holding = holding and not release
-            return {'source': 'synthetic', 'height_reference': 'object_bottom_above_receiving_surface',
-                    'fragile': bool(row['labels']['fragility']), 'task_success': not holding, 'steps': steps}
     return Fixture()

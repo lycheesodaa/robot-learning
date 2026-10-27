@@ -5,14 +5,13 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "vla-safety"
 version = "0.1.0"
-description = "MolmoAct2 internal and external safety research scaffold"
+description = "MolmoAct2 SO-101 fragile-release interpretability experiments"
 requires-python = ">=3.11,<3.14"
 dependencies = ["numpy==2.2.6", "Pillow==11.2.1"]
 
 [project.optional-dependencies]
 policy = ["torch==2.7.1", "torchvision==0.22.1", "transformers==5.3.0", "huggingface-hub==1.7.2", "accelerate==1.8.1", "einops==0.8.1", "requests==2.32.4"]
 dev = ["pytest==8.4.1"]
-concept-ui = ["streamlit>=1.37,<2"]
 sim = ["mujoco==3.16.0", "imageio==2.38.1", "imageio-ffmpeg==0.6.0"]
 
 [tool.setuptools.packages.find]
