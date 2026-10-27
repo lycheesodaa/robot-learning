@@ -21,6 +21,7 @@ param(
     [string] $ImageSize = '224x224',  # HxW frames are shrunk to before sending (checkpoint's input_features); '' sends full frames
     [int] $VizPort = 8765,   # live viewer at http://127.0.0.1:<VizPort>/; runs are saved under .\runs
     [switch] $NoViz,         # run the plain robot_client instead (no recording, no viewer; frames still resized)
+    [switch] $NoHome,        # leave the arm where it is on exit instead of returning it to its start pose
     [Parameter(ValueFromRemainingArguments)] [string[]] $ClientArgs
 )
 $ErrorActionPreference = 'Stop'
@@ -42,6 +43,7 @@ try {
     $entry = if ($NoViz) { @((Join-Path $PSScriptRoot 'resize_client.py')) }
              else { @((Join-Path $PSScriptRoot 'viz_client.py'), "--viz_port=$VizPort") }
     if ($ImageSize) { $entry += "--image_size=$ImageSize" }
+    if ($NoHome) { $entry += '--no_home' }
     & $Python @entry "--config_path=$Config" `
         "--server_address=127.0.0.1:$LocalPort" "--task=$Task" @ClientArgs
     if ($LASTEXITCODE) { throw "robot_client exited with code $LASTEXITCODE" }

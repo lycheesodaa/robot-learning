@@ -132,7 +132,7 @@ def serve(store, port: int, host: str = "127.0.0.1") -> ThreadingHTTPServer:
                         self._send(b"not found", "text/plain", 404)
                 else:
                     self._send(b"not found", "text/plain", 404)
-            except (BrokenPipeError, ConnectionResetError):
+            except ConnectionError:  # the browser dropped the request (Broken pipe, reset, WinError 10053)
                 pass
 
     server = ThreadingHTTPServer((host, port), Handler)

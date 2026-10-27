@@ -19,10 +19,10 @@ a local client drives the arm. The two talk over gRPC through an SSH tunnel.
 - **SO-101 follower arm**: 6 Feetech STS3215 servos plus the Feetech USB serial bus board, and its power
   supply. This is the only arm needed: the policy replaces the leader arm.
 - **Two USB cameras** that OpenCV can open:
-  - `cam0`, top view at 640×480 @ 30 fps
-  - `cam1`, side view at 320×240 @ 30 fps
+  - `cam0`, external view of the workspace at 320×240 @ 30 fps
+  - `cam1`, wrist camera on the gripper at 320×240 @ 30 fps
 
-  The checkpoint was trained on top and side views, so mount the cameras to match.
+  A built-in laptop webcam also shows up as an OpenCV index; don't use it for either key.
 - **A PC** running Windows (PowerShell) or Linux/macOS (bash), with free USB ports for the arm and both cameras.
   The client runs on the CPU.
 
@@ -101,6 +101,7 @@ Useful launcher options:
 | `-NoViz` / `NO_VIZ=1` | Use the plain client: no recording and no viewer |
 | `-LocalPort` / `-RemotePort` | Change the tunnel's local and remote ports |
 | `-ImageSize ''` | Send full-resolution frames instead of 224×224 |
+| `-NoHome` / `NO_HOME=1` | Leave the arm where it is on exit instead of returning it to its start pose |
 
 To replay a finished run in the viewer:
 
@@ -112,6 +113,10 @@ python client/viz_server.py runs/20261020_182433
 ## Safety
 
 - `max_relative_target: 15` limits each joint to 15° per step. Keep this limit until the behaviour looks sane.
+- When the client stops (normal exit, Ctrl-C, an error, SIGTERM, Ctrl-Break or closing the console window),
+  the arm returns to the pose it started in over 1–3 s. Press Ctrl-C again to stop it where it is.
+  A hard kill (`kill -9`, `taskkill /F`) or power loss skips this. The gripper also returns to its start
+  opening, so it drops whatever it holds.
 - `disable_torque_on_disconnect: false` makes the arm **hold its last pose** after Ctrl-C instead of going limp.
   To release the arm, cut its power.
 - Keep a hand on the power switch for the first runs.
@@ -126,3 +131,4 @@ python client/viz_server.py runs/20261020_182433
 | `client/viz_server.py`, `client/viz.html` | Viewer and run replay |
 | `client/resize_client.py` | Robot client that resizes frames, without recording |
 | `client/check_torque_hold.py` | Checks whether turning on torque would make the arm jump; `--sync` removes the risk |
+| `client/home_on_exit.py` | Returns the arm to its start pose whenever the client stops |
