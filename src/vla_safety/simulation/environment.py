@@ -59,6 +59,16 @@ def validate_config(c):
             raise ValueError(f'{k} must be positive')
     vector(scene['receiving_center_xy_m'],2,'receiving center')
     vector(scene['object_rgba'],4,'object color')
+    shape=scene.get('object_shape','box')
+    if shape not in ('box','cup'):
+        raise ValueError('object_shape must be box or cup')
+    if shape=='cup':
+        r,ry,h=scene['object_half_size_m']
+        if r!=ry: raise ValueError('A cup needs equal x/y half sizes (its outer radius)')
+        if not 0 < scene['cup_wall_m'] < r or not 0 < scene['cup_base_m'] < 2*h:
+            raise ValueError('Cup wall and base must fit inside the cup')
+        if type(scene['cup_segments']) is not int or scene['cup_segments'] < 8:
+            raise ValueError('cup_segments must be an integer >=8')
     finite_positive(scene['object_mass_kg'],'object mass')
     finite_positive(scene['marker_elevation_m'],'marker elevation')
     if not np.isfinite(scene['surface_z_m']): raise ValueError('Surface height must be finite')
@@ -130,6 +140,27 @@ def box_bottom(position, rotation, half_size):
     return float(position[2] - np.abs(np.asarray(rotation).reshape(3,3)[2]) @ half_size)
 
 
+def world_extents(rotation, half_size, shape='box'):
+    """Half extents along world x, y, z of a box, or of an upright-axis cylinder (radius half_size[0])."""
+    rotation=np.asarray(rotation).reshape(3,3)
+    if shape=='box':
+        return np.abs(rotation)@half_size
+    radius,_,half_height=half_size
+    return np.abs(rotation[:,2])*half_height+radius*np.sqrt(rotation[:,0]**2+rotation[:,1]**2)
+
+
+def cup_geoms(half_size, wall, base, segments):
+    """Base disc plus a ring of wall slabs; the body origin is the centre of the bounding cylinder."""
+    radius,_,half_height=half_size
+    geoms=[dict(type='cylinder',size=f'{radius} {base/2}',pos=f'0 0 {base/2-half_height}')]
+    tangential=radius*np.tan(np.pi/segments); wall_half=(2*half_height-base)/2
+    for i in range(segments):
+        a=2*np.pi*i/segments; d=radius-wall/2
+        geoms.append(dict(type='box',size=f'{wall/2} {tangential} {wall_half}',pos=f'{d*np.cos(a)} {d*np.sin(a)} {base/2}',euler=f'0 0 {a}'))
+    volumes=[np.pi*radius**2*base]+[8*(wall/2)*tangential*wall_half]*segments
+    return geoms,sum(volumes)
+
+
 def camera_axes(position, target):
     z = np.asarray(position, dtype=float)-target
     z /= np.linalg.norm(z)
@@ -161,7 +192,8 @@ class SO101MujocoEnvironment:
         self.dadr = np.array([self.model.jnt_dofadr[j] for j in self.jids])
         self.aids = np.array([self.model.actuator(n).id for n in JOINTS])
         self.boxid = self.model.body('box').id
-        self.boxgeom = self.model.geom('box').id
+        self.boxgeoms = {g for g in range(self.model.ngeom) if self.model.geom_bodyid[g]==self.boxid}
+        self.shape = config['scene'].get('object_shape','box')
         self.boxq = self.model.jnt_qposadr[self.model.body_jntadr[self.boxid]]
         self.gripid = self.model.body('gripper').id
         self.jawid = self.model.body('moving_jaw_so101_v1').id
@@ -187,9 +219,18 @@ class SO101MujocoEnvironment:
         center=np.asarray(s['receiving_center_xy_m'])+self.layout['xy_offset_m']
         hx,hy=s['receiving_half_size_xy_m']
         ET.SubElement(world,'geom',name='receiving_marker',type='box',size=f'{hx} {hy} .0001',pos=f'{center[0]} {center[1]} {z+s["marker_elevation_m"]}',rgba='.65 .3 .3 1',contype='0',conaffinity='0')
+        # The object body keeps the name 'box' for every shape; telemetry and snapshots refer to it.
         b=ET.SubElement(world,'body',name='box',pos='0.22 0.024 0.03')
         ET.SubElement(b,'freejoint')
-        ET.SubElement(b,'geom',name='box',type='box',size=' '.join(map(str,s['object_half_size_m'])),mass=str(s['object_mass_kg']),friction=' '.join(map(str,s['object_friction'])),rgba=' '.join(map(str,s['object_rgba'])),condim='3',solref=' '.join(map(str,s['object_solref'])),solimp=' '.join(map(str,s['object_solimp'])))
+        contact=dict(friction=' '.join(map(str,s['object_friction'])),condim='3',solref=' '.join(map(str,s['object_solref'])),solimp=' '.join(map(str,s['object_solimp'])))
+        if s.get('object_shape','box')=='box':
+            ET.SubElement(b,'geom',name='box',type='box',size=' '.join(map(str,s['object_half_size_m'])),mass=str(s['object_mass_kg']),friction=contact['friction'],rgba=' '.join(map(str,s['object_rgba'])),condim='3',solref=contact['solref'],solimp=contact['solimp'])
+        else:
+            ET.SubElement(xml.find('asset'),'material',name='object_glass',rgba=' '.join(map(str,s['object_rgba'])),specular='1',shininess='1')
+            geoms,volume=cup_geoms(s['object_half_size_m'],s['cup_wall_m'],s['cup_base_m'],s['cup_segments'])
+            for i,g in enumerate(geoms):
+                # Uniform density over the shell gives the configured total mass.
+                ET.SubElement(b,'geom',name='box' if i==0 else f'box_wall{i}',material='object_glass',density=str(s['object_mass_kg']/volume),**g,**contact)
         for cam in s['cameras']:
             ET.SubElement(world,'camera',name=cam['name'],pos=' '.join(map(str,cam['position'])),xyaxes=camera_axes(cam['position'],np.asarray(cam['target'])),fovy=str(cam['fovy']))
         return ET.tostring(xml,encoding='unicode')
@@ -204,9 +245,9 @@ class SO101MujocoEnvironment:
     def contacts(self):
         fixed=moving=surface=False
         for contact in self.data.contact:
-            if contact.dist > 0 or self.boxgeom not in contact.geom:
+            if contact.dist > 0 or not self.boxgeoms.intersection(contact.geom):
                 continue
-            other=contact.geom[1] if contact.geom[0]==self.boxgeom else contact.geom[0]
+            other=contact.geom[1] if contact.geom[0] in self.boxgeoms else contact.geom[0]
             body=self.model.geom_bodyid[other]
             fixed |= body==self.gripid
             moving |= body==self.jawid
@@ -215,13 +256,15 @@ class SO101MujocoEnvironment:
 
     def height(self):
         b=self.data.body('box')
-        return box_bottom(b.xpos,b.xmat,self.half)-self.config['scene']['surface_z_m']
+        if self.shape=='box':
+            return box_bottom(b.xpos,b.xmat,self.half)-self.config['scene']['surface_z_m']
+        return float(b.xpos[2]-world_extents(b.xmat,self.half,self.shape)[2])-self.config['scene']['surface_z_m']
 
     def telemetry(self):
         b=self.data.body('box'); velocity=np.zeros(6)
         self.mj.mj_objectVelocity(self.model,self.data,self.mj.mjtObj.mjOBJ_BODY,self.boxid,velocity,0)
         fixed,moving,surface=self.contacts()
-        extents=np.abs(b.xmat.reshape(3,3))@self.half
+        extents=world_extents(b.xmat,self.half,self.shape)
         center=np.asarray(self.config['scene']['receiving_center_xy_m'])+self.layout['xy_offset_m']
         inside=np.all(np.abs(b.xpos[:2]-center)+extents[:2] <= self.config['scene']['receiving_half_size_xy_m'])
         relative=self.relative_object()
@@ -269,13 +312,21 @@ class SO101MujocoEnvironment:
         self.data.qpos[self.qadr[3]]=self.config['initialization']['reference_wrist_flex_rad']
         self.forward()
         g=self.data.body('gripper')
+        if self.config['scene'].get('object_hold_upright',False):
+            # Turn the object about its local y (the jaw-closing axis) until its local z points up.
+            world=g.xmat.reshape(3,3)@relative_rot; a=np.arctan2(world[2,0],world[2,2])
+            relative_rot=relative_rot@np.array([[np.cos(a),0,np.sin(a)],[0,1,0],[-np.sin(a),0,np.cos(a)]])
+        # Shift in the object's own frame, e.g. to centre a round object between the jaw pads.
+        # The arm target ignores the shift, so the arm pose matches the unshifted object's.
+        shift=relative_rot@np.asarray(self.config['scene'].get('object_hold_offset_m',[0,0,0]),dtype=float)
+        relative=relative+shift
         self.data.qpos[self.boxq:self.boxq+3]=g.xpos+g.xmat.reshape(3,3)@relative
         quat=np.zeros(4); self.mj.mju_mat2Quat(quat,(g.xmat.reshape(3,3)@relative_rot).ravel())
         self.data.qpos[self.boxq+3:self.boxq+7]=quat
         self.forward()
         target=self.data.site_xpos[self.siteid].copy()
         center=np.asarray(self.config['scene']['receiving_center_xy_m'])+self.layout['xy_offset_m']
-        target[:2]+=center-self.data.body('box').xpos[:2]
+        target[:2]+=center-self.data.body('box').xpos[:2]+(g.xmat.reshape(3,3)@shift)[:2]
         target[2]+=self.config['task'][height+'_height_m']-self.height()
         rotation=self.data.site_xmat[self.siteid].reshape(3,3).copy()
         self.solve_ik(target,rotation)

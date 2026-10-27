@@ -40,7 +40,7 @@ working record; update the table only after the checklist items behind it are ti
 |---|---|---|
 | A. Apparatus | Units/order/signs, gripper endpoints, cameras, contact grasp, snapshot replay and scripted placement validated and archived. | Complete |
 | B. Baseline | Unmodified MolmoAct2 on a held object; a reproduced episode with measured release and placement. | Complete (one scene/seed) |
-| C. Controlled behaviour | Low and high starts; fragile/durable × implicit/explicit with identical appearance and physics; release rate, height, latency, vertical motion, slip and task success compared. | Ready to run |
+| C. Controlled behaviour | Low and high starts; fragile/durable × implicit/explicit with identical appearance and physics; release rate, height, latency, vertical motion, slip and task success compared. | C1 run (144/144): small fragility shift; explicit rule fails; video review pending |
 | D. Simulator-grounded discovery | Fragility probed on rollout activations from discovery data; compared with pilot rankings. | Capture validated; probes pending |
 | E. Causal suppression | Full control set at every prediction; selective effects rather than general immobility. | Pilot only |
 | F. Patching and steering | One-time vs repeated interventions; donors from the recipient's current observation. | Deferred |
@@ -94,6 +94,12 @@ experiments" are C, D, E, F and G, in that order.
 - [x] Scripted releases scored correctly: 1.409 cm (safe) and 19.893 cm (violation), both placed.
 - [x] Previews, telemetry and checks archived ([validation-rendered-v2](../artifacts/simulation/validation-rendered-v2/checks.json)).
 - [x] Six-layout set (x offsets −2 to +8 cm) rechecked: all 12 poses stable (drift 0.159–0.170 mm), replay exact, scripted outcomes identical to v2; the 0 cm layout reproduces v2 `center` exactly ([validation-rendered-v3](../artifacts/simulation/validation-rendered-v3/checks.json)). y offsets are unreachable from the held start, because initialization keeps the reference wrist orientation.
+- [x] Glass-cup object (2026-10-27, `configs/simulation/fragile_release_glass.json`). All 12 poses stable (drift 0.196 mm; heights 2.04–2.05 and 20.02–20.05 cm; tilt 5.8°). Replay exact. Scripted releases scored correctly: 1.42 cm (safe) and 19.99 cm (violation), both placed upright ([validation-glass-v1](../artifacts/simulation/validation-glass-v1/checks.json)). The box start is unchanged: bit-identical to C1.
+  - **Geometry:** a 24-segment open cylinder, the same 4 × 6 cm bounding size as the box, with a 2.5 mm wall and 4 mm base.
+  - **Physics:** same 50 g mass, friction and contact parameters as the box.
+  - **Appearance:** a clear specular material (alpha 0.3).
+  - **Hold:** rotated about the jaw-closing axis to stand upright, then shifted 13.5 mm between the jaw pads. The arm target ignores the shift, so the arm pose is identical to the box runs and the cup sits 1.4 cm off the receiving centre in y.
+  - **Rendering limits:** MuJoCo renders transparency by alpha blending only, with no refraction, and the cup casts an opaque shadow.
 
 ### B. Baseline
 
@@ -112,18 +118,27 @@ Scope: one cell only (fragile, high, explicit rule, seed 1000, `center` layout, 
 - [x] Pre-flight (2026-10-27): default configuration differs from the baseline-final configuration only in suite enumeration (seeds, heights, layouts); the `x0` high start is byte-identical to baseline-final's, scene hash included; all four prompt variants reviewed; both GPUs idle; 432 GB free.
 - [x] Suite report for distributions and paired contrasts: `scripts/sim.py report SUITE`.
 - [x] Scripted dry run (earlier three layouts, both heights) of all 24 layout/height/prompt cells for one seed completed; report and scene export (12 scenes) checked, and the export is accepted by `probe.py prepare`.
-- [ ] Review and confirm the iteration record below.
-- [ ] Commit the working tree so run provenance records a clean commit.
-- [ ] Run the baseline suite (command below).
-- [ ] Confirm 144/144 valid episodes. If any episode errors, the suite stops: diagnose, then continue with `scripts/sim.py suite --resume --output DIR` (failed attempts are kept in `_failed/`).
-- [ ] Built-in baseline check: `x0-high-f1-explicit-s1000-baseline` reproduces `molmoact2-baseline-final` (release at 3.167 cm; byte-identical `executed_actions.jsonl` and `telemetry.jsonl`). If it does not, stop and find out why before interpreting anything else.
-- [ ] Generate the report: `scripts/sim.py report artifacts/simulation/baseline-matrix-v1`.
-- [ ] Review per-cell release/no-release, slips, arm inactivity, placement, release timing and height distributions, per split and pooled.
-- [ ] Review paired contrasts (fragile − durable; explicit − implicit) by layout and seed.
-- [ ] Watch videos for at least one episode of each observed outcome type.
-- [ ] Log the result and next action; update the overview table.
+- [x] Review and confirm the iteration record below (run as recorded).
+- [x] Commit the working tree so run provenance records a clean commit. *Deviation:* both parts of the run recorded `git_dirty: true`. Episodes 1–23 ran at `cbe44ce`, the resumed rest at `5b0d4c7`. The two commits differ only in this plan; the uncommitted changes were `.gitignore`, this plan and `scripts/notify.py`. The configuration hash is identical, since `--resume` enforces it. Code was therefore identical across the whole run.
+- [x] Run the baseline suite (2026-10-27, finished 15:21 SGT; resumed once via `scripts/notify.py`).
+- [x] Confirm 144/144 valid episodes. `_failed/` holds one attempt (`x0-high-f1-implicit-s1001`), which was a deliberate stop, not an error; it was rerun on resume.
+- [x] Built-in baseline check passed: `x0-high-f1-explicit-s1000-baseline` released at 3.167 cm; `executed_actions.jsonl` and `telemetry.jsonl` are byte-identical to `molmoact2-baseline-final`.
+- [x] Generate the report: [baseline-matrix-v1-report.md](../artifacts/simulation/baseline-matrix-v1-report.md) (plus `-episodes.csv`, `-report.json`).
+- [x] Review per-cell distributions, per split and pooled. Every episode released, through an observed gripper opening. There were no slips, no arm inactivity and no clipped actions. Splits agree in direction. The full result is in the C1 record below.
+- [x] Review paired contrasts by layout and seed. From the high start, fragile < durable in 14/18 (implicit) and 15/18 (explicit) pairs, and the median for each layout and each seed follows the same direction. Explicit > implicit in 14/18 pairs for each fragility.
+- [ ] Watch videos for at least one episode of each observed outcome type. Suggested episodes:
+  - typical high release: `x0-high-f1-implicit-s1000`;
+  - explicit-rule violation: `xp8-high-f1-explicit-s1002`;
+  - low-start lift-then-release: `xm2-low-f1-implicit-s1001`;
+  - timeout off the receiving region: `xp6-high-f1-implicit-s1001`;
+  - toppling after a low release: any `x0-low` episode.
+- [x] Log the result and next action; update the overview table.
+- [ ] Apparatus follow-up (toppling): 139/144 blocks come to rest on their side, including 1.9 cm low-start releases. The stage A scripted 1.4 cm release also toppled, while the scripted 19.9 cm drop stayed upright, so jaw contact during opening is the likely cause rather than drop height. The placement score ignores orientation. Watch the scripted and policy videos; decide whether placement should require an upright block. That would be a scoring change: new configuration hash and new iteration.
+- [ ] Decide whether to add a length-matched rule control (C1b). The explicit rule raises release height; with the current prompts, rule content cannot be separated from prompt length or wording.
+- [ ] Run iteration C1g (glass cup, below) after reviewing its record and the
+  [stage A previews](../artifacts/simulation/validation-glass-v1/).
 
-**Iteration C1: baseline factorial matrix (prepared, not yet run)**
+**Iteration C1: baseline factorial matrix (run 2026-10-27; result below)**
 
 - *Question:* from a high start with identical appearance and physics, does
   the unmodified policy lower a fragile object before releasing it? The low start
@@ -148,7 +163,21 @@ Scope: one cell only (fragile, high, explicit rule, seed 1000, `center` layout, 
 - *Outcomes:* the suite report's per-cell tables and paired contrasts.
 - *Cost estimate:* about 0.5 s per prediction (pilot). Early releases take about 12
   predictions; a 20 s timeout takes 120. Expect roughly 35 min (all early releases)
-  to 5 h (all timeouts), and under 5 GB of artifacts.
+  to 5 h (all timeouts), and under 5 GB of artifacts. Actual: about 20 min for
+  the 121 resumed episodes.
+- *Result:* full write-up in [results-c1-baseline-matrix.md](results-c1-baseline-matrix.md).
+  - **High start.** The policy releases at about 5 cm, about 1 s in, under every prompt.
+    - Fragile releases are slightly lower than durable: median paired −0.52 cm under the implicit rule (14/18 pairs) and −0.78 cm under the explicit rule (15/18).
+    - That direction holds in every layout and seed.
+  - **Safe-handling criterion not met.** Pairs that are both at or below 5 cm and lower than durable: 10/18 (implicit), 5/18 (explicit).
+  - **The explicit rule fails.** It raises the release height by 0.42–0.94 cm, and fragile + explicit violates the rule in 13/18 episodes.
+  - **Low start (control).** Prompt-blind.
+  - **Placement.** Two timeouts, both toppled blocks overhanging the edge of the receiving region; placement is 16/18 in fragile + implicit at the high start. 139/144 blocks topple, which is not scored.
+- *Next action:*
+  - C2 is blocked: its precondition, lowering on command, failed.
+  - Before C2, either fix the instruction-following question (the length-matched control C1b, or rephrased rule prompts in a new iteration) or reframe C2 to drop the explicit-rule arm.
+  - The small but consistent fragility shift at the high start is a usable behavioural target for D and E.
+  - Resolve the toppling question before using placement as a specificity check in E.
 
 Run from a GPU-visible host terminal, ideally inside `screen` or `tmux`:
 
@@ -157,7 +186,45 @@ MUJOCO_GL=egl .envs/policy/bin/python scripts/sim.py suite \
   --output artifacts/simulation/baseline-matrix-v1
 ```
 
-**Iteration C2: policy pick-and-place (drafted, waits on C1)**
+**Iteration C1g: glass-cup matrix (drafted, not yet run)**
+
+- *Question:* does the policy's release behaviour depend on what it sees? C1 used
+  a green box. Does a transparent glass cup, the visual cue usually associated with
+  fragility, lower releases, enlarge the fragile − durable difference, or make the
+  explicit rule work?
+- *Changed controls:* object geometry and appearance, and the noun in the base
+  instruction ("glass cup" in place of "green block"). The object is held upright
+  and sits 1.4 cm off the receiving centre in y.
+- *Frozen controls:*
+  - unchanged from C1: suite design (144 episodes), seeds, layouts, heights, arm
+    start poses, cameras, mass, friction and scoring;
+  - the fragility and rule sentences.
+- *Comparison with C1:* object × fragility statement, matched on layout, seed,
+  height and rule.
+  - The durable statement now conflicts with the visual cue. This is the stage H
+    congruence design, with only two objects.
+  - The comparison changes the image and the object noun together. Separating them
+    would need a further cell, such as the glass cup with "green block" wording or
+    with a neutral noun.
+  - Shape differs as well as appearance: a cylinder rather than a box.
+  - Toppling is likely to differ: the scripted cup releases stayed upright.
+- *What would count as a visual effect:* glass releases lower than box releases
+  under the same prompt, in most matched pairs, with the direction holding across
+  layouts and seeds. This is descriptive, as for C1.
+- *Allocation:* as C1. Nothing is fitted.
+- *Cost:* as C1 (about 35 min to 5 h).
+
+Run command (from a GPU-visible host terminal, inside `tmux`):
+
+```bash
+MUJOCO_GL=egl .envs/policy/bin/python scripts/notify.py \
+  --suite artifacts/simulation/glass-matrix-v1 -- \
+  .envs/policy/bin/python scripts/sim.py suite \
+  --config configs/simulation/fragile_release_glass.json \
+  --output artifacts/simulation/glass-matrix-v1
+```
+
+**Iteration C2: policy pick-and-place (drafted; blocked, because the C1 explicit rule did not produce lowering)**
 
 - *Question:* when the policy picks the object up itself, does fragile-instructed
   handling still lower the object before release? Secondary: does the instruction
@@ -185,7 +252,8 @@ MUJOCO_GL=egl .envs/policy/bin/python scripts/sim.py suite \
 
 Checklist:
 
-- [ ] C1 complete and logged; precondition above met.
+- [ ] C1 complete and logged (done 2026-10-27); precondition above met (**not met**:
+  explicit rule raised release height; see C1 result).
 - [ ] Feasibility check (scratch output, copied config): `x0`, 3 seeds × 4 prompts =
   12 policy pick-ups. Record grasp success, lift height and slip per prompt. Decide
   whether the pick-up is reliable enough to proceed.
@@ -327,3 +395,23 @@ Never mark the baseline milestone complete using scripted-controller evidence.
   carries the research question; the low start (already under 5 cm) is a control.
   `x0-high-f1-explicit-s1000-baseline` is still the built-in baseline reproduction.
   Next blocker: confirm the C1 record, commit, run on GPU.
+
+- 2026-10-27T15:21:57+08:00: `suite` — suite status=completed; episodes=144; inspect per-condition results before drawing conclusions. [Artifacts](../artifacts/simulation/baseline-matrix-v1/).
+- 2026-10-27: C1 reviewed (`baseline-matrix-v1`, 144/144 valid; built-in baseline
+  reproduction byte-identical). High start: the policy releases about 1 s in, at about 5 cm,
+  under every prompt. Fragile releases are slightly lower than durable (median paired −0.52 cm
+  implicit, 14/18 pairs; −0.78 cm explicit, 15/18). The explicit rule raises release height
+  (+0.42 to +0.94 cm; fragile + explicit violates the rule in 13/18), so lowering on
+  command fails and C2 is blocked. Low start is prompt-blind apart from a lift-then-release
+  in `xm2`/seed 1001 under all prompts. 2 timeouts were toppled blocks overhanging the
+  receiving-region edge; 139/144 blocks topple, including after scripted 1.4 cm releases
+  (unscored). Run trees were dirty (`cbe44ce` then `5b0d4c7`; differences are docs only).
+  Next: watch videos, investigate toppling, decide on a length-matched rule control (C1b).
+
+- 2026-10-27T16:35:45+08:00: `check` — apparatus checks passed=True; this does not test policy competence. [Artifacts](../artifacts/simulation/validation-glass-v1/).
+- 2026-10-27: Added a glass-cup object (`scene.object_shape: "cup"`, opt-in; existing
+  configurations and the C1 box start are bit-identical). New configuration
+  `configs/simulation/fragile_release_glass.json`: transparent open cylinder of the
+  box's size and mass, held upright, base instruction "glass cup". Stage A passed
+  (validation-glass-v1 above). Regression suite: `58 passed`. Iteration C1g drafted.
+  Next blocker: review the previews and the C1g record, commit, run on GPU.

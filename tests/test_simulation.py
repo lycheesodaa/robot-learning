@@ -5,7 +5,7 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-from vla_safety.simulation.environment import Calibration, box_bottom, load_config, validate_config
+from vla_safety.simulation.environment import Calibration, box_bottom, load_config, validate_config, world_extents
 from vla_safety.simulation.scoring import ReleaseTracker
 
 ROOT=Path(__file__).resolve().parents[1]
@@ -28,6 +28,19 @@ def test_calibration_has_offsets_and_reversible_gripper(config):
 @pytest.mark.parametrize('rotation,expected',[(np.eye(3),.27),(np.array([[0,0,1],[0,1,0],[-1,0,0]]),.29)])
 def test_bottom_accounts_for_orientation(rotation,expected):
     assert box_bottom([0,0,.3],rotation,[.01,.02,.03])==pytest.approx(expected)
+
+
+@pytest.mark.parametrize('rotation,expected',[(np.eye(3),[.02,.02,.03]),(np.array([[0,0,1],[0,1,0],[-1,0,0]]),[.03,.02,.02])])
+def test_cup_extents_follow_its_axis(rotation,expected):
+    np.testing.assert_allclose(world_extents(rotation,[.02,.02,.03],'cup'),expected,atol=1e-12)
+    np.testing.assert_allclose(world_extents(rotation,[.02,.02,.03]),np.abs(rotation)@[.02,.02,.03])
+
+
+@pytest.mark.parametrize('key,value',[('object_shape','sphere'),('cup_wall_m',.03),('cup_segments',4),('object_half_size_m',[.02,.03,.03])])
+def test_invalid_cup_rejected(key,value):
+    config=load_config(ROOT/'configs/simulation/fragile_release_glass.json')
+    config['scene'][key]=value
+    with pytest.raises(ValueError):validate_config(config)
 
 
 @pytest.mark.parametrize('section,key,value',[
@@ -102,6 +115,29 @@ def test_physical_grasp_and_complete_snapshot_replay(env):
     env.data.ctrl[env.aids[5]]=1.4
     for _ in range(50):env.physics_step()
     np.testing.assert_array_equal(final,env.snapshot()['integration'])
+
+
+def test_glass_cup_held_upright_and_replays():
+    pytest.importorskip('mujoco')
+    from vla_safety.simulation.environment import SO101MujocoEnvironment
+    config=load_config(ROOT/'configs/simulation/fragile_release_glass.json')
+    if not (ROOT/config['assets']['directory']).exists():pytest.skip('Pinned robot assets unavailable')
+    env=SO101MujocoEnvironment(config,ROOT)
+    try:
+        assert len(env.boxgeoms)==config['scene']['cup_segments']+1
+        assert env.model.body_mass[env.boxid]==pytest.approx(config['scene']['object_mass_kg'])
+        env.reset('high');snapshot=env.snapshot();initial=env.telemetry()
+        assert initial['fixed_contact'] and initial['moving_contact'] and not initial['surface_contact']
+        assert abs(initial['height_m']-.2)<.003
+        assert env.data.body('box').xmat.reshape(3,3)[2,2]>np.cos(np.radians(10))
+        env.data.ctrl[env.aids[5]]=1.4
+        for _ in range(50):env.physics_step()
+        final=env.snapshot()['integration'];env.restore(snapshot)
+        env.data.ctrl[env.aids[5]]=1.4
+        for _ in range(50):env.physics_step()
+        np.testing.assert_array_equal(final,env.snapshot()['integration'])
+    finally:
+        env.close()
 
 
 def test_scripted_low_and_high_release_score_differ(config,tmp_path,env):
