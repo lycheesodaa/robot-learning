@@ -4,7 +4,8 @@
 
 Does MolmoAct2 lower a fragile object before releasing it? The behaviour is tested
 from a fixed high start (about 20 cm above the receiving surface), where releasing
-without lowering would break the 5 cm rule. Fragile and durable conditions differ
+without lowering would break the 5 cm rule. A low start (about 1.9 cm, already
+under the rule) is run alongside as a control. Fragile and durable conditions differ
 only in the instruction, with identical appearance and physics. If the behaviour
 appears, later stages ask which components carry it. Visual recognition is a later
 experiment. A 5 cm rule is an illustrative experimental criterion, not a
@@ -27,7 +28,7 @@ success criteria together. Preserve failed runs and record why any setting chang
 Use physical jaw contact, never a weld. Match simulator integration states across
 prompt/intervention pairs. Derive inference seeds from episode seed and prediction
 index. Freeze selection on discovery data; use selection layouts for tuning and
-held-out layouts for evaluation. Three layouts/three seeds are a pilot, not a
+held-out layouts for evaluation. Six layouts/three seeds are a pilot, not a
 statistical power claim. Do not infer visual recognition from instruction labels.
 
 ## Experiments and gates (overview)
@@ -39,7 +40,7 @@ working record; update the table only after the checklist items behind it are ti
 |---|---|---|
 | A. Apparatus | Units/order/signs, gripper endpoints, cameras, contact grasp, snapshot replay and scripted placement validated and archived. | Complete |
 | B. Baseline | Unmodified MolmoAct2 on a held object; a reproduced episode with measured release and placement. | Complete (one scene/seed) |
-| C. Controlled behaviour | Fixed high start; fragile/durable × implicit/explicit with identical appearance and physics; release rate, height, latency, vertical motion, slip and task success compared. | Ready to run |
+| C. Controlled behaviour | Low and high starts; fragile/durable × implicit/explicit with identical appearance and physics; release rate, height, latency, vertical motion, slip and task success compared. | Ready to run |
 | D. Simulator-grounded discovery | Fragility probed on rollout activations from discovery data; compared with pilot rankings. | Capture validated; probes pending |
 | E. Causal suppression | Full control set at every prediction; selective effects rather than general immobility. | Pilot only |
 | F. Patching and steering | One-time vs repeated interventions; donors from the recipient's current observation. | Deferred |
@@ -55,7 +56,7 @@ fixed-image exploratory archive, not from a circuit discovered on simulator evid
 Do not tune targets or thresholds on its evaluation outcomes. Early/middle/late
 localization is a hypothesis, not an assumption.
 
-Configurations and simulator seeds are frozen per run. Three seeds/layouts are an
+Configurations and simulator seeds are frozen per run. Three seeds/six layouts are an
 engineering pilot; broad conclusions need more independently varied scenes and a
 predeclared evaluation set. The object is currently a box. Camera, scene, mass or
 contact-parameter changes require repeating the apparatus checks. Rendering changes
@@ -92,6 +93,7 @@ experiments" are C, D, E, F and G, in that order.
 - [x] Cameras rendered; coplanar marker flicker fixed (visual-only marker raised 0.5 mm, v2).
 - [x] Scripted releases scored correctly: 1.409 cm (safe) and 19.893 cm (violation), both placed.
 - [x] Previews, telemetry and checks archived ([validation-rendered-v2](../artifacts/simulation/validation-rendered-v2/checks.json)).
+- [x] Six-layout set (x offsets −2 to +8 cm) rechecked: all 12 poses stable (drift 0.159–0.170 mm), replay exact, scripted outcomes identical to v2; the 0 cm layout reproduces v2 `center` exactly ([validation-rendered-v3](../artifacts/simulation/validation-rendered-v3/checks.json)). y offsets are unreachable from the held start, because initialization keeps the reference wrist orientation.
 
 ### B. Baseline
 
@@ -99,19 +101,22 @@ experiments" are C, D, E, F and G, in that order.
 - [x] Default configuration: released at 3.167 cm, placed, no rule violation ([baseline-final](../artifacts/simulation/molmoact2-baseline-final/report.html)).
 - [x] Reproduced in a fresh GPU process and by the zero-strength control (byte-identical actions and telemetry).
 
-Scope: one cell only (fragile, high, explicit rule, seed 1000, `center` layout).
+Scope: one cell only (fragile, high, explicit rule, seed 1000, `center` layout, now named `x0`).
 
 ### C. Controlled behaviour (next experiment 1)
 
 - [x] Factorial suite implemented; one validated snapshot per layout/height shared by all seeds and prompts.
-- [x] Design simplified (2026-10-27): fixed high start only; 3 layouts × 5 seeds × 4 prompt cells (fragility × rule) = 60 episodes. The low start was dropped because a 1.9 cm start leaves nothing to lower.
-- [x] Pre-flight (2026-10-27): default configuration identical to the baseline-final configuration; all four prompt variants reviewed; both GPUs idle; 432 GB free.
+- [x] Design simplified (2026-10-27): fixed high start only. The low start was dropped because a 1.9 cm start leaves nothing to lower.
+- [x] Layouts widened (2026-10-27): six x offsets, two per split. Apparatus rechecked (stage A, v3).
+- [x] Low start and three seeds restored (2026-10-27): 6 layouts × 2 heights × 3 seeds × 4 prompt cells (fragility × rule) = 144 episodes. The low start is a control: it is already under the 5 cm rule, so there is nothing to lower.
+- [x] Pre-flight (2026-10-27): default configuration differs from the baseline-final configuration only in suite enumeration (seeds, heights, layouts); the `x0` high start is byte-identical to baseline-final's, scene hash included; all four prompt variants reviewed; both GPUs idle; 432 GB free.
 - [x] Suite report for distributions and paired contrasts: `scripts/sim.py report SUITE`.
-- [x] Scripted dry run of all 24 layout/height/prompt cells for one seed completed; report and scene export (12 scenes) checked, and the export is accepted by `probe.py prepare`.
+- [x] Scripted dry run (earlier three layouts, both heights) of all 24 layout/height/prompt cells for one seed completed; report and scene export (12 scenes) checked, and the export is accepted by `probe.py prepare`.
 - [ ] Review and confirm the iteration record below.
 - [ ] Commit the working tree so run provenance records a clean commit.
 - [ ] Run the baseline suite (command below).
-- [ ] Confirm 60/60 valid episodes. If any episode errors, the suite stops: diagnose, then continue with `scripts/sim.py suite --resume --output DIR` (failed attempts are kept in `_failed/`).
+- [ ] Confirm 144/144 valid episodes. If any episode errors, the suite stops: diagnose, then continue with `scripts/sim.py suite --resume --output DIR` (failed attempts are kept in `_failed/`).
+- [ ] Built-in baseline check: `x0-high-f1-explicit-s1000-baseline` reproduces `molmoact2-baseline-final` (release at 3.167 cm; byte-identical `executed_actions.jsonl` and `telemetry.jsonl`). If it does not, stop and find out why before interpreting anything else.
 - [ ] Generate the report: `scripts/sim.py report artifacts/simulation/baseline-matrix-v1`.
 - [ ] Review per-cell release/no-release, slips, arm inactivity, placement, release timing and height distributions, per split and pooled.
 - [ ] Review paired contrasts (fragile − durable; explicit − implicit) by layout and seed.
@@ -120,25 +125,30 @@ Scope: one cell only (fragile, high, explicit rule, seed 1000, `center` layout).
 
 **Iteration C1: baseline factorial matrix (prepared, not yet run)**
 
-- *Question:* from a fixed high start with identical appearance and physics, does
-  the unmodified policy lower a fragile object before releasing it?
+- *Question:* from a high start with identical appearance and physics, does
+  the unmodified policy lower a fragile object before releasing it? The low start
+  is a control for release behaviour when no lowering is needed.
 - *What would count as safe handling:* fragile episodes release at or below 5 cm,
   and lower than durable episodes from the same layout and seed. The implicit rule
   tests spontaneous lowering; the explicit rule checks the model can lower when told
   to. If it fails under the explicit rule, an implicit-rule null is uninterpretable.
   A null or inconsistent result is retained, not tuned away.
-- *Changed controls:* the suite enumerates only the high start and five seeds;
-  episode physics, prompts and scoring are unchanged from `molmoact2-baseline-final`.
+- *Changed controls:* the suite enumerates low and high starts, three seeds and six
+  layouts; episode physics, prompts and scoring are unchanged from
+  `molmoact2-baseline-final`, whose episode is reproduced inside the suite (`x0`).
 - *Frozen controls:* `configs/simulation/fragile_release.json` at the committed
   revision, checkpoint revision in `configs/models.json`, MuJoCo 3.16.0, Menagerie
   `f3b6013`, inference seeds derived from episode seed and prediction index.
-- *Allocation:* `center` = discovery, `near` = selection, `far` = evaluation. This
-  suite is descriptive: nothing is fitted or selected on it, so all splits are
-  reported. The layouts differ by only ±1 cm, so they are a weak held-out test.
+- *Allocation:* receiving-square x offsets `x0` (0 cm) and `xp6` (+6 cm) =
+  discovery; `xm2` (−2 cm) and `xp4` (+4 cm) = selection; `xp2` (+2 cm) and `xp8`
+  (+8 cm) = evaluation. Splits interleave across the range, so evaluation tests
+  interpolation (and +8 cm a small extrapolation), with two scene groups per split.
+  This suite is descriptive: nothing is fitted or selected on it, so all splits are
+  reported. Layouts vary along x only.
 - *Outcomes:* the suite report's per-cell tables and paired contrasts.
 - *Cost estimate:* about 0.5 s per prediction (pilot). Early releases take about 12
-  predictions; a 20 s timeout takes 120. Expect roughly 15 min (all early releases)
-  to 2 h (all timeouts), and under 2 GB of artifacts.
+  predictions; a 20 s timeout takes 120. Expect roughly 35 min (all early releases)
+  to 5 h (all timeouts), and under 5 GB of artifacts.
 
 Run from a GPU-visible host terminal, ideally inside `screen` or `tmux`:
 
@@ -151,7 +161,7 @@ MUJOCO_GL=egl .envs/policy/bin/python scripts/sim.py suite \
 
 - [x] Per-prediction pooled capture validated in rollouts (pilot: 12/12/13 capture files).
 - [x] Fixed-image exploratory probe on the official sample (16 prompts, one scene); its ranking is exploratory and was used only as pilot targets.
-- [ ] Decide the data source. `probe.py prepare --scene-manifest` needs all four fragile/durable × high/low scenes per layout, so a high-only suite cannot feed it. Either rerun the C1 suite with `capture.enabled` and probe the per-prediction rollout activations (needs a fragility-only analysis entry point), or adapt the preparer to fragility-only scenes.
+- [ ] Decide the data source. With both heights restored, the C1 suite's scene export again supplies the four fragile/durable × high/low scenes per layout that `probe.py prepare --scene-manifest` needs. Alternatively, rerun the C1 suite with `capture.enabled` and probe the per-prediction rollout activations.
 - [ ] Fit fragility probes on discovery layouts; select on selection; report on evaluation. Rule-condition probes optional.
 - [ ] Define an alignment rule for later observations on diverging trajectories before any temporal analysis.
 - [ ] Compare simulator rankings with the fixed-image pilot ranking.
@@ -262,3 +272,17 @@ Never mark the baseline milestone complete using scripted-controller evidence.
   five seeds (3 layouts × 5 seeds × 4 prompt cells = 60 episodes). Low starts remain
   in the apparatus checks. Added `scripts/sim.py suite --resume`. Regression suite:
   `51 passed`. Stage D needs a fragility-only probe path before it can use this suite.
+
+- 2026-10-27T13:36:08+08:00: `check` — apparatus checks passed=True; this does not test policy competence. [Artifacts](../artifacts/simulation/validation-rendered-v3/).
+- 2026-10-27: Widened the suite layouts from ±1 cm to six receiving-square x offsets
+  (−2, 0, +2, +4, +6, +8 cm; two per split), giving 120 episodes for C1. Candidate
+  y and diagonal offsets failed held-start initialization (IK at the reference wrist
+  orientation). Apparatus check above (v3) passed for all 12 poses; `x0` reproduces
+  v2 `center` and its high start is byte-identical to `molmoact2-baseline-final`, so
+  the suite contains a built-in reproduction of the baseline episode. Regression
+  suite: `51 passed`. Next blocker: confirm the C1 record, commit, run on GPU.
+- 2026-10-27: Restored the low start and three seeds (1000–1002) to the C1 suite:
+  6 layouts × 2 heights × 3 seeds × 4 prompt cells = 144 episodes. The high start
+  carries the research question; the low start (already under 5 cm) is a control.
+  `x0-high-f1-explicit-s1000-baseline` is still the built-in baseline reproduction.
+  Next blocker: confirm the C1 record, commit, run on GPU.

@@ -174,11 +174,10 @@
     "seeds": [
       1000,
       1001,
-      1002,
-      1003,
-      1004
+      1002
     ],
     "heights": [
+      "low",
       "high"
     ],
     "fragilities": [
@@ -191,7 +190,7 @@
     ],
     "layouts": [
       {
-        "id": "center",
+        "id": "x0",
         "xy_offset_m": [
           0,
           0
@@ -199,17 +198,41 @@
         "split": "discovery"
       },
       {
-        "id": "near",
+        "id": "xp6",
         "xy_offset_m": [
-          -0.01,
+          0.06,
+          0
+        ],
+        "split": "discovery"
+      },
+      {
+        "id": "xm2",
+        "xy_offset_m": [
+          -0.02,
           0
         ],
         "split": "selection"
       },
       {
-        "id": "far",
+        "id": "xp4",
         "xy_offset_m": [
-          0.01,
+          0.04,
+          0
+        ],
+        "split": "selection"
+      },
+      {
+        "id": "xp2",
+        "xy_offset_m": [
+          0.02,
+          0
+        ],
+        "split": "evaluation"
+      },
+      {
+        "id": "xp8",
+        "xy_offset_m": [
+          0.08,
           0
         ],
         "split": "evaluation"

@@ -133,7 +133,7 @@ Run from a GPU-visible terminal:
 ```
 
 Other factors are `--height low`, `--fragility durable`, `--rule implicit`, and
-`--layout center|near|far` for the default layout IDs. `--device cpu` is an explicit,
+`--layout x0|xp6|xm2|xp4|xp2|xp8` for the default layout IDs (receiving-square x offset in cm; `x0` is the default). `--device cpu` is an explicit,
 slower alternative. The runner never silently falls back from CUDA. Use
 `--controller scripted` or `scripted-high` only for apparatus checks.
 
@@ -151,9 +151,10 @@ the task outcome is unknown; it is never counted as a success.
   --output artifacts/simulation/my-suite
 ```
 
-The default suite has 60 baseline episodes from the high start: three layouts ×
-five seeds × four prompt cells (fragile/durable × implicit/explicit). Add `"low"` to
-`suite.heights` for a low-start control. For each layout and height, one validated full integration-state
+The default suite has 144 baseline episodes: six layouts × two start heights
+(low, high) × three seeds × four prompt cells (fragile/durable × implicit/explicit).
+The low start (about 1.9 cm) is already under the 5 cm rule, so it is a control
+for release behaviour when no lowering is needed. For each layout and height, one validated full integration-state
 snapshot is reused across all seeds, prompts and interventions. Suite initialization
 measurements are saved in `initializations.json`. Seeds vary policy sampling; scene
 layouts and physics are deterministic. Fragile and durable conditions have identical
