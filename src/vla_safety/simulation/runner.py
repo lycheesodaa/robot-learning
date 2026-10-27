@@ -246,9 +246,40 @@ def run_episode(config,root,folder,*,height='high',fragile=True,rule='explicit',
     return result,snapshot
 
 
-def run_suite(config,root,folder,controller='molmoact2',render=True):
-    root=Path(root);folder=Path(folder);folder.mkdir(parents=True,exist_ok=False)
-    atomic_json(folder/'config.json',config)
+def _completed_episode(path,snapshot):
+    """A sealed success/timeout episode from this exact start state, else None."""
+    if not (path/'files.json').exists() or json.loads((path/'status.json').read_text())['status'] not in ('success','timeout'):
+        return None
+    with np.load(path/'initial_state.npz') as saved:
+        if not np.array_equal(saved['integration'],snapshot['integration']):
+            raise ValueError(f'{path.name}: saved start state differs from the rebuilt one; resume would break pairing')
+    return json.loads((path/'result.json').read_text())
+
+
+def _set_aside(folder,path):
+    """Failed or partial attempts are preserved, never deleted."""
+    attempts=folder/'_failed';attempts.mkdir(exist_ok=True)
+    n=1
+    while (attempts/f'{path.name}-attempt{n}').exists(): n+=1
+    path.rename(attempts/f'{path.name}-attempt{n}')
+
+
+def run_suite(config,root,folder,controller='molmoact2',render=True,resume=False):
+    """With resume, completed episodes are reused and failed/partial ones are rerun."""
+    root=Path(root);folder=Path(folder);settings={'controller':controller,'render':render}
+    if resume:
+        if not (folder/'config.json').exists():
+            raise ValueError('Nothing to resume: no suite config in the output directory')
+        if json.loads((folder/'config.json').read_text())!=config:
+            raise ValueError('Configuration differs from the suite being resumed')
+        if (folder/'suite.json').exists() and json.loads((folder/'suite.json').read_text())!=settings:
+            raise ValueError('Controller/render settings differ from the suite being resumed')
+        (folder/'CANCEL').unlink(missing_ok=True)
+        if (folder/'error.txt').exists(): _set_aside(folder,folder/'error.txt')
+    else:
+        folder.mkdir(parents=True,exist_ok=False)
+        atomic_json(folder/'config.json',config)
+    atomic_json(folder/'suite.json',settings)
     atomic_json(folder/'status.json',{'status':'running'})
     policy=None;specifications={'baseline':([],{'condition':'baseline'})}
     results=[];scenes={};failure=None;initializations=[]
@@ -271,9 +302,16 @@ def run_suite(config,root,folder,controller='molmoact2',render=True):
                     failure='cancelled';break
                 stem=f"{layout['id']}-{height}-f{int(fragile)}-{rule}-s{seed}-{name}"
                 specs,descriptor=specifications[name]
-                print(stem,flush=True)
-                result,_=run_episode(config,root,folder/stem,height=height,fragile=fragile,rule=rule,seed=seed,layout=layout,
-                                     controller=controller,policy=policy,specs=specs,descriptor=descriptor,initial_snapshot=snapshot,render=render)
+                result=None
+                if resume and (folder/stem).exists():
+                    result=_completed_episode(folder/stem,snapshot)
+                    if result is None: _set_aside(folder,folder/stem)
+                if result is not None:
+                    print(stem,'(completed earlier)',flush=True)
+                else:
+                    print(stem,flush=True)
+                    result,_=run_episode(config,root,folder/stem,height=height,fragile=fragile,rule=rule,seed=seed,layout=layout,
+                                         controller=controller,policy=policy,specs=specs,descriptor=descriptor,initial_snapshot=snapshot,render=render)
                 results.append({'episode':stem,**{k:v for k,v in result.items() if k!='trace'}})
                 atomic_json(folder/'results.json',results)
                 scene_path=folder/stem/'scene_manifest_row.json'

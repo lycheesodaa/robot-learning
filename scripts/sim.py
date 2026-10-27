@@ -23,11 +23,13 @@ def main():
                             ('rollout', 'Run one closed-loop simulated release'),
                             ('suite', 'Run matched simulated release experiments')]:
         p = sub.add_parser(name, help=help_text)
-        p.add_argument('--config', type=Path, default=ROOT / 'configs/simulation/fragile_release.json')
+        p.add_argument('--config', type=Path, help='Default: configs/simulation/fragile_release.json, or the saved config when resuming')
         p.add_argument('--output', type=Path, help='New directory; existing output is never overwritten')
         p.add_argument('--device', help='Explicit policy device override, e.g. cuda:0 or cpu')
         p.add_argument('--controller', choices=['molmoact2', 'scripted', 'scripted-high'], default='molmoact2')
         p.add_argument('--no-render', action='store_true', help='Physics-only scripted diagnostics; no video or model observations')
+        if name == 'suite':
+            p.add_argument('--resume', action='store_true', help='Continue the suite in --output: reuse completed episodes, set failed ones aside and rerun them')
         if name == 'rollout':
             p.add_argument('--height', choices=['low', 'high'], default='high')
             p.add_argument('--fragility', choices=['fragile', 'durable'], default='fragile')
@@ -43,7 +45,12 @@ def main():
         for path in write_report(args.suite).values():
             print(path)
         return
-    config = load_config(args.config)
+    resume = getattr(args, 'resume', False)
+    if resume and not args.output:
+        parser.error('--resume needs --output pointing at the existing suite')
+    if resume and not (args.output / 'config.json').exists():
+        parser.error(f'No suite to resume in {args.output}')
+    config = load_config(args.config or (args.output / 'config.json' if resume else ROOT / 'configs/simulation/fragile_release.json'))
     if args.device:
         config['policy']['device'] = args.device
     if args.no_render and args.command != 'check' and args.controller == 'molmoact2':
@@ -57,7 +64,7 @@ def main():
         record_progress(config, ROOT, output, args.command, result)
         if not result['ok']: raise SystemExit(1)
     elif args.command == 'suite':
-        result = run_suite(config, ROOT, output, controller=args.controller, render=not args.no_render)
+        result = run_suite(config, ROOT, output, controller=args.controller, render=not args.no_render, resume=resume)
         print(json.dumps(result, indent=2))
         record_progress(config, ROOT, output, args.command, result)
         if result['status'] != 'completed': raise SystemExit(1)

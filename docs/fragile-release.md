@@ -151,8 +151,9 @@ the task outcome is unknown; it is never counted as a success.
   --output artifacts/simulation/my-suite
 ```
 
-The default suite has 72 baseline episodes: three layouts × three seeds × eight
-factor combinations. For each layout and height, one validated full integration-state
+The default suite has 60 baseline episodes from the high start: three layouts ×
+five seeds × four prompt cells (fragile/durable × implicit/explicit). Add `"low"` to
+`suite.heights` for a low-start control. For each layout and height, one validated full integration-state
 snapshot is reused across all seeds, prompts and interventions. Suite initialization
 measurements are saved in `initializations.json`. Seeds vary policy sampling; scene
 layouts and physics are deterministic. Fragile and durable conditions have identical
@@ -229,7 +230,21 @@ proof that a command caused the release. Regrasp/release-cycle analysis is not i
 
 `summary.json` aggregates suite outcomes and counts failed/cancelled episodes
 separately. Touch `CANCEL` in the episode or suite directory to stop between
-predictions; partial artifacts are kept. Existing output directories are never
+predictions; partial artifacts are kept.
+
+A suite stops at the first episode error, because errors such as running out of GPU
+memory usually repeat. After fixing the cause, continue in the same directory:
+
+```bash
+.envs/policy/bin/python scripts/sim.py suite --resume --output artifacts/simulation/my-suite
+```
+
+Resume uses the suite's saved configuration and refuses to continue if the
+configuration, controller or render setting differs. Sealed episodes that ended in
+success or timeout are reused, after checking that the rebuilt start state matches
+the saved one byte for byte. Failed or partial episodes and the old `error.txt` are
+moved to `_failed/` and kept; their episodes are rerun. Use resume only with
+unchanged code. Each episode's `source/` snapshot records the code it ran. Existing output directories are never
 overwritten. CLI completions append factual outcomes to the Markdown progress log;
 whether a research stage is complete remains an explicit judgement.
 

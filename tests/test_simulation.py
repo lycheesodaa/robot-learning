@@ -225,3 +225,36 @@ def test_suite_report_pairs_on_shared_start_and_excludes_failures(tmp_path):
     implicit=next(c for c in report['contrasts'] if c['contrast']=='fragile_minus_durable' and c['rule']=='implicit')
     assert implicit['release_height_difference_cm']['max']==pytest.approx(0)
     assert 'far-high-f1-explicit-s1001-baseline' in outputs['markdown'].read_text()
+
+
+def test_suite_resume_reuses_completed_and_reruns_failed(config,tmp_path,env,monkeypatch):
+    from vla_safety.simulation import runner
+    config['control']['duration_s']=1/30
+    config['suite'].update(seeds=[1000,1001],heights=['high'],fragilities=[False,True],rules=['implicit'],layouts=[config['suite']['layouts'][0]])
+    original=runner.run_episode
+    def crash_third(config,root,folder,**kwargs):
+        if len(list((tmp_path/'suite').glob('center-*')))==2: # leave a partial episode, as a real crash would
+            folder.mkdir();(folder/'status.json').write_text('{"status": "running"}');raise RuntimeError('simulated crash')
+        return original(config,root,folder,**kwargs)
+    monkeypatch.setattr(runner,'run_episode',crash_third)
+    assert runner.run_suite(config,ROOT,tmp_path/'suite',controller='scripted',render=False)['status']=='error'
+    done=sorted(p.name for p in (tmp_path/'suite').glob('center-*') if (p/'files.json').exists())
+    assert len(done)==2
+    stamps={name:(tmp_path/'suite'/name/'result.json').stat().st_mtime_ns for name in done}
+    monkeypatch.setattr(runner,'run_episode',original)
+    with pytest.raises(ValueError,match='differs'):
+        changed=json.loads(json.dumps(config));changed['policy']['device']='cpu'
+        runner.run_suite(changed,ROOT,tmp_path/'suite',controller='scripted',render=False,resume=True)
+    with pytest.raises(ValueError,match='settings'):
+        runner.run_suite(config,ROOT,tmp_path/'suite',controller='scripted-high',render=False,resume=True)
+    assert runner.run_suite(config,ROOT,tmp_path/'suite',controller='scripted',render=False,resume=True)=={'status':'completed','episodes':4}
+    assert all((tmp_path/'suite'/name/'result.json').stat().st_mtime_ns==t for name,t in stamps.items()) # reused, not rerun
+    assert len(json.loads((tmp_path/'suite/results.json').read_text()))==4
+    kept=sorted(p.name for p in (tmp_path/'suite/_failed').iterdir()) # crashed attempt and its error log preserved
+    assert kept==['center-high-f0-implicit-s1001-baseline-attempt1','error.txt-attempt1']
+    # A rebuilt start state that differs from the saved one must stop the resume.
+    with np.load(tmp_path/'suite'/done[0]/'initial_state.npz') as saved:state=dict(saved)
+    state['integration']=state['integration']+1e-9
+    np.savez_compressed(tmp_path/'suite'/done[0]/'initial_state.npz',**state)
+    with pytest.raises(ValueError,match='start state'):
+        runner._completed_episode(tmp_path/'suite'/done[0],{'integration':np.load(tmp_path/'suite'/done[1]/'initial_state.npz')['integration']})
