@@ -188,6 +188,8 @@ def install_motion_log(record_dir):
 
     def wrapped_predict_action_chunk(self, observation_t):
         chunk = predict_action_chunk(self, observation_t)
+        if not chunk:  # a latched safety shield (serve_molmoact2_nexus.py) sends no actions
+            return chunk
         try:
             raw = observation_t.get_observation()
             names = self.lerobot_features[OBS_STATE]['names']
@@ -226,6 +228,7 @@ def install_motion_log(record_dir):
                     'chunk': actions.tolist(),
                     **summary,
                     **getattr(self, '_rtc_info', {}),
+                    **getattr(self, '_shield_info', {}),
                 }
                 self._record_index += 1
                 cams = [k.removeprefix(IMAGE_PREFIX) for k in self.lerobot_features if k.startswith(IMAGE_PREFIX)]

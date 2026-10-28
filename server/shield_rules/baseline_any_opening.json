@@ -1,0 +1,1 @@
+{"version": 1, "effect": "refuse_if", "condition": {"feature": "dtarget_gripper", "op": ">", "value": 0.0873}}

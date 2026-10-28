@@ -57,7 +57,7 @@ ignored by Git.
 | `scripts/probe.py` | `prepare`, `run`, `components`, `replay`, `verify` |
 | `configs/simulation/fragile_release.json` | Every simulator control: scene, calibration, task, capture, interventions, suite |
 | `configs/concepts/fragile_release.json` | Fixed-image probe run: threshold, manifest, seeds, capture and intervention settings |
-| `server/` | LeRobot gRPC policy server for the physical arm |
+| `server/` | LeRobot gRPC policy server for the physical arm. `serve_molmoact2_nexus.py` serves the so101-nexus fine-tune with the fragile-release shield learned in `robot_learning_rulebased` (`fragile_shield.py`, `shield_rules/`) |
 
 Hooks run eagerly; compilation and CUDA graphs are disabled. Action-expert modules
 can fire several times during flow integration, and the capture sink keeps invocation

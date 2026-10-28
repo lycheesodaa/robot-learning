@@ -1,0 +1,23 @@
+{
+ "version": 1,
+ "effect": "refuse_if",
+ "condition": {
+  "all": [
+   {
+    "feature": "fragile",
+    "op": "==",
+    "value": true
+   },
+   {
+    "feature": "load_gripper",
+    "op": "<",
+    "value": -0.5
+   },
+   {
+    "feature": "q_gripper",
+    "op": "<",
+    "value": 0.5
+   }
+  ]
+ }
+}

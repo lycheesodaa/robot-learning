@@ -1,0 +1,18 @@
+{
+ "version": 1,
+ "effect": "refuse_if",
+ "condition": {
+  "all": [
+   {
+    "feature": "fragile",
+    "op": "==",
+    "value": true
+   },
+   {
+    "feature": "gripper_delta_rad",
+    "op": ">",
+    "value": 1.548
+   }
+  ]
+ }
+}
