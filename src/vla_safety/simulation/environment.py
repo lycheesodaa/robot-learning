@@ -74,9 +74,12 @@ def validate_config(c):
     if not np.isfinite(scene['surface_z_m']): raise ValueError('Surface height must be finite')
     for key,n in [('object_solref',2),('object_solimp',3)]:
         if (vector(scene[key],n,key)<=0).any(): raise ValueError(f'{key} must be positive')
-    if [x['name'] for x in scene['cameras']] != ['top','side']:
-        raise ValueError('Cameras must be ordered top, side')
-    for camera in scene['cameras']:
+    # cam0 is the fixed top view; cam1 is the fixed side view or a camera of the robot asset (e.g. the wrist camera).
+    if len(scene['cameras']) != 2 or scene['cameras'][0]['name'] != 'top' or 'asset_camera' in scene['cameras'][0]:
+        raise ValueError('Cameras must be top, then side or an asset camera')
+    if 'asset_camera' not in scene['cameras'][1] and scene['cameras'][1]['name'] != 'side':
+        raise ValueError('The second fixed camera must be named side')
+    for camera in (x for x in scene['cameras'] if 'asset_camera' not in x):
         position=vector(camera['position'],3,'camera position'); target=vector(camera['target'],3,'camera target')
         if np.linalg.norm(position-target) < 1e-6 or not 0 < camera['fovy'] < 180:
             raise ValueError('Invalid camera geometry')
@@ -231,7 +234,7 @@ class SO101MujocoEnvironment:
             for i,g in enumerate(geoms):
                 # Uniform density over the shell gives the configured total mass.
                 ET.SubElement(b,'geom',name='box' if i==0 else f'box_wall{i}',material='object_glass',density=str(s['object_mass_kg']/volume),**g,**contact)
-        for cam in s['cameras']:
+        for cam in (x for x in s['cameras'] if 'asset_camera' not in x):
             ET.SubElement(world,'camera',name=cam['name'],pos=' '.join(map(str,cam['position'])),xyaxes=camera_axes(cam['position'],np.asarray(cam['target'])),fovy=str(cam['fovy']))
         return ET.tostring(xml,encoding='unicode')
 
@@ -404,10 +407,15 @@ class SO101MujocoEnvironment:
             s=self.config['scene']
             self.renderer=self.mj.Renderer(self.model,height=s['camera_height'],width=s['camera_width'])
         frames=[]
-        for name in ('top','side'):
-            self.renderer.update_scene(self.data,camera=name)
+        for cam in self.config['scene']['cameras']:
+            self.renderer.update_scene(self.data,camera=cam.get('asset_camera',cam['name']))
             frames.append(self.renderer.render().copy())
         return frames
+
+    @property
+    def camera_names(self):
+        """Observation view names, in policy order (cam0, cam1)."""
+        return tuple(c['name'] for c in self.config['scene']['cameras'])
 
     def observe(self):
         from PIL import Image

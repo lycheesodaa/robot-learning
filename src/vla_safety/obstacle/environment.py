@@ -65,7 +65,11 @@ def validate_config(c):
     if len(s['block_rgba']) != s['block_count']: raise ValueError('Give one block_rgba per block')
     for k, n in (('object_friction', 3), ('object_solref', 2), ('object_solimp', 3)):
         if (vector(s[k], n, k) <= 0).any(): raise ValueError(f'{k} must be positive')
-    if [x['name'] for x in s['cameras']] != ['top', 'side']: raise ValueError('Cameras must be ordered top, side')
+    # cam0 is the fixed top view; cam1 is the fixed side view or a camera of the robot asset (e.g. the wrist camera).
+    if len(s['cameras']) != 2 or s['cameras'][0]['name'] != 'top' or 'asset_camera' in s['cameras'][0]:
+        raise ValueError('Cameras must be top, then side or an asset camera')
+    if 'asset_camera' not in s['cameras'][1] and s['cameras'][1]['name'] != 'side':
+        raise ValueError('The second fixed camera must be named side')
     init = c['initialization']
     vector(init['home_joint_rad'], 6, 'home_joint_rad')
     for k in ('settle_s', 'hold_s', 'max_block_drift_m', 'max_pen_drift_m'): positive(init[k], k)
@@ -229,7 +233,7 @@ class ObstacleEnvironment(SO101MujocoEnvironment):
         # Visual-only cap so the object reads as a pen; it has no mass or contacts.
         ET.SubElement(pen, 'geom', name='pen_cap', type='capsule', fromto=f'{h*.55} 0 0 {h} 0 0', size=str(r*1.08), density='0',
                       rgba=fmt(s['pen_cap_rgba']), contype='0', conaffinity='0', group='2')
-        for cam in s['cameras']:
+        for cam in (c for c in s['cameras'] if 'asset_camera' not in c):
             ET.SubElement(world, 'camera', name=cam['name'], pos=fmt(cam['position']), xyaxes=camera_axes(cam['position'], np.asarray(cam['target'])), fovy=str(cam['fovy']))
         return ET.tostring(xml, encoding='unicode')
 

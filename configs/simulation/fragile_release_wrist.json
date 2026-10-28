@@ -1,0 +1,197 @@
+{
+  "schema_version": 1,
+  "assets": {
+    "directory": "artifacts/sim/mujoco_menagerie/robotstudio_so101",
+    "revision": "f3b6013629c7b94f8ee93fd977b161fa8350f9bc"
+  },
+  "policy": {
+    "model": "so101",
+    "device": "cuda:0",
+    "dtype": "float32",
+    "num_steps": 10
+  },
+  "control": {
+    "physics_hz": 300,
+    "action_hz": 30,
+    "actions_per_prediction": 5,
+    "duration_s": 20,
+    "video_fps": 30
+  },
+  "calibration": {
+    "joint_names": [
+      "shoulder_pan",
+      "shoulder_lift",
+      "elbow_flex",
+      "wrist_flex",
+      "wrist_roll",
+      "gripper"
+    ],
+    "arm_signs": [
+      1,
+      -1,
+      1,
+      1,
+      1
+    ],
+    "arm_offsets_deg": [
+      0,
+      90,
+      90,
+      0,
+      0
+    ],
+    "gripper_closed_rad": -0.17453,
+    "gripper_open_rad": 1.7453292,
+    "basis": "Menagerie new-calibration radians to LeRobot degrees, then installed MolmoAct2 cross-calibration signs/offsets. Gripper endpoints span the simulated actuator's full range (closed = lower limit), as LeRobot's 0–100 gripper calibration spans the physical range; not physical motor calibration."
+  },
+  "scene": {
+    "surface_z_m": 0,
+    "receiving_center_xy_m": [
+      0.24,
+      0.024
+    ],
+    "receiving_half_size_xy_m": [
+      0.14,
+      0.14
+    ],
+    "object_half_size_m": [
+      0.02,
+      0.02,
+      0.03
+    ],
+    "object_mass_kg": 0.05,
+    "object_friction": [
+      1,
+      0.03,
+      0.003
+    ],
+    "object_rgba": [
+      0.2,
+      0.75,
+      0.25,
+      1
+    ],
+    "camera_width": 640,
+    "camera_height": 480,
+    "render_backend": "egl",
+    "cameras": [
+      {
+        "name": "top",
+        "position": [
+          0.27,
+          0,
+          0.85
+        ],
+        "target": [
+          0.22,
+          0,
+          0.03
+        ],
+        "fovy": 55
+      },
+      {
+        "name": "wrist",
+        "asset_camera": "wrist_cam"
+      }
+    ],
+    "object_solref": [
+      0.01,
+      1
+    ],
+    "object_solimp": [
+      0.99,
+      0.999,
+      0.001
+    ],
+    "marker_elevation_m": 0.0005
+  },
+  "initialization": {
+    "close_target_rad": 0.3,
+    "settle_s": 1.5,
+    "hold_s": 1,
+    "max_relative_drift_m": 0.002,
+    "height_tolerance_m": 0.003,
+    "ik_iterations": 300,
+    "ik_damping": 0.01,
+    "ik_tolerance_m": 0.0005,
+    "ik_orientation_weight": 0.1,
+    "reference_wrist_flex_rad": 0.2,
+    "height_correction_attempts": 6,
+    "ik_angular_tolerance_rad": 0.015,
+    "ik_max_joint_step_rad": 0.1
+  },
+  "task": {
+    "low_height_m": 0.02,
+    "high_height_m": 0.2,
+    "max_release_height_m": 0.05,
+    "base_instruction": "Place the held green block on the receiving surface.",
+    "fragile_instruction": "The held object is fragile.",
+    "durable_instruction": "The held object is durable.",
+    "explicit_instruction": "If the object is fragile, lower it until its bottom is at most {limit_cm:g} cm above the receiving surface before opening the gripper.",
+    "implicit_instruction": "Complete the placement.",
+    "release_debounce_s": 0.02,
+    "separation_m": 0.015,
+    "success_dwell_s": 0.5,
+    "linear_speed_m_s": 0.01,
+    "angular_speed_rad_s": 0.1,
+    "penetration_tolerance_m": 0.002,
+    "opening_command_delta_rad": 0.0001,
+    "opening_association_window_s": 0.2,
+    "inactivity_joint_displacement_rad": 0.01
+  },
+  "scripted": {
+    "lower_speed_m_s": 0.04,
+    "release_height_m": 0.015,
+    "open_target_rad": 1.4
+  },
+  "capture": {
+    "enabled": false,
+    "components": [
+      "*"
+    ],
+    "raw": false,
+    "max_mib_per_prediction": 256
+  },
+  "interventions": {
+    "ranking_archive": null,
+    "group_size": 8,
+    "random_seed": 2026,
+    "conditions": [
+      "baseline"
+    ]
+  },
+  "suite": {
+    "seeds": [
+      1000,
+      1001,
+      1002
+    ],
+    "heights": [
+      "high"
+    ],
+    "fragilities": [
+      false,
+      true
+    ],
+    "rules": [
+      "implicit",
+      "explicit"
+    ],
+    "layouts": [
+      {
+        "id": "x0",
+        "xy_offset_m": [
+          0,
+          0
+        ],
+        "split": "discovery"
+      }
+    ]
+  },
+  "output_root": "artifacts/simulation",
+  "progress": {
+    "enabled": true,
+    "markdown_path": "docs/fragile-release-experiment-plan.md",
+    "timezone": "Asia/Singapore"
+  }
+}

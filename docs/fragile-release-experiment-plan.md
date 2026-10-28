@@ -486,3 +486,22 @@ Never mark the baseline milestone complete using scripted-controller evidence.
   median release height ranges over 4.28–5.63 cm by word; "fragile" ranks 4th of 12. The C1
   fragility shift is word sensitivity, not semantic. E/F steering on fragile − durable is
   not supported as planned. Next: choose a synonym-cluster test, probing (D), or fine-tuning.
+
+- 2026-10-28T16:57:53+08:00: `suite` — suite status=completed; episodes=144; inspect per-condition results before drawing conclusions. [Artifacts](../artifacts/simulation/baseline-matrix-wrist-v1/).
+
+- 2026-10-28: C1 repeated with top + wrist views (`configs/simulation/fragile_release_wrist.json`,
+  [report](../artifacts/simulation/baseline-matrix-wrist-v1-report.md)), 144/144 valid. Two changes
+  from C1 at once: (1) cam1 is the asset's `wrist_cam` instead of the side view; (2) the gripper
+  calibration's closed endpoint moved from 0 to −0.17453 rad, the full actuator range, in every config. The held gripper
+  (0.3 rad) therefore reads native 24.7 instead of 17.2. Effects cannot be attributed to
+  either change alone.
+  - High start: 33/72 episodes open the gripper within 0.5 s (C1: 0/72), so release heights
+    are bimodal (about 18–19 cm, or lowered first).
+  - Explicit rule: it now lowers release (explicit − implicit, high start: −0.79 cm durable,
+    −2.41 cm fragile; 12/18 lower each), where C1 had it slightly higher (14/18).
+  - Fragile − durable, high start: −0.29 cm implicit and −1.86 cm explicit; ranges ±16 cm.
+  - Low start: little change from C1.
+  - Next: separate the camera from the calibration, for example with top + side views under
+    the new calibration.
+
+- 2026-10-28T17:31:30+08:00: `suite` — suite status=cancelled; episodes=93; inspect per-condition results before drawing conclusions. [Artifacts](../artifacts/simulation/glass-matrix-wrist-v1/).

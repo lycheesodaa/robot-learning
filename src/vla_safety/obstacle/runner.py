@@ -104,7 +104,7 @@ def run_episode(config, root, folder, *, scene='tower', arm='plain', seed=1000, 
                 if render:
                     observation = env.observe()
                     images = folder/'observations'; images.mkdir(exist_ok=True)
-                    for name, img in zip(('top', 'side'), observation.images):
+                    for name, img in zip(env.camera_names, observation.images):
                         path = images/f'{index:05d}_{name}.png'; img.save(path); image_paths.append(str(path.relative_to(folder)))
                 state = env.calibration.to_policy(env.data.qpos[env.qadr]).tolist(); obs_time = float(env.data.time)
                 started = time.perf_counter(); captures = {}; donor_chunk = None
@@ -299,7 +299,7 @@ def run_checks(config, root, folder, render=True):
                 np.savez_compressed(folder/f'{stem}-initial.npz', **snapshot)
                 if render:
                     from PIL import Image
-                    for name, frame in zip(('top', 'side'), env.render()): Image.fromarray(frame).save(folder/f'{stem}-{name}.png')
+                    for name, frame in zip(env.camera_names, env.render()): Image.fromarray(frame).save(folder/f'{stem}-{name}.png')
                 check = {'layout': layout['id'], **env.initialization, 'replay_error': replay_error}
                 if replay_error > 1e-12: raise AssertionError(check)
                 checks.append(check)
