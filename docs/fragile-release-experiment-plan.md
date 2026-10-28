@@ -40,7 +40,7 @@ working record; update the table only after the checklist items behind it are ti
 |---|---|---|
 | A. Apparatus | Units/order/signs, gripper endpoints, cameras, contact grasp, snapshot replay and scripted placement validated and archived. | Complete |
 | B. Baseline | Unmodified MolmoAct2 on a held object; a reproduced episode with measured release and placement. | Complete (one scene/seed) |
-| C. Controlled behaviour | Low and high starts; fragile/durable × implicit/explicit with identical appearance and physics; release rate, height, latency, vertical motion, slip and task success compared. | C1 run (144/144): small fragility shift; explicit rule fails; video review pending |
+| C. Controlled behaviour | Low and high starts; fragile/durable × implicit/explicit with identical appearance and physics; release rate, height, latency, vertical motion, slip and task success compared. | C1 run (144/144): small fragility shift; explicit rule fails. C1g (glass cup): release behaviour breaks down at the high start. C1n (word-swap control): neutral word swaps shift release as much as fragile/durable, so the C1 shift is not semantic. Video review pending |
 | D. Simulator-grounded discovery | Fragility probed on rollout activations from discovery data; compared with pilot rankings. | Capture validated; probes pending |
 | E. Causal suppression | Full control set at every prediction; selective effects rather than general immobility. | Pilot only |
 | F. Patching and steering | One-time vs repeated interventions; donors from the recipient's current observation. | Deferred |
@@ -135,8 +135,12 @@ Scope: one cell only (fragile, high, explicit rule, seed 1000, `center` layout, 
 - [x] Log the result and next action; update the overview table.
 - [ ] Apparatus follow-up (toppling): 139/144 blocks come to rest on their side, including 1.9 cm low-start releases. The stage A scripted 1.4 cm release also toppled, while the scripted 19.9 cm drop stayed upright, so jaw contact during opening is the likely cause rather than drop height. The placement score ignores orientation. Watch the scripted and policy videos; decide whether placement should require an upright block. That would be a scoring change: new configuration hash and new iteration.
 - [ ] Decide whether to add a length-matched rule control (C1b). The explicit rule raises release height; with the current prompts, rule content cannot be separated from prompt length or wording.
-- [ ] Run iteration C1g (glass cup, below) after reviewing its record and the
-  [stage A previews](../artifacts/simulation/validation-glass-v1/).
+- [x] Run iteration C1g (glass cup, below): 2026-10-27, 144/144 valid. *Deviation:* the starting arm pose differs from C1 by 2–8° per joint (see the C1g result).
+- [x] Generate the C1g report ([glass-matrix-v1-report.md](../artifacts/simulation/glass-matrix-v1-report.md)) and write up [results-c1g-glass-matrix.md](results-c1g-glass-matrix.md).
+- [ ] Watch C1g videos: `x0-high-f1-implicit-s1000` (pan away, then slip), `xm2-high-f0-explicit-s1001` (release after an opening), any `x0-high-f1-explicit` episode (descent, then holding).
+- [x] Decide on separating C1g's three changes (appearance, noun, arm pose): not pursued for now (2026-10-27).
+- [x] Run iteration C1n (word-swap control, below): 2026-10-28, 216/216 valid; reports generated; write-up in [results-c1n-word-swap.md](results-c1n-word-swap.md).
+- [ ] Decide the next step after C1n: synonym-cluster test, probing (D), or fine-tuning; stage E/F steering on fragile − durable is not supported as planned.
 
 **Iteration C1: baseline factorial matrix (run 2026-10-27; result below)**
 
@@ -186,7 +190,7 @@ MUJOCO_GL=egl .envs/policy/bin/python scripts/sim.py suite \
   --output artifacts/simulation/baseline-matrix-v1
 ```
 
-**Iteration C1g: glass-cup matrix (drafted, not yet run)**
+**Iteration C1g: glass-cup matrix (run 2026-10-27; result below)**
 
 - *Question:* does the policy's release behaviour depend on what it sees? C1 used
   a green box. Does a transparent glass cup, the visual cue usually associated with
@@ -212,17 +216,51 @@ MUJOCO_GL=egl .envs/policy/bin/python scripts/sim.py suite \
   under the same prompt, in most matched pairs, with the direction holding across
   layouts and seeds. This is descriptive, as for C1.
 - *Allocation:* as C1. Nothing is fitted.
-- *Cost:* as C1 (about 35 min to 5 h).
+- *Cost:* as C1 (about 35 min to 5 h). Actual: about 1 h 50 min, mostly 20 s timeouts.
+- *Deviation:* the arm start poses are **not** identical to C1. Holding the cup upright moves the object's centre relative to the gripper, so the arm target shifts. Initial joint angles differ by 2–8°. Provenance: all at `3490fa6`, 121/144 with `git_dirty: true` from unrelated work that started during the run.
+- *Result:* full write-up in [results-c1g-glass-matrix.md](results-c1g-glass-matrix.md).
+  - **High start: the release behaviour breaks down.**
+    - Only 3/72 releases follow a gripper opening; 45/72 are slips after 10–14 s and 24/72 never release.
+    - The arm swings the base round to about −42° (57/72) and moves the cup about at 11–20 cm with the gripper commanded closed.
+    - The report's fragile − durable +2.61 cm and 17/18 fragile + implicit violations are slip heights, not release decisions.
+  - **The explicit rule lowers the arm** to about 4–5 cm within 3 s (about 11 cm without it), but the policy does not then open the gripper.
+  - **Low start:** unchanged and prompt-blind. The cup ends upright in 41/72 episodes (box: 1/72).
+  - **Not a test of the visual cue.** Appearance, the instruction noun and the arm pose all changed, and "glass cup … durable" is self-contradictory.
+- *Next action:*
+  - The visual route did not produce careful handling.
+  - The C1 box fragility shift remains the behavioural target. Test whether it is about meaning with the word-swap control (C1n).
+  - Separating C1g's changes is not pursued for now.
 
-Run command (from a GPU-visible host terminal, inside `tmux`):
+**Iteration C1n: word-swap control (run 2026-10-27/28; result below)**
 
-```bash
-MUJOCO_GL=egl .envs/policy/bin/python scripts/notify.py \
-  --suite artifacts/simulation/glass-matrix-v1 -- \
-  .envs/policy/bin/python scripts/sim.py suite \
-  --config configs/simulation/fragile_release_glass.json \
-  --output artifacts/simulation/glass-matrix-v1
-```
+- *Question:* is C1's fragile − durable shift (−0.52 cm median, 14/18 pairs, implicit, high start) about the meaning of "fragile"? Or would any one-word change to the object statement move the release by a similar amount?
+- *Design:* six suites, one per word pair. Each pair replaces the two statements "The held object is X." / "The held object is Y.", with the rest unchanged from C1.
+  - Configs are in `configs/simulation/prompt_swap/`.
+  - Scope: high start and implicit rule only, × 6 layouts × 3 seeds × 2 words = 36 episodes per pair.
+  - The suite labels the first word `f1` and the second `f0`. For the neutral pairs this label is arbitrary.
+
+  | Pair | First (`f1`) | Second (`f0`) |
+  |---|---|---|
+  | `fragile` (anchor) | fragile | durable |
+  | `heavy` | heavy | light |
+  | `rough` | rough | smooth |
+  | `old` | old | new |
+  | `blue` | blue | green (green matches the image) |
+  | `zorpy` | zorpy | blicky (nonsense) |
+
+- *Frozen controls:* as C1: scene, arm pose, seeds, scoring and checkpoint. The anchor should reproduce C1's high-start implicit episodes. Each suite runs both words on the same GPU.
+- *What would count as a meaning effect:* the anchor's paired shift falls outside the range of the neutral pairs. Compare both the absolute median shift and the sign consistency (pairs out of 18). If neutral swaps give shifts of 0.5 cm or more with similar consistency, C1's fragility shift is not specific to meaning.
+- *Allocation:* descriptive; nothing is fitted.
+- *Cost:* about 216 episodes. Two chains of three suites, one per GPU. Actual: about 22 min.
+- *Provenance:* all at `20cc6ff` with `git_dirty: true` (the uncommitted prompt-swap configs and docs).
+- *Result:* full write-up in [results-c1n-word-swap.md](results-c1n-word-swap.md).
+  - **The anchor reproduces C1:** identical release outcomes in 36/36 episodes; 34/36 byte-identical.
+  - **The neutral pairs shift the release as much as fragile/durable.** Paired medians: heavy − light −0.48 cm (16/18), rough − smooth +1.02 cm (smooth lower in 17/17), old − new +0.23 cm (6/18), blue − green −0.76 cm (16/18), zorpy − blicky +0.35 cm (7/18). Fragile − durable: −0.52 cm (14/18).
+  - **Median release height by word ranges from 4.28 to 5.63 cm.** "Fragile" (4.70) ranks fourth of twelve, beside both nonsense words.
+  - **Conclusion:** the C1 shift is word sensitivity, not use of fragility meaning. There is one word per meaning, so a small semantic component within the word-level noise cannot be ruled out.
+- *Next action:*
+  - Do not steer on the fragile − durable difference as planned for E/F.
+  - Options: a synonym-cluster test (several words per meaning, with word as a random effect); probing (D) for "represented but not used"; or targeted fine-tuning to create a behaviour to interpret.
 
 **Iteration C2: policy pick-and-place (drafted; blocked, because the C1 explicit rule did not produce lowering)**
 
@@ -415,3 +453,36 @@ Never mark the baseline milestone complete using scripted-controller evidence.
   box's size and mass, held upright, base instruction "glass cup". Stage A passed
   (validation-glass-v1 above). Regression suite: `58 passed`. Iteration C1g drafted.
   Next blocker: review the previews and the C1g record, commit, run on GPU.
+
+- 2026-10-27T18:31:33+08:00: `suite` — suite status=completed; episodes=144; inspect per-condition results before drawing conclusions. [Artifacts](../artifacts/simulation/glass-matrix-v1/).
+
+- 2026-10-27: Reviewed C1g (glass-matrix-v1, 144/144 valid); write-up in
+  [results-c1g-glass-matrix.md](results-c1g-glass-matrix.md). From the high start the
+  release behaviour breaks down: 3/72 opening-associated releases, 45/72 slips after
+  10–14 s, 24/72 no release. The arm swings the base to about −42° and moves the cup
+  about with the gripper closed, so the report's release heights are slip heights. The
+  explicit rule lowers the arm to about 5 cm but the gripper is not opened. Low start
+  unchanged; cup upright in 41/72 low-start episodes (box 1/72). Deviation: the arm start
+  pose differs from C1 by 2–8° per joint. Separating appearance, noun and pose is not
+  pursued. Next: word-swap control C1n (started; configs in `configs/simulation/prompt_swap/`).
+
+- 2026-10-27T23:44:25+08:00: `suite` — suite status=completed; episodes=36; inspect per-condition results before drawing conclusions. [Artifacts](../artifacts/simulation/swap-fragile-v1/).
+
+- 2026-10-27T23:44:42+08:00: `suite` — suite status=completed; episodes=36; inspect per-condition results before drawing conclusions. [Artifacts](../artifacts/simulation/swap-old-v1/).
+
+- 2026-10-27T23:50:58+08:00: `suite` — suite status=completed; episodes=36; inspect per-condition results before drawing conclusions. [Artifacts](../artifacts/simulation/swap-blue-v1/).
+
+- 2026-10-27T23:51:40+08:00: `suite` — suite status=completed; episodes=36; inspect per-condition results before drawing conclusions. [Artifacts](../artifacts/simulation/swap-heavy-v1/).
+
+- 2026-10-27T23:54:57+08:00: `suite` — suite status=completed; episodes=36; inspect per-condition results before drawing conclusions. [Artifacts](../artifacts/simulation/swap-zorpy-v1/).
+
+- 2026-10-28T00:00:04+08:00: `suite` — suite status=completed; episodes=36; inspect per-condition results before drawing conclusions. [Artifacts](../artifacts/simulation/swap-rough-v1/).
+
+- 2026-10-28: Reviewed C1n (six word-swap suites, 216/216 valid); write-up in
+  [results-c1n-word-swap.md](results-c1n-word-swap.md). The anchor reproduces C1 (identical
+  release outcomes 36/36). Neutral swaps shift the release as much as fragile/durable:
+  smooth lower than rough in 17/17 pairs (1.02 cm), blue lower than green 16/18 (0.76 cm),
+  heavy lower than light 16/18 (0.48 cm); fragile lower than durable 14/18 (0.52 cm). The
+  median release height ranges over 4.28–5.63 cm by word; "fragile" ranks 4th of 12. The C1
+  fragility shift is word sensitivity, not semantic. E/F steering on fragile − durable is
+  not supported as planned. Next: choose a synonym-cluster test, probing (D), or fine-tuning.
