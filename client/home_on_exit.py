@@ -11,6 +11,9 @@ Not covered: kill -9, taskkill /F, a crashed interpreter or lost power. The proc
 gets to run then, and the arm holds its last pose (disable_torque_on_disconnect: false).
 
 A second Ctrl-C while homing stops the arm where it is.
+
+Keys in `robot.homing_guard.hold_keys` are not homed: they keep their last command, e.g. a
+gripper that must not drop what it holds (nexus_client.py adds gripper.pos during fragile runs).
 """
 
 import signal
@@ -34,12 +37,15 @@ class _Homing:
         self.robot = robot
         self.home: dict[str, float] | None = None
         self.homing = False
+        self.last_sent: dict[str, float] | None = None
+        self.hold_keys: set[str] = set()  # left at their last command instead of homed
         # Serialises bus access between the control loop and homing from another thread.
         self.lock = threading.RLock()
         self._connect, self._send = robot.connect, robot.send_action
         self._observe, self._disconnect = robot.get_observation, robot.disconnect
         robot.connect, robot.send_action = self.connect, self.send_action
         robot.get_observation, robot.disconnect = self.get_observation, self.disconnect
+        robot.homing_guard = self
 
     def connect(self, *args, **kwargs):
         self._connect(*args, **kwargs)
@@ -52,7 +58,9 @@ class _Homing:
         with self.lock:
             if self.homing:  # the policy no longer drives the arm
                 return dict(action)
-            return self._send(action)
+            performed = self._send(action)
+            self.last_sent = {k: float(v) for k, v in performed.items()}
+            return performed
 
     def get_observation(self):
         with self.lock:
@@ -70,7 +78,11 @@ class _Homing:
             try:
                 obs = self._observe()
                 start = {k: float(obs[k]) for k in self.home}
-                dist = max(abs(self.home[k] - start[k]) for k in self.home)
+                home = dict(self.home)
+                for k in self.hold_keys & set(self.last_sent or {}):
+                    start[k] = home[k] = self.last_sent[k]
+                    print(f"[home] keeping {k} at its last command {home[k]:.1f}", flush=True)
+                dist = max(abs(home[k] - start[k]) for k in home)
                 duration = min(max(dist / SPEED, MIN_S), MAX_S)
                 print(f"[home] returning to start pose over {duration:.1f} s "
                       "(Ctrl-C again to stop the arm where it is)", flush=True)
@@ -78,7 +90,7 @@ class _Homing:
                 while True:
                     f = min((time.perf_counter() - t0) / duration, 1.0)
                     a = f * f * (3 - 2 * f)  # smoothstep: no jerk at either end
-                    self._send({k: start[k] + (self.home[k] - start[k]) * a for k in self.home})
+                    self._send({k: start[k] + (home[k] - start[k]) * a for k in home})
                     if f >= 1.0:
                         break
                     time.sleep(STEP_S)

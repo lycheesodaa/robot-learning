@@ -182,8 +182,12 @@ VIZ = _pop_viz_args() if __name__ == "__main__" else {}
 
 @draccus.wrap()
 def main(cfg: RobotClientConfig):
+    run(cfg, VizRobotClient)
+
+
+def run(cfg: RobotClientConfig, client_cls: type[VizRobotClient]):
     logging.info(pformat(asdict(cfg)))
-    client = VizRobotClient(cfg)
+    client = client_cls(cfg)
 
     run_id = time.strftime("%Y%m%d_%H%M%S")
     run_dir = Path(VIZ["runs_dir"]) / run_id

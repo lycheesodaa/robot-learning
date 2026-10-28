@@ -7,14 +7,21 @@
 # Environment overrides: CONFIG, LOCAL_PORT (8080), REMOTE_PORT (8080), PYTHON (python),
 # IMAGE_SIZE (224x224, HxW frames are shrunk to before sending; empty sends full frames),
 # VIZ_PORT (8765, live viewer), NO_VIZ=1 (plain robot_client, no recording; frames still resized),
-# NO_HOME=1 (leave the arm where it is on exit instead of returning it to its start pose).
+# NO_HOME=1 (leave the arm where it is on exit instead of returning it to its start pose),
+# NEXUS=1 (client for server/serve_molmoact2_nexus.py: nexus_client.py, so101_molmoact2_nexus.yaml,
+# full 320x240 frames; see nexus_client.py).
 set -euo pipefail
 
 if [ $# -lt 2 ]; then
-    sed -n '2,8p' "$0"; exit 2
+    sed -n '2,12p' "$0"; exit 2
 fi
 ssh_target=$1; task=$2; shift 2
-config=${CONFIG:-$(dirname "$0")/so101_molmoact2.yaml}
+if [ -n "${NEXUS:-}" ]; then
+    [ -z "${NO_VIZ:-}" ] || { echo "NEXUS=1 needs the recording client; unset NO_VIZ." >&2; exit 2; }
+    config=${CONFIG:-$(dirname "$0")/so101_molmoact2_nexus.yaml}
+else
+    config=${CONFIG:-$(dirname "$0")/so101_molmoact2.yaml}
+fi
 local_port=${LOCAL_PORT:-8080}
 remote_port=${REMOTE_PORT:-8080}
 
@@ -30,9 +37,10 @@ for _ in $(seq 60); do
     sleep 0.5
 done
 
-if [ -n "${NO_VIZ:-}" ]; then entry=("$(dirname "$0")/resize_client.py")
+if [ -n "${NEXUS:-}" ]; then entry=("$(dirname "$0")/nexus_client.py" "--viz_port=${VIZ_PORT:-8765}")
+elif [ -n "${NO_VIZ:-}" ]; then entry=("$(dirname "$0")/resize_client.py")
 else entry=("$(dirname "$0")/viz_client.py" "--viz_port=${VIZ_PORT:-8765}"); fi
-image_size=${IMAGE_SIZE-224x224}
+if [ -n "${NEXUS:-}" ]; then image_size=${IMAGE_SIZE-}; else image_size=${IMAGE_SIZE-224x224}; fi
 if [ -n "$image_size" ]; then entry+=("--image_size=$image_size"); fi
 if [ -n "${NO_HOME:-}" ]; then entry+=(--no_home); fi
 "${PYTHON:-python}" "${entry[@]}" "--config_path=$config" \
