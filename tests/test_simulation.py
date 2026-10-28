@@ -18,7 +18,7 @@ def config():
 
 def test_calibration_has_offsets_and_reversible_gripper(config):
     cal=Calibration(config['calibration'])
-    q=np.array([[0,-np.pi/2,np.pi/2,0,0,0],[.2,-.3,.4,.5,-.6,config['calibration']['gripper_open_rad']]])
+    q=np.array([[0,-np.pi/2,np.pi/2,0,0,config['calibration']['gripper_closed_rad']],[.2,-.3,.4,.5,-.6,config['calibration']['gripper_open_rad']]])
     native=cal.to_policy(q)
     np.testing.assert_allclose(native[0],[0,180,180,0,0,0],atol=1e-12)
     assert native[1,5]==100

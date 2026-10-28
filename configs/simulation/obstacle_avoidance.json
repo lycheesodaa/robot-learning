@@ -41,9 +41,9 @@
       0,
       0
     ],
-    "gripper_closed_rad": 0,
+    "gripper_closed_rad": -0.17453,
     "gripper_open_rad": 1.7453292,
-    "basis": "Menagerie new-calibration radians to LeRobot degrees, then installed MolmoAct2 cross-calibration signs/offsets. Gripper endpoints are explicit simulated calibration assumptions; not physical motor calibration."
+    "basis": "Menagerie new-calibration radians to LeRobot degrees, then installed MolmoAct2 cross-calibration signs/offsets. Gripper endpoints span the simulated actuator's full range (closed = lower limit), as LeRobot's 0–100 gripper calibration spans the physical range; not physical motor calibration."
   },
   "scene": {
     "pan_axis_xy_m": [
