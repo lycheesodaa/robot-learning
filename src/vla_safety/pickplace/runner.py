@@ -16,7 +16,7 @@ from . import policy as v6
 
 def _report(folder, result):
     (folder/'report.html').write_text('<!doctype html><meta charset="utf-8"><title>Pick-and-place rollout</title>'
-        '<h1>v6 pick-and-place rollout</h1><video controls width="960" src="rollout.mp4"></video>'
+        '<h1>Pick-and-place rollout</h1><video controls width="960" src="rollout.mp4"></video>'
         '<p>front_low (cam0) then wrist (cam1). Simulated behaviour; breakage is the impact-speed rule.</p><pre>' +
         html.escape(json.dumps(result, indent=2)) + '</pre>')
 

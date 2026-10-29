@@ -1,4 +1,4 @@
-"""LeRobot loader for the v6 LoRA checkpoint (rulebased eval_policy.build_policy settings)."""
+"""LeRobot loaders for the v6 LoRA checkpoint and zero-shot MolmoAct2 (rulebased eval_policy.build_policy settings)."""
 from pathlib import Path
 
 import numpy as np
@@ -11,7 +11,8 @@ def snapshot_path(config, root):
 
 
 def load_policy(config, root):
-    """One resident model per process."""
+    """One resident model per process; policy.kind 'zeroshot' loads the base checkpoint, otherwise v6."""
+    if config.get('kind') == 'zeroshot': return load_zeroshot(config, root)
     import torch
     from lerobot.configs.policies import PreTrainedConfig
     from lerobot.policies import make_pre_post_processors
@@ -45,6 +46,43 @@ def load_policy(config, root):
         _POLICIES[key] = (policy, pre, post)
     return _POLICIES[key], {'model_id': config['repo_id'], 'revision': config['revision'], 'snapshot': str(path),
                             'base_snapshot': str(base),
+                            'model_dtype': str(_POLICIES[key][0].config.model_dtype)}
+
+
+def load_zeroshot(config, root):
+    """allenai/MolmoAct2-SO100_101 as rulebased --policy zeroshot, normalized with the checkpoint's own norm_tag stats."""
+    import torch
+    from lerobot.configs.types import FeatureType, PolicyFeature
+    from lerobot.policies import make_policy_config, make_pre_post_processors
+    from lerobot.policies.molmoact2.modeling_molmoact2 import MolmoAct2Policy
+    path = snapshot_path(config, root)
+    tokenizer = Path(root)/'artifacts/models'/config['action_tokenizer']/config['action_tokenizer_revision']
+    if not (path/'norm_stats.json').exists():
+        raise FileNotFoundError(f'{path}: run scripts/download_models.py first')
+    if not (tokenizer/'tokenizer.json').exists():
+        raise FileNotFoundError(f'{tokenizer}: download allenai/MolmoAct2-FAST-Tokenizer@{config["action_tokenizer_revision"]} first')
+    if config['device'].startswith('cuda') and not torch.cuda.is_available():
+        raise RuntimeError('CUDA is not visible')
+    key = (str(path), config['device'])
+    if key not in _POLICIES:
+        _POLICIES.clear()
+        cfg = make_policy_config(
+            'molmoact2', checkpoint_path=str(path), norm_tag=config['norm_tag'], discrete_action_tokenizer=str(tokenizer),
+            model_dtype=config['model_dtype'], chunk_size=config['chunk_size'], n_action_steps=config['chunk_size'],
+            setup_type=config['setup_type'], control_mode=config['control_mode'],
+            image_keys=['observation.images.cam0', 'observation.images.cam1'], normalize_gripper=True,
+            inference_action_mode=config['inference_action_mode'], device=config['device'])
+        cfg.input_features = {k: PolicyFeature(FeatureType.VISUAL, (3, 480, 640))
+                              for k in ('observation.images.cam0', 'observation.images.cam1')}
+        cfg.input_features['observation.state'] = PolicyFeature(FeatureType.STATE, (6,))
+        cfg.output_features = {'action': PolicyFeature(FeatureType.ACTION, (6,))}
+        policy = MolmoAct2Policy(cfg).to(config['device'])
+        pre, post = make_pre_post_processors(policy_cfg=cfg, dataset_stats=None)   # None -> norm_tag stats
+        policy.config.per_episode_seed = config['per_episode_seed']
+        policy.config.n_action_steps = config['n_action_steps']
+        policy.eval()
+        _POLICIES[key] = (policy, pre, post)
+    return _POLICIES[key], {'model_id': config['repo_id'], 'revision': config['revision'], 'snapshot': str(path),
                             'model_dtype': str(_POLICIES[key][0].config.model_dtype)}
 
 
