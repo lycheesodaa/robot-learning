@@ -70,12 +70,27 @@ class _Homing:
         self.go_home()
         self._disconnect(*args, **kwargs)
 
+    def _release_port(self):
+        """Clear a busy flag left by a packet that Ctrl-C cut short. The SDK sets
+        port.is_using for each packet and clears it on completion, so an interrupted write
+        leaves every later transfer failing with "Port is in use!". Called with the lock held
+        and homing set, so nothing else is on the bus."""
+        port = getattr(getattr(self.robot, "bus", None), "port_handler", None)
+        if port is None or not port.is_using:
+            return
+        port.is_using = False
+        port.clearPort()
+        time.sleep(0.05)  # servos time out and drop the partial packet
+        port.ser.reset_input_buffer()  # and any reply that arrived meanwhile
+        print("[home] cleared a transfer interrupted by Ctrl-C", flush=True)
+
     def go_home(self):
         with self.lock:
             if self.home is None or self.homing:
                 return
             self.homing = True
             try:
+                self._release_port()
                 obs = self._observe()
                 start = {k: float(obs[k]) for k in self.home}
                 home = dict(self.home)
