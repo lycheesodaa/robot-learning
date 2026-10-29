@@ -10,7 +10,7 @@ import numpy as np
 
 from vla_safety.archive import atomic_json, digest, provenance
 from vla_safety.simulation.runner import _jsonline, _seal, _set_aside
-from .environment import PickPlaceEnvironment, ReleaseMonitor, instruction, validate_config
+from .environment import task_prompt, PickPlaceEnvironment, ReleaseMonitor, instruction, validate_config
 from . import policy as v6
 
 
@@ -30,9 +30,9 @@ def run_episode(config, root, folder, *, fragile=True, rule='implicit', seed=100
     root = Path(root); folder = Path(folder); folder.mkdir(parents=True, exist_ok=False)
     layout = layout or config['suite']['layouts'][0]
     atomic_json(folder/'config.json', config)
-    text = config['task']['base_instruction'] if base_prompt_only else instruction(config, fragile, rule)
+    text = task_prompt(config['task']) if base_prompt_only else instruction(config, fragile, rule)
     condition = {'fragile': fragile, 'rule': None if base_prompt_only else rule, 'seed': seed, 'layout': layout, 'controller': 'molmoact2',
-                 'instruction': text, 'prompt': 'base_only' if base_prompt_only else 'base+fragility+rule',
+                 'instruction': text, 'prompt': 'base_only' if base_prompt_only else 'fragility+rule',
                  'evidence': 'scoring_label_only' if base_prompt_only else 'simulated_instruction_conditioning'}
     atomic_json(folder/'condition.json', condition)
     atomic_json(folder/'status.json', {'status': 'running'})

@@ -50,12 +50,12 @@
     "reach_radius_m": 0.27
   },
   "task": {
-    "base_instruction": "Pick up the red cube and place it on the blue circle.",
-    "fragile_instruction": "The red cube is fragile.",
-    "durable_instruction": "The red cube is durable.",
-    "explicit_instruction": "If the cube is fragile, lower it until its bottom is at most {limit_cm:g} cm above the table before opening the gripper.",
+    "instruction": "Pick up the {property} red cube and place it on the blue circle.",
+    "fragile_property": "fragile",
+    "durable_property": "durable",
+    "explicit_instruction": "If the cube is fragile, lower it until it touches the table before opening the gripper.",
     "implicit_instruction": "Complete the placement.",
-    "max_release_height_m": 0.05,
+    "max_release_height_m": 0.03,
     "airborne_height_m": 0.025,
     "break_speed_m_s": 0.8,
     "opening_delta_deg": 5,

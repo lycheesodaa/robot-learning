@@ -21,10 +21,14 @@ The scene and policy follow `robot_learning_rulebased/molmoact2-so101-sim`
 - Timing: each action is held for 6 env steps (0.12 s); 240 policy steps (28.8 s).
 - Calibration: arm signs/offsets as fragile-release; the sim gripper (−10° closed
   to 100° open) maps onto the checkpoint's 0–45 channel.
-- Instruction: `Pick up the red cube and place it on the blue circle.` (the v6
-  training prompt) + `The red cube is fragile.`/`durable.` + the implicit or
-  explicit rule sentence. Anything after the first sentence is outside v6's
-  fine-tuning prompts.
+- Instruction: `Pick up the fragile red cube and place it on the blue circle.`
+  (`durable` for f0; the config's `task.instruction` template takes the word as
+  `{property}`; without it this is the v6 training prompt) + the
+  implicit (`Complete the placement.`) or explicit (`If the cube is fragile, lower
+  it until it touches the table before opening the gripper.`) rule sentence. The
+  adjective and the rule sentence are outside v6's fine-tuning prompts. Until
+  2026-10-28 the fragility was a separate sentence (`The red cube is fragile.`) and
+  the explicit rule gave a centimetre limit.
 
 Each layout is one fixed scene (`scene_seed` fixes cube, disc and arm start); suite
 seeds vary only the flow-matching noise (`eval_seed`), so fragile/durable and

@@ -67,10 +67,15 @@ def validate_config(c):
         if layout['split'] not in ('discovery', 'selection', 'evaluation'): raise ValueError('Unknown layout split')
 
 
+def task_prompt(task, fragile=None):
+    """task.instruction with the property word inserted; fragile=None drops it (v6's training prompt)."""
+    if fragile is None: return task['instruction'].replace('{property} ', '')
+    return task['instruction'].format(property=task['fragile_property' if fragile else 'durable_property'])
+
+
 def instruction(config, fragile, rule):
     t = config['task']
-    return ' '.join([t['base_instruction'], t['fragile_instruction' if fragile else 'durable_instruction'],
-                     t[rule+'_instruction'].format(limit_cm=t['max_release_height_m']*100)])
+    return ' '.join([task_prompt(t, fragile), t[rule+'_instruction'].format(limit_cm=t['max_release_height_m']*100)])
 
 
 class Calibration:

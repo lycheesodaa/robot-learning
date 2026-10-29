@@ -53,7 +53,7 @@ def main():
             p.add_argument('--seed', type=int, default=1000)
             p.add_argument('--layout', help='Layout id from the JSON configuration')
             p.add_argument('--base-prompt-only', action='store_true',
-                           help="Send only task.base_instruction (v6's training prompt); --fragility then only labels scoring")
+                           help="Send task.instruction without the property word (v6's training prompt); --fragility then only labels scoring")
         else:
             p.add_argument('--resume', action='store_true', help='Continue the suite in --output')
             p.add_argument('--layouts', nargs='+', help='Subset of layout ids')
