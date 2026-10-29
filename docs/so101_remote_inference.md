@@ -185,14 +185,14 @@ How this differs from the base checkpoint:
 
 1. **Calibrate the shield** once per arm and object, on the robot PC. The script guides you through it in about two minutes. Keep a hand on the arm, because the first steps run with torque off.
    ```powershell
-   python client\calibrate_shield.py --out shield_calibration.json --object "foam egg"
+   python client\calibrate_shield.py --object "foam egg"
    ```
    It measures three things:
    - The gripper's closed and open readings. These set the gripper scaling.
    - The forward-kinematics TCP height with the object resting in the jaws on the table. This height maps to the simulator's set-down height of 0.0295 m.
    - The gripper load when squeezing the object and when closing on nothing. These set the load sign and the `load_gripper` threshold, halfway between the two readings.
 
-   Use the object you will run with, because a soft object squeezes with less load than the simulator's cube. Torque stays on at the end; cut power to release the arm. Copy the JSON to the server, for example to `server/shield_artifacts/calibration.json`.
+   Use the object you will run with, because a soft object squeezes with less load than the simulator's cube. Torque stays on at the end; cut power to release the arm. The script writes `server/shield_artifacts/calibration.json` (`--out` changes it), the path the server command below uses. Commit it and pull on the server, or copy it there.
 2. **Start the server in shadow mode first.** In this mode it logs every decision and changes nothing:
    ```bash
    screen -S nexus

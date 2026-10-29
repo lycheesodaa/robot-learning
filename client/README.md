@@ -115,21 +115,21 @@ python client/viz_server.py runs/20261020_182433
 
 This mode runs the sim-trained [so101-nexus fine-tune](https://huggingface.co/ataghof/molmoact2-so101nexus-lora-champion)
 on the real arm. It adds the safety rule learned in simulation (`robot_learning_rulebased`), which refuses to open the
-gripper while it is squeezing a fragile object above the table. The server is `server/serve_molmoact2_nexus.py` on
-`main`. Its docstring and `server/shield_rules/README.md` cover the conversions and the rules.
+gripper while it is squeezing a fragile object above the table. The server is `server/serve_molmoact2_nexus.py`. Its docstring and `server/shield_rules/README.md` cover the conversions and the rules.
 
 1. **Calibrate the shield once per arm and object** (about two minutes, guided):
    ```
-   python client/calibrate_shield.py --out shield_calibration.json --object "foam egg"
+   python client/calibrate_shield.py --object "foam egg"
    ```
    The script measures three things. First, the gripper's closed and open readings, which set the gripper scaling to
    the checkpoint's 0–45. Second, the forward-kinematics TCP height with the object resting in the jaws on the table.
    Third, the gripper load when squeezing the object versus closing on nothing, which sets the sign and the
-   `load_gripper` threshold. Use the object you will run with. Copy the JSON to the server.
+   `load_gripper` threshold. Use the object you will run with. It writes `server/shield_artifacts/calibration.json`; commit it and pull on
+   the server, or copy it there.
 2. **Start the server** in shadow mode first. In shadow mode it logs every decision and changes nothing:
    ```bash
    python server/serve_molmoact2_nexus.py --host=127.0.0.1 --port=8080 --fps=8 --no_similarity_filter \
-       --record_dir=artifacts/real_runs --fragile --shield=shadow --shield_calibration=shield_calibration.json
+       --record_dir=artifacts/real_runs --fragile --shield=shadow --shield_calibration=server/shield_artifacts/calibration.json
    ```
    Then use `--shield=hold` (refused openings keep the gripper closed; the arm keeps moving) or `--shield=abort`
    (the first refusal stops the run). Both require a calibration file whose `measured` field is true.

@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """Measure what the fragile-release shield needs from this arm and object; write the JSON that
-server/serve_molmoact2_nexus.py takes as --shield_calibration (copy it to the server).
+server/serve_molmoact2_nexus.py takes as --shield_calibration. It goes to server/shield_artifacts/calibration.json,
+the path in the server's run command; commit it and pull on the server (or copy it there).
 
-  python client/calibrate_shield.py --out shield_calibration.json --object "foam egg"
+  python client/calibrate_shield.py --object "foam egg"
   python client/calibrate_shield.py --config client/so101_molmoact2_nexus.yaml --robot.port=COM7 ...
 
 Guided, about two minutes. Keep a hand on the arm: the first steps run with torque off.
@@ -34,6 +35,7 @@ from lerobot.robots import make_robot_from_config
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'server'))  # the server's fragile_shield.py
 import fragile_shield as S  # noqa: E402
 
+DEFAULT_OUT = Path(__file__).resolve().parents[1] / 'server/shield_artifacts/calibration.json'
 SETTLE_S = 1.5
 SAMPLES = 20
 MIN_SEPARATION_NM = 0.1  # squeeze must exceed the empty-close load by this much
@@ -86,7 +88,7 @@ def squeeze(bus, closed, open_):
 def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument('--config', default=str(Path(__file__).with_name('so101_molmoact2_nexus.yaml')))
-    parser.add_argument('--out', type=Path, default=Path('shield_calibration.json'))
+    parser.add_argument('--out', type=Path, default=DEFAULT_OUT)
     parser.add_argument('--object', default='', help='Name of the test object, kept in the notes')
     parser.add_argument('--force', action='store_true',
                         help='Write measured=true even if holding and empty loads are not separable')
@@ -159,9 +161,11 @@ def main():
             'arm_load_signs': 'not measured (1.0); rules on arm loads are uncalibrated',
             'separable': separable,
         })
+    args.out.parent.mkdir(parents=True, exist_ok=True)
     args.out.write_text(json.dumps(cal.to_dict(), indent=2))
     print(f'\nWrote {args.out}' + ('' if cal.measured else ' with measured=false: the server allows only --shield=shadow'))
-    print('Copy it to the server and pass --shield_calibration=<path>. Torque is still on; cut power to release the arm.')
+    print('Get it to the server (commit and pull, or copy) and pass --shield_calibration=<path>. '
+          'Torque is still on; cut power to release the arm.')
 
 
 if __name__ == '__main__':
