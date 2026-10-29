@@ -1,4 +1,4 @@
-"""Robot client for server/serve_molmoact2_nexus.py (main branch): the so101-nexus MolmoAct2
+"""Robot client for server/serve_molmoact2_nexus.py: the so101-nexus MolmoAct2
 fine-tune with the fragile-release shield learned in simulation.
 
 Drop-in replacement for viz_client.py, with the same flags, recording and viewer. Run it

@@ -6,7 +6,7 @@ fragile-release shield learned in simulation (robot_learning_rulebased).
       --no_similarity_filter --record_dir=artifacts/real_runs \
       --fragile --shield=shadow --shield_calibration=server/shield_artifacts/calibration.json
 
-Drive it with the client branch's nexus client (client/run_client.sh with NEXUS=1, or
+Drive it with the nexus client (client/run_client.sh with NEXUS=1, or
 run_client.ps1 -Nexus). That client checks every queued action again against live joint and
 load readings right before sending it, and it empties its queue when the shield latches. The
 stock client works too, but it executes whatever it has already queued.

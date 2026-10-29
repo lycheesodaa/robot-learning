@@ -12,7 +12,7 @@ Both sides use **LeRobot 0.6.1 on Python 3.12**.
 
 ## Files
 
-The server files are on this branch. The client files are on the [`client` branch](https://github.com/lycheesodaa/robot-learning/tree/client); run the robot PC commands below from a checkout of that branch.
+The server files are in `server/` and the robot PC files in `client/` ([client/README.md](../client/README.md) has the robot PC setup). Run the robot PC commands below from the repo root.
 
 | File | Purpose |
 | --- | --- |
@@ -21,12 +21,12 @@ The server files are on this branch. The client files are on the [`client` branc
 | [server/requirements.txt](../server/requirements.txt) | Server packages, for a fresh env outside `.envs/lerobot` |
 | [server/serve_molmoact2_nexus.py](../server/serve_molmoact2_nexus.py) | Serves the so101-nexus fine-tune with the fragile-release shield (section 5) |
 | [server/fragile_shield.py](../server/fragile_shield.py), [server/shield_rules/](../server/shield_rules/) | Shield rule language, forward kinematics and real-to-sim features; the learned rules |
-| [client/so101_molmoact2.yaml](https://github.com/lycheesodaa/robot-learning/blob/client/client/so101_molmoact2.yaml) | All client settings (robot, cameras, checkpoint, chunking); copy it per setup |
-| [client/run_client.ps1](https://github.com/lycheesodaa/robot-learning/blob/client/client/run_client.ps1) | Windows: opens the tunnel, runs the client, closes the tunnel |
-| [client/run_client.sh](https://github.com/lycheesodaa/robot-learning/blob/client/client/run_client.sh) | The same for Linux and macOS |
-| [client/check_torque_hold.py](https://github.com/lycheesodaa/robot-learning/blob/client/client/check_torque_hold.py) | Checks whether turning on torque would make the arm jump (read-only by default); `--probe-firmware` makes a 5° test move; `--sync` removes the risk |
-| [client/nexus_client.py](https://github.com/lycheesodaa/robot-learning/blob/client/client/nexus_client.py), [client/so101_molmoact2_nexus.yaml](https://github.com/lycheesodaa/robot-learning/blob/client/client/so101_molmoact2_nexus.yaml) | Client and config for the nexus server (section 5) |
-| [client/calibrate_shield.py](https://github.com/lycheesodaa/robot-learning/blob/client/client/calibrate_shield.py) | Measures the shield calibration for an arm and object |
+| [client/so101_molmoact2.yaml](../client/so101_molmoact2.yaml) | All client settings (robot, cameras, checkpoint, chunking); copy it per setup |
+| [client/run_client.ps1](../client/run_client.ps1) | Windows: opens the tunnel, runs the client, closes the tunnel |
+| [client/run_client.sh](../client/run_client.sh) | The same for Linux and macOS |
+| [client/check_torque_hold.py](../client/check_torque_hold.py) | Checks whether turning on torque would make the arm jump (read-only by default); `--probe-firmware` makes a 5° test move; `--sync` removes the risk |
+| [client/nexus_client.py](../client/nexus_client.py), [client/so101_molmoact2_nexus.yaml](../client/so101_molmoact2_nexus.yaml) | Client and config for the nexus server (section 5) |
+| [client/calibrate_shield.py](../client/calibrate_shield.py) | Measures the shield calibration for an arm and object |
 
 ## 1. Server (GPU machine)
 

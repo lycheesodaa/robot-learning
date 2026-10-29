@@ -1,4 +1,4 @@
-# LeRobot 0.6.1 robot_client config for server/serve_molmoact2_nexus.py (main branch): the
+# LeRobot 0.6.1 robot_client config for server/serve_molmoact2_nexus.py: the
 # so101-nexus MolmoAct2 fine-tune with the fragile-release shield. Run it through the launchers
 # with NEXUS=1 / -Nexus, which pick this file and client/nexus_client.py.
 
