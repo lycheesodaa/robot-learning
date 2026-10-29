@@ -27,6 +27,7 @@ import draccus
 import numpy as np
 
 from lerobot.async_inference.robot_client import RobotClientConfig
+from lerobot.motors.motors_bus import get_address
 from lerobot.robots import make_robot_from_config
 
 import fragile_shield as S
@@ -36,10 +37,25 @@ SAMPLES = 20
 MIN_SEPARATION_NM = 0.1  # squeeze must exceed the empty-close load by this much
 
 
+def read_stalled(bus, register, motor):
+    """bus.read that keeps the value when the status packet carries a servo error. A gripper
+    stalled on an object sets the overload flag (lerobot's Protection_Current 250 on the
+    gripper); the reply still holds the reading, which is what the squeeze measures."""
+    id_ = bus.motors[motor].id
+    addr, length = get_address(bus.model_ctrl_table, bus.motors[motor].model, register)
+    value, comm, _ = bus._read(addr, length, id_, num_retry=2, raise_on_error=False)
+    if not bus._is_comm_success(comm):
+        raise ConnectionError(f"Failed to read '{register}' on {id_=}: {bus.packet_handler.getTxRxResult(comm)}")
+    decoded = bus._decode_sign(register, {id_: value})
+    if register in bus.normalized_data:
+        decoded = bus._normalize(decoded)
+    return decoded[id_]
+
+
 def sample(bus, register, motor, n=SAMPLES, period=0.05):
     values = []
     for _ in range(n):
-        values.append(float(bus.read(register, motor, normalize=register != 'Present_Load')))
+        values.append(float(read_stalled(bus, register, motor)))
         time.sleep(period)
     return statistics.median(values)
 
@@ -54,12 +70,13 @@ def ask(text):
 
 
 def squeeze(bus, closed, open_):
-    """Close on whatever is between the jaws; return the settled Present_Load (raw, signed)."""
-    bus.write('Goal_Position', 'gripper', closed)
+    """Close on whatever is between the jaws; return the settled Present_Load (raw, signed).
+    Goals go out with sync_write, which expects no status packet, so a stall flag cannot fail them."""
+    bus.sync_write('Goal_Position', {'gripper': closed})
     time.sleep(SETTLE_S)
     load = sample(bus, 'Present_Load', 'gripper')
     position = sample(bus, 'Present_Position', 'gripper', n=5)
-    bus.write('Goal_Position', 'gripper', open_)
+    bus.sync_write('Goal_Position', {'gripper': open_})
     time.sleep(SETTLE_S)
     return load, position
 

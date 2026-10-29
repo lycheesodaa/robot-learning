@@ -6,7 +6,8 @@ arguments, plus
     --runs_dir=<path>      where runs are saved (default: <repo>/runs)
     --no_browser           don't open the viewer automatically
     --image_size=HxW       shrink camera frames to HxW before sending (see resize_client.py);
-                           recorded frames are then what the policy sees. Omit to send full frames.
+                           recorded frames are then what the policy sees. Overrides `image_size:`
+                           in the config YAML; with neither, frames go as captured.
     --no_home              leave the arm where it is on exit instead of returning it to its
                            start pose (see home_on_exit.py)
 
@@ -197,6 +198,7 @@ def run(cfg: RobotClientConfig, client_cls: type[VizRobotClient]):
         "aggregate_fn_name": cfg.aggregate_fn_name, "policy_type": cfg.policy_type,
         "pretrained_name_or_path": cfg.pretrained_name_or_path,
         "max_relative_target": cfg.robot.max_relative_target,
+        "image_size": VIZ.get("image_size"),
         "state_keys": client.state_keys, "action_keys": client.action_keys, "cam_keys": client.cam_keys,
     })
     client.rec = rec
@@ -223,8 +225,9 @@ def run(cfg: RobotClientConfig, client_cls: type[VizRobotClient]):
 
 
 if __name__ == "__main__":
-    if any(a.startswith("--image_size=") for a in sys.argv[1:]):
-        resize_client.install(*resize_client.pop_image_size())
+    VIZ["image_size"] = resize_client.pop_image_size(default=None)
+    if VIZ["image_size"]:
+        resize_client.install(*VIZ["image_size"])
     if not home_on_exit.pop_no_home():
         home_on_exit.install()
     register_third_party_plugins()

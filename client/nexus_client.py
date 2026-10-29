@@ -192,8 +192,9 @@ def main(cfg: RobotClientConfig):
 
 if __name__ == "__main__":
     viz_client.VIZ.update(viz_client._pop_viz_args())
-    if any(a.startswith("--image_size=") for a in sys.argv[1:]):
-        resize_client.install(*resize_client.pop_image_size())
+    viz_client.VIZ["image_size"] = resize_client.pop_image_size(default=None)
+    if viz_client.VIZ["image_size"]:
+        resize_client.install(*viz_client.VIZ["image_size"])
     if not home_on_exit.pop_no_home():
         home_on_exit.install()
     register_third_party_plugins()

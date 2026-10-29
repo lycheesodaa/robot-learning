@@ -144,7 +144,7 @@ gripper while it is squeezing a fragile object above the table. The server is `s
 What `-Nexus` changes:
 
 - **Config `so101_molmoact2_nexus.yaml`:** fps 8 with chunks of 10, because the checkpoint was trained at one
-  action per 0.12 s. Aggregation is `latest_only`, and frames are sent at full 320×240.
+  action per 0.12 s. Aggregation is `latest_only`, and frames are sent as captured (`image_size: null`; see the config).
 - **Loads in observations:** every observation includes the servo loads for the server's shield.
 - **Live re-check before sending:** each queued action is checked again, right before it is sent, against the joint
   positions and loads read at that moment. Actions that went stale in the queue are caught too.

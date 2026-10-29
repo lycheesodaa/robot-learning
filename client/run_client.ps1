@@ -22,7 +22,7 @@ param(
     [int] $LocalPort = 8080,
     [int] $RemotePort = 8080,
     [string] $Python = 'python',
-    [string] $ImageSize,     # HxW frames are shrunk to before sending; '' sends full frames. Default 224x224, or '' with -Nexus
+    [string] $ImageSize,     # HxW frames are shrunk to before sending; '' sends full frames. Default: image_size in the config
     [int] $VizPort = 8765,   # live viewer at http://127.0.0.1:<VizPort>/; runs are saved under .\runs
     [switch] $NoViz,         # run the plain robot_client instead (no recording, no viewer; frames still resized)
     [switch] $NoHome,        # leave the arm where it is on exit instead of returning it to its start pose
@@ -32,7 +32,6 @@ param(
 $ErrorActionPreference = 'Stop'
 if ($Nexus -and $NoViz) { throw '-Nexus needs the recording client; drop -NoViz.' }
 if (-not $Config) { $Config = Join-Path $PSScriptRoot $(if ($Nexus) { 'so101_molmoact2_nexus.yaml' } else { 'so101_molmoact2.yaml' }) }
-if (-not $PSBoundParameters.ContainsKey('ImageSize')) { $ImageSize = if ($Nexus) { '' } else { '224x224' } }
 
 $listening = Get-NetTCPConnection -LocalPort $LocalPort -State Listen -ErrorAction SilentlyContinue
 if ($listening) { throw "Local port $LocalPort is already in use; pick another -LocalPort or close the old tunnel." }
@@ -51,7 +50,7 @@ try {
     $entry = if ($Nexus) { @((Join-Path $PSScriptRoot 'nexus_client.py'), "--viz_port=$VizPort") }
              elseif ($NoViz) { @((Join-Path $PSScriptRoot 'resize_client.py')) }
              else { @((Join-Path $PSScriptRoot 'viz_client.py'), "--viz_port=$VizPort") }
-    if ($ImageSize) { $entry += "--image_size=$ImageSize" }
+    if ($PSBoundParameters.ContainsKey('ImageSize')) { $entry += "--image_size=$ImageSize" }
     if ($NoHome) { $entry += '--no_home' }
     & $Python @entry "--config_path=$Config" `
         "--server_address=127.0.0.1:$LocalPort" "--task=$Task" @ClientArgs
