@@ -21,6 +21,7 @@ from vla_safety.pickplace.runner import run_episode, run_suite
 from vla_safety.simulation.runner import record_progress
 
 DEFAULT = ROOT / 'configs/simulation/fragile_pickplace.json'
+CAMERA_PRESETS = ['front_low', 'front_45', 'shoulder', 'top_down', 'front_facing']
 
 
 def narrow(config, args):
@@ -35,6 +36,26 @@ def narrow(config, args):
     if args.seeds: suite['seeds'] = args.seeds
 
 
+# Instruction rewrites for the generalization variants: (task key, trained wording, variant wording).
+VARIANT_TEXT = {
+    'glass_box': [('instruction', 'red cube', 'glass box'), ('explicit_instruction', 'If the cube', 'If the box')],
+    'bowl': [('instruction', 'on the blue circle', 'in the blue bowl'),
+             ('explicit_instruction', 'touches the table', 'touches the bottom of the bowl')],
+}
+
+
+def override_scene(config, args):
+    scene, task = config['scene'], config['task']
+    if args.camera_preset: scene['camera_preset'] = args.camera_preset
+    for key in ('floor', 'lighting', 'object', 'target', 'backdrop', 'wrist_camera'):
+        value = getattr(args, key, None)
+        if value is None or value == scene.get(key, {'object': 'cube', 'target': 'disc', 'backdrop': 'wall', 'wrist_camera': 'nexus'}.get(key)): continue
+        scene[key] = value
+        for field, old, new in VARIANT_TEXT.get(value, []):
+            if old not in task[field]: raise SystemExit(f'task.{field} lacks {old!r}; cannot reword for {value}')
+            task[field] = task[field].replace(old, new)
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     sub = parser.add_subparsers(dest='command', required=True)
@@ -42,11 +63,22 @@ def main():
     p.add_argument('scene_seeds', type=int, nargs='+')
     p.add_argument('--config', type=Path, default=DEFAULT)
     p.add_argument('--output', type=Path, required=True)
+    p.add_argument('--camera-preset', choices=CAMERA_PRESETS, help='cam0 preset override')
+    for key, choices in [('floor', ['wood', 'plain_light']), ('lighting', ['realism', 'indoor', 'default']), ('object', ['cube', 'glass_box']),
+                         ('target', ['disc', 'bowl']), ('backdrop', ['wall', 'room']), ('wrist_camera', ['nexus', 'dataset'])]:
+        p.add_argument(f"--{key.replace('_', '-')}", choices=choices)
     for name, help_text in [('rollout', 'Run one closed-loop episode'), ('suite', 'Run matched fragility x rule x seed episodes')]:
         p = sub.add_parser(name, help=help_text)
         p.add_argument('--config', type=Path, help='Default: configs/simulation/fragile_pickplace.json, or the saved config when resuming')
         p.add_argument('--output', type=Path, help='New directory; existing output is never overwritten')
         p.add_argument('--device', help='Policy device override, e.g. cuda:1')
+        p.add_argument('--camera-preset', choices=CAMERA_PRESETS, help='cam0 preset override')
+        p.add_argument('--floor', choices=['wood', 'plain_light'], help='Table surface override')
+        p.add_argument('--lighting', choices=['realism', 'indoor', 'default'], help="Lighting override ('default' is so101-nexus's rig)")
+        p.add_argument('--object', choices=['cube', 'glass_box'], help='Carried object; glass_box rewords the instruction')
+        p.add_argument('--target', choices=['disc', 'bowl'], help='Goal marker; bowl rewords the instruction')
+        p.add_argument('--backdrop', choices=['wall', 'room'], help="'room' adds a wall behind the arm")
+        p.add_argument('--wrist-camera', choices=['nexus', 'dataset'], help="'dataset' is a fixed 110 deg wrist camera")
         if name == 'rollout':
             p.add_argument('--fragility', choices=['fragile', 'durable'], default='fragile')
             p.add_argument('--rule', choices=['implicit', 'explicit'], default='implicit')
@@ -64,7 +96,7 @@ def main():
     if args.command == 'survey':
         from PIL import Image
         import numpy as np
-        config = load_config(args.config); args.output.mkdir(parents=True, exist_ok=False); rows = []
+        config = load_config(args.config); override_scene(config, args); args.output.mkdir(parents=True, exist_ok=False); rows = []
         for seed in args.scene_seeds:
             env = PickPlaceEnvironment(config, {'id': f'scene{seed}', 'scene_seed': seed, 'target_xy_offset_m': [0, 0], 'split': 'discovery'})
             try:
@@ -79,6 +111,9 @@ def main():
         parser.error('--resume needs --output pointing at an existing suite')
     config = load_config(args.config or (args.output / 'config.json' if resume else DEFAULT))
     if args.device: config['policy']['device'] = args.device
+    if resume and any((args.camera_preset, args.floor, args.lighting, args.object, args.target, args.backdrop, args.wrist_camera)):
+        parser.error('Scene overrides come from the saved config when resuming')
+    override_scene(config, args)
     output = (args.output or RunArchive.new_path(ROOT / config['output_root'], args.command)).resolve()
     print(f'Artifacts: {output}', flush=True)
     if args.command == 'suite':

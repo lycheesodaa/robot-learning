@@ -45,6 +45,8 @@
     "cube_color": "red",
     "target_color": "blue",
     "camera_preset": "front_low",
+    "floor": "wood",
+    "lighting": "realism",
     "wrist_size": [640, 480],
     "grip_friction_floor": [1.2, 0.05, 0.01],
     "reach_radius_m": 0.27

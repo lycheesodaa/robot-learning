@@ -1,6 +1,6 @@
 """Scene realism + camera-pose matching for the so101-nexus pick-and-place env.
 
-Vendored unchanged apart from the texture lookup from ataghof/molmoact2-so101-sim
+Vendored unchanged apart from the texture lookup and the floor/lighting options of install() from ataghof/molmoact2-so101-sim
 (Apache-2.0) as used in robot_learning_rulebased@facdfff; the v6 LoRA checkpoint was
 trained on scenes built by this module, so keep it in step with that copy.
 
@@ -77,9 +77,11 @@ _ASSETS = f"""  <statistic extent="0.8" center="0.18 0 0.12"/>
     <texture name="rk_sky" type="skybox" builtin="gradient" rgb1="0.82 0.82 0.84" rgb2="0.52 0.53 0.55" width="512" height="3072"/>
     <texture name="rk_wood" type="2d" file="{TEX_PATH}"/>
     <material name="rk_table" texture="rk_wood" texuniform="true" texrepeat="3 3" specular="0.2" shininess="0.2" reflectance="0.03"/>
+    <material name="rk_plain" rgba="0.80 0.78 0.74 1" specular="0.05" shininess="0.05" reflectance="0.0"/>
     <material name="rk_wall" rgba="0.87 0.86 0.83 1" specular="0.03" shininess="0.02" reflectance="0.0"/>
     <material name="rk_cube" specular="0.35" shininess="0.4" reflectance="0.02"/>
     <material name="rk_disc" specular="0.25" shininess="0.25" reflectance="0.0"/>
+    <material name="rk_glass" specular="0.9" shininess="0.9" reflectance="0.15"/>
   </asset>
 """
 
@@ -99,31 +101,115 @@ _LIGHTS = """    <light name="rk_key" type="spot" pos="0.55 0.45 1.35" dir="-0.3
     <light name="rk_rim" type="directional" dir="-0.4 -0.7 -0.5" diffuse="0.18 0.18 0.22"
            specular="0.12 0.12 0.12" castshadow="false"/>"""
 
+# Indoor rig, not in rulebased: two soft ceiling lights (one shadow caster) + a cool window fill,
+# for the flat, slightly warm room lighting of the community SO-100/101 datasets.
+_VISUAL_INDOOR = """  <visual>
+    <headlight ambient="0.28 0.28 0.28" diffuse="0.08 0.08 0.08" specular="0 0 0"/>
+    <quality shadowsize="8192" offsamples="8"/>
+    <map shadowclip="1.1" shadowscale="0.5" haze="0.05"/>
+  </visual>"""
+_LIGHTS_INDOOR = """    <light name="rk_ceiling1" type="spot" pos="0.30 0.25 1.4" dir="-0.1 -0.15 -1"
+           diffuse="0.50 0.48 0.44" specular="0.05 0.05 0.05" cutoff="60" exponent="2" castshadow="true"/>
+    <light name="rk_ceiling2" type="spot" pos="0.10 -0.45 1.6" dir="0.1 0.3 -1"
+           diffuse="0.30 0.29 0.27" specular="0 0 0" cutoff="70" exponent="2" castshadow="false"/>
+    <light name="rk_window" type="directional" dir="0.3 0.8 -0.5" diffuse="0.16 0.17 0.19"
+           specular="0 0 0" castshadow="false"/>"""
+_RIGS = {"realism": (_VISUAL, _LIGHTS), "indoor": (_VISUAL_INDOOR, _LIGHTS_INDOOR)}
+
 # A light back wall so the background is a wall, not a void (behind the +X workspace).
 _WALL = ('    <geom name="rk_wall" type="box" pos="0.75 0 0.45" size="0.02 1.2 0.6" '
          'material="rk_wall" contype="0" conaffinity="0"/>\n')
+# backdrop 'room', not in rulebased: a second wall behind the arm, the background of a camera facing it.
+_ROOM_WALL = ('    <geom name="rk_wall_back" type="box" pos="-0.40 0 0.45" size="0.02 1.2 0.6" '
+              'material="rk_wall" contype="0" conaffinity="0"/>\n')
+
+# Generalization variants, not in rulebased: a clear glass box in place of the red cube (same geometry and
+# physics, only its look), and a blue bowl on the goal (the disc is hidden; see PickPlaceEnvironment.reset).
+_GLASS_RGBA = "0.80 0.90 0.92 0.35"
+_BOWL = {"base_radius": 0.035, "rim_radius": 0.055, "height": 0.03, "wall": 0.003, "segments": 48, "colliders": 24}
+
+
+def _bowl_xml():
+    """Visual lathed bowl mesh + hidden collision base and tilted wall boxes, in the target body's frame."""
+    b = _BOWL; rb, R, H, t, n = b["base_radius"], b["rim_radius"], b["height"], b["wall"], b["segments"]
+    # (r, z) cross-section, outside bottom centre -> outer wall -> rim -> inner wall -> inside floor centre.
+    profile = [(0., 0.), (rb, 0.), (R + t/2, H), (R - t/2, H), (rb - t/2, t), (0., t)]
+    verts, ring = [(0., 0., 0.)], {}
+    for i, (r, z) in enumerate(profile[1:-1], start=1):
+        ring[i] = len(verts)
+        verts += [(r*np.cos(2*np.pi*k/n), r*np.sin(2*np.pi*k/n), z) for k in range(n)]
+    top = len(verts); verts.append((0., 0., t))
+    faces = []
+    for k in range(n):
+        k2 = (k + 1) % n
+        faces.append((0, ring[1] + k2, ring[1] + k))
+        for i in range(1, len(profile) - 2):
+            a, c = ring[i], ring[i + 1]
+            faces += [(a + k, a + k2, c + k2), (a + k, c + k2, c + k)]
+        last = ring[len(profile) - 2]
+        faces.append((top, last + k, last + k2))
+    vertex = " ".join(f"{v:.5f}" for p in verts for v in p)
+    face = " ".join(str(i) for f in faces for i in f)
+    slope = np.arctan2(R - rb, H); half_len = np.hypot(R - rb, H)/2; m = b["colliders"]
+    half_width = np.pi*(R + t)/m*1.1
+    walls = ""
+    for k in range(m):
+        theta = 2*np.pi*k/m
+        qz = np.array([np.cos(theta/2), 0, 0, np.sin(theta/2)]); qy = np.array([np.cos(slope/2), 0, np.sin(slope/2), 0])
+        q = np.zeros(4); mujoco.mju_mulQuat(q, qz, qy)
+        rc = (rb + R)/2
+        walls += (f'      <geom name="rk_bowl_wall{k}" type="box" size="{t/2} {half_width:.5f} {half_len:.5f}" '
+                  f'pos="{rc*np.cos(theta):.5f} {rc*np.sin(theta):.5f} {H/2}" quat="{q[0]:.6f} {q[1]:.6f} {q[2]:.6f} {q[3]:.6f}" '
+                  'group="3" contype="1" conaffinity="1" condim="4"/>\n')
+    asset = f'    <mesh name="rk_bowl" vertex="{vertex}" face="{face}" inertia="shell"/>\n'
+    rgba = " ".join(str(x) for x in C.COLOR_MAP["blue"])
+    body = (f'      <geom name="rk_bowl_visual" type="mesh" mesh="rk_bowl" rgba="{rgba}" material="rk_disc" '
+            'contype="0" conaffinity="0" group="1"/>\n'
+            f'      <geom name="rk_bowl_base" type="cylinder" size="{rb} {t/2}" pos="0 0 {t/2}" '
+            'group="3" contype="1" conaffinity="1" condim="4"/>\n' + walls)
+    return asset, body
+
 
 _installed = {"done": False}
+# install() options: floor 'wood' (rulebased) or 'plain_light'; lighting 'realism' (rulebased rig), 'indoor' or
+# 'default' (so101-nexus); carried object 'cube' (rulebased) or 'glass_box'; target 'disc' (rulebased) or 'bowl';
+# backdrop 'wall' (rulebased) or 'room'.
+_options = {"floor": "wood", "lighting": "realism", "object": "cube", "target": "disc", "backdrop": "wall"}
 if not hasattr(OS, "_rk_orig_build"):
     OS._rk_orig_build = OS.build_object_scene_xml
 
 
 def _realistic_build(*args, **kwargs):
     xml = OS._rk_orig_build(*args, **kwargs)
-    xml = xml.replace(SCN.SCENE_VISUAL_XML, _VISUAL, 1)
-    xml = xml.replace(SCN.SCENE_LIGHTS_XML, _LIGHTS + "\n" + _WALL, 1)
+    visual, lights = _RIGS.get(_options["lighting"], (SCN.SCENE_VISUAL_XML, SCN.SCENE_LIGHTS_XML))
+    xml = xml.replace(SCN.SCENE_VISUAL_XML, visual, 1)
+    walls = _WALL + (_ROOM_WALL if _options["backdrop"] == "room" else "")
+    xml = xml.replace(SCN.SCENE_LIGHTS_XML, lights + "\n" + walls, 1)
     xml = xml.replace('<compiler angle="radian"/>', '<compiler angle="radian"/>\n' + _ASSETS, 1)
-    # floor plane -> wood table material (drop the flat rgba)
-    xml = re.sub(r'(<geom name="floor" type="plane"[^>]*?)\s+rgba="[^"]*"', r'\1 material="rk_table"', xml)
-    # cube geom -> add specular material (keeps its desaturated rgba for color)
-    xml = re.sub(r'(<geom name="\w+_geom" type="box")', r'\1 material="rk_cube"', xml)
+    # floor plane -> wood table (or plain light) material (drop the flat rgba)
+    floor = "rk_table" if _options["floor"] == "wood" else "rk_plain"
+    xml = re.sub(r'(<geom name="floor" type="plane"[^>]*?)\s+rgba="[^"]*"', rf'\1 material="{floor}"', xml)
+    # cube geom -> add specular material (keeps its desaturated rgba for color), or clear glass
+    if _options["object"] == "glass_box":
+        xml = re.sub(r'(<geom name="\w+_geom" type="box"[^>]*?)\s+rgba="[^"]*"', rf'\1 rgba="{_GLASS_RGBA}" material="rk_glass"', xml)
+    else:
+        xml = re.sub(r'(<geom name="\w+_geom" type="box")', r'\1 material="rk_cube"', xml)
     # target disc -> add specular material
     xml = re.sub(r'(<geom name="target_disc" type="cylinder")', r'\1 material="rk_disc"', xml)
+    if _options["target"] == "bowl":
+        asset, body = _bowl_xml()
+        xml = xml.replace("  </asset>\n", asset + "  </asset>\n", 1)
+        xml = re.sub(r'(<body name="target"[^>]*>\n)', lambda m: m.group(1) + body, xml, count=1)
     return xml
 
 
-def install():
+def install(floor="wood", lighting="realism", obj="cube", target="disc", backdrop="wall"):
     """Desaturate COLOR_MAP (in place) + monkeypatch the scene builder. Call BEFORE building the env."""
+    if floor not in ("wood", "plain_light") or lighting not in ("realism", "indoor", "default"):
+        raise ValueError(f"Unknown floor={floor!r} or lighting={lighting!r}")
+    if obj not in ("cube", "glass_box") or target not in ("disc", "bowl") or backdrop not in ("wall", "room"):
+        raise ValueError(f"Unknown object={obj!r}, target={target!r} or backdrop={backdrop!r}")
+    _options.update(floor=floor, lighting=lighting, object=obj, target=target, backdrop=backdrop)
     if _installed["done"]:
         return
     for k, v in _REAL_COLORS.items():
@@ -168,6 +254,13 @@ _CAM_PRESETS = {
     "front_45": (np.array([0.60, -0.10, 0.42]), np.array([0.22, 0.0, 0.03]), 60.0),
     # high over-the-shoulder (~48 deg down)
     "shoulder": (np.array([-0.10, -0.05, 0.45]), np.array([0.28, 0.0, 0.02]), 58.0),
+    # near-overhead (~70 deg down), base at the top of the image (as the overhead camera of
+    # Beegbrain/pick_lemon_and_drop_in_bowl); not in rulebased. set_camera renders from the
+    # look-at's far side of `eye` in x, so eye.x < target.x puts the camera beyond the workspace.
+    "top_down": (np.array([0.02, 0.0, 0.58]), np.array([0.22, 0.0, 0.0]), 58.0),
+    # camera opposite the arm, facing it ~38 deg down from x=0.45, z=0.28 (true position; mirrored here as
+    # above): the 'laptop'/'front' webcam of most MolmoAct2 SO-100/101 datasets. Not in rulebased.
+    "front_facing": (np.array([-0.19, 0.0, 0.28]), np.array([0.13, 0.0, 0.03]), 55.0),
 }
 
 

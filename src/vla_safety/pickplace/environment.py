@@ -16,6 +16,10 @@ import sys
 import numpy as np
 
 CONTROLLERS = ('molmoact2',)
+# Wrist camera: so101-nexus's per-reset randomised pinhole (60-90 deg FoV), or a fixed wide one mounted 3 cm further
+# back and pitched 20 deg, so the jaw prongs fill the bottom third as in the community datasets' fisheye wrist views.
+WRIST_CAMERAS = {'nexus': {}, 'dataset': dict(fov_deg_range=(110., 110.), pitch_deg_range=(-20., -20.), pos_x_noise=0.,
+                                              pos_y_center=0.04, pos_y_noise=0., pos_z_center=-0.07, pos_z_noise=0.)}
 
 
 def load_config(path):
@@ -42,6 +46,9 @@ def validate_config(c):
     s = c['scene']
     for k in ('cube_half_size_m', 'reach_radius_m'): positive(s[k], k)
     if np.asarray(s['grip_friction_floor']).shape != (3,): raise ValueError('grip_friction_floor needs three values')
+    if s['floor'] not in ('wood', 'plain_light') or s['lighting'] not in ('realism', 'indoor', 'default'): raise ValueError('Unknown floor or lighting')
+    if s.get('object', 'cube') not in ('cube', 'glass_box') or s.get('target', 'disc') not in ('disc', 'bowl'): raise ValueError('Unknown object or target')
+    if s.get('backdrop', 'wall') not in ('wall', 'room') or s.get('wrist_camera', 'nexus') not in WRIST_CAMERAS: raise ValueError('Unknown backdrop or wrist camera')
     t = c['task']
     for k in ('max_release_height_m', 'airborne_height_m', 'break_speed_m_s', 'opening_delta_deg', 'rest_height_m', 'rest_speed_m_s', 'success_dwell_s'):
         positive(t[k], k)
@@ -117,9 +124,10 @@ class PickPlaceEnvironment:
         from . import realism
         self.mj, self.realism = mujoco, realism
         self.layout = layout or config['suite']['layouts'][0]
-        realism.install()
+        realism.install(s['floor'], s['lighting'], s.get('object', 'cube'), s.get('target', 'disc'), s.get('backdrop', 'wall'))
+        wrist = WristCamera(**WRIST_CAMERAS[s.get('wrist_camera', 'nexus')])
         nexus = PickAndPlaceConfig(obs_mode='visual', target_colors=s['target_color'],
-                                   observations=list(PickAndPlaceConfig().observations or []) + [OverheadCamera(), WristCamera()],
+                                   observations=list(PickAndPlaceConfig().observations or []) + [OverheadCamera(), wrist],
                                    objects=[CubeObject(half_size=s['cube_half_size_m'], color=s['cube_color'])])
         self.env = PickAndPlaceEnv(config=nexus, render_mode='rgb_array')
         U = self.U = self.env.unwrapped
@@ -138,6 +146,9 @@ class PickPlaceEnvironment:
         self.low, self.high = self.env.action_space.low, self.env.action_space.high
         self.cube_body = int(U.model.geom_bodyid[U._obj_geom_id])
         self.floor = mujoco.mj_name2id(U.model, mujoco.mjtObj.mjOBJ_GEOM, 'floor')
+        # Landing surfaces for impact detection: the table, plus the bowl's base and walls when present.
+        self.supports = {self.floor} | {g for g in range(U.model.ngeom)
+                                        if (mujoco.mj_id2name(U.model, mujoco.mjtObj.mjOBJ_GEOM, g) or '').startswith('rk_bowl_')}
         self.instruction = ''
         self.obs = None
 
@@ -146,7 +157,9 @@ class PickPlaceEnvironment:
         self.instruction = instruction
         obs, _ = self.env.reset(seed=self.layout['scene_seed'])
         offset = np.asarray(self.layout['target_xy_offset_m'], dtype=float)
-        if offset.any():
+        bowl = self.config['scene'].get('target', 'disc') == 'bowl'
+        if bowl: self.U.model.geom_rgba[self.U._target_geom_id][3] = 0   # reset recolours the disc; the bowl replaces it
+        if offset.any() or bowl:
             self.U.model.body_pos[self.U._target_body_id][:2] += offset
             self.mj.mj_forward(self.U.model, self.U.data)
             obs = self.U._get_obs()
@@ -210,7 +223,7 @@ class PickPlaceEnvironment:
         force, buf = 0., np.zeros(6)
         for i in range(d.ncon):
             c = d.contact[i]
-            if {c.geom1, c.geom2} == {self.U._obj_geom_id, self.floor}:
+            if self.U._obj_geom_id in (c.geom1, c.geom2) and {c.geom1, c.geom2} - {self.U._obj_geom_id} <= self.supports:
                 self.mj.mj_contactForce(m, d, i, buf)
                 force = max(force, abs(float(buf[0])))
         return force
