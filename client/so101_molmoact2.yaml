@@ -1,0 +1,41 @@
+# LeRobot 0.6.1 robot_client config: SO101 follower + remote MolmoAct2 server.
+# Edit the robot block for your hardware; everything here can be overridden on the
+# command line (e.g. --robot.port=COM7 --task="..."). The launchers set
+# server_address to the local end of the SSH tunnel.
+
+robot:
+  type: so101_follower
+  port: COM3              # lerobot-find-port; /dev/ttyACM0 on Linux
+  id: my_follower         # selects the saved calibration; keep it the same everywhere
+  use_degrees: true       # the checkpoint expects degrees
+  max_relative_target: 15 # max degrees per joint per step; raise once behaviour looks sane, null disables
+  disable_torque_on_disconnect: false  # hold the last pose on Ctrl-C instead of going limp; power off to release
+  cameras:
+    # The checkpoint's image keys are cam0/cam1 and the client cannot rename them.
+    # cam0 = external view of the workspace, cam1 = wrist/gripper view. Check indices with
+    # lerobot-find-cameras opencv; on the Surface, index 1 is the laptop webcam, so it is left out.
+    # 320x240 is a native mode with the same FOV as 640x480 on both; at 640x480 the wrist cam
+    # only reaches ~27 fps alongside cam0. Frames are shrunk to 224x224 before sending anyway.
+    # cam0: {type: opencv, index_or_path: 2, width: 640, height: 480, fps: 30}  # external
+    # cam1: {type: opencv, index_or_path: 0, width: 640, height: 480, fps: 30}  # wrist
+    cam0: {type: opencv, index_or_path: 2, width: 320, height: 240, fps: 30}  # external
+    cam1: {type: opencv, index_or_path: 0, width: 320, height: 240, fps: 30}  # wrist
+
+# Client-side only (stripped before LeRobot parses this file): HxW every frame is shrunk to
+# before sending, or null to send frames at the camera resolution above. The server resizes to
+# the policy's input either way; this only decides where (and how much goes over the wire).
+# --image_size=... / -ImageSize / IMAGE_SIZE override it.
+# image_size: null  # full frame size specified above
+image_size: 224x224  # the checkpoint was trained on 224x224 frames; the server resizes to that anyways, so this saves bandwidth and CPU on the client
+
+policy_type: molmoact2
+pretrained_name_or_path: lerobot/MolmoAct2-SO100_101-LeRobot  # or your fine-tuned repo / server-side path
+policy_device: cuda       # device on the server; pick the GPU with CUDA_VISIBLE_DEVICES there
+
+server_address: 127.0.0.1:8080
+task: ""                  # pass --task="..." per run
+
+fps: 30
+actions_per_chunk: 30     # the checkpoint predicts 30 steps (1 s at 30 fps)
+chunk_size_threshold: 0.7 # ask for a new chunk when the queue drops below this fraction
+aggregate_fn_name: weighted_average  # weighted_average | latest_only | average | conservative

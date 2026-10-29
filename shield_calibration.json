@@ -1,0 +1,36 @@
+{
+  "gripper_closed": 0.0,
+  "gripper_open": 100.0,
+  "load_signs": [
+    1.0,
+    1.0,
+    1.0,
+    1.0,
+    1.0,
+    -1.0
+  ],
+  "tcp_rest_z_m": 0.0032953520499463124,
+  "thresholds": {
+    "load_gripper": -0.7703
+  },
+  "measured": true,
+  "notes": {
+    "date": "2026-10-29T15:49:48",
+    "robot_id": "my_follower",
+    "object": "red block",
+    "gripper_load_raw": {
+      "holding": 500.0,
+      "empty": 24.0
+    },
+    "gripper_settled": {
+      "holding": 15.405589638718473,
+      "empty": 0.2044989775051125
+    },
+    "load_nm": {
+      "holding": -1.47,
+      "empty": -0.07056
+    },
+    "arm_load_signs": "not measured (1.0); rules on arm loads are uncalibrated",
+    "separable": true
+  }
+}

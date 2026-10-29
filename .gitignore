@@ -9,3 +9,17 @@ build/
 dist/
 logs/
 .env
+
+# Robot PC (client/)
+venv/
+.venv/
+client/logs/
+runs/
+outputs/
+*.log
+
+# Editor / OS
+.vscode/
+.idea/
+Thumbs.db
+.DS_Store

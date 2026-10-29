@@ -1,0 +1,38 @@
+# LeRobot 0.6.1 robot_client config for server/serve_molmoact2_nexus.py (main branch): the
+# so101-nexus MolmoAct2 fine-tune with the fragile-release shield. Run it through the launchers
+# with NEXUS=1 / -Nexus, which pick this file and client/nexus_client.py.
+
+robot:
+  type: so101_follower
+  port: COM3              # lerobot-find-port; /dev/ttyACM0 on Linux
+  id: my_follower         # selects the saved calibration; keep it the same everywhere
+  use_degrees: true       # the server converts degrees to the checkpoint frame
+  max_relative_target: 15 # max degrees per joint per step
+  disable_torque_on_disconnect: false  # hold the last pose (and grip) on Ctrl-C; power off to release
+  cameras:
+    # cam0 = external view, cam1 = wrist, as in so101_molmoact2.yaml. The checkpoint was trained on
+    # a low oblique front view (sim camera at 0.5 m, 14 cm high, looking back at the arm) and the
+    # wrist camera. Place cam0 the same way if you can. The server scales frames to 640x480, so
+    # 320x240 here is upscaled 2x there; set 640x480 to give it native-resolution frames.
+    cam0: {type: opencv, index_or_path: 2, width: 640, height: 480, fps: 30}  # external
+    cam1: {type: opencv, index_or_path: 0, width: 640, height: 480, fps: 30}  # wrist
+    # cam0: {type: opencv, index_or_path: 2, width: 320, height: 240, fps: 30}  # external
+    # cam1: {type: opencv, index_or_path: 0, width: 320, height: 240, fps: 30}  # wrist
+
+# Client-side only (stripped before LeRobot parses this file): HxW every frame is shrunk to
+# before sending, or null to send frames at the camera resolution above. E.g. capture at 640x480
+# and compare image_size: null (full frames) against 240x320 (shrunk on the client, as before).
+# --image_size=... / -ImageSize / IMAGE_SIZE override it.
+image_size: null
+
+policy_type: molmoact2
+pretrained_name_or_path: ataghof/molmoact2-so101nexus-lora-champion  # informational: the nexus server loads its own --checkpoint
+policy_device: cuda
+
+server_address: 127.0.0.1:8080
+task: ""                  # the checkpoint knows one prompt: "Pick up the red cube and place it on the blue circle."
+
+fps: 8                    # one action per 0.12 s, the rate the checkpoint was trained at (6 sim steps of 0.02 s)
+actions_per_chunk: 10     # the checkpoint's chunk size
+chunk_size_threshold: 0.5 # ask for a new chunk when 5 actions are left (~0.6 s, about one round trip)
+aggregate_fn_name: latest_only  # a new chunk replaces the queue; nexus_client forces this while the shield is active
