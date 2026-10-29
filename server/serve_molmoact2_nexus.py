@@ -4,7 +4,7 @@ fragile-release shield learned in simulation (robot_learning_rulebased).
 
   .envs/lerobot/bin/python server/serve_molmoact2_nexus.py --host=127.0.0.1 --port=8080 --fps=8 \
       --no_similarity_filter --record_dir=artifacts/real_runs \
-      --fragile --shield=shadow --shield_calibration=artifacts/shield/calibration.json
+      --fragile --shield=shadow --shield_calibration=server/shield_artifacts/calibration.json
 
 Drive it with the client branch's nexus client (client/run_client.sh with NEXUS=1, or
 run_client.ps1 -Nexus). That client checks every queued action again against live joint and

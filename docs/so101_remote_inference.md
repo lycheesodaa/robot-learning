@@ -19,10 +19,14 @@ The server files are on this branch. The client files are on the [`client` branc
 | [server/serve_molmoact2.py](../server/serve_molmoact2.py) | Stock LeRobot policy server with `molmoact2` added to its allow-list; takes the same options |
 | [server/smoke_client.py](../server/smoke_client.py) | Robot-free loopback test: sends the official sample images and state, prints the action chunk |
 | [server/requirements.txt](../server/requirements.txt) | Server packages, for a fresh env outside `.envs/lerobot` |
+| [server/serve_molmoact2_nexus.py](../server/serve_molmoact2_nexus.py) | Serves the so101-nexus fine-tune with the fragile-release shield (section 5) |
+| [server/fragile_shield.py](../server/fragile_shield.py), [server/shield_rules/](../server/shield_rules/) | Shield rule language, forward kinematics and real-to-sim features; the learned rules |
 | [client/so101_molmoact2.yaml](https://github.com/lycheesodaa/robot-learning/blob/client/client/so101_molmoact2.yaml) | All client settings (robot, cameras, checkpoint, chunking); copy it per setup |
 | [client/run_client.ps1](https://github.com/lycheesodaa/robot-learning/blob/client/client/run_client.ps1) | Windows: opens the tunnel, runs the client, closes the tunnel |
 | [client/run_client.sh](https://github.com/lycheesodaa/robot-learning/blob/client/client/run_client.sh) | The same for Linux and macOS |
 | [client/check_torque_hold.py](https://github.com/lycheesodaa/robot-learning/blob/client/client/check_torque_hold.py) | Checks whether turning on torque would make the arm jump (read-only by default); `--probe-firmware` makes a 5° test move; `--sync` removes the risk |
+| [client/nexus_client.py](https://github.com/lycheesodaa/robot-learning/blob/client/client/nexus_client.py), [client/so101_molmoact2_nexus.yaml](https://github.com/lycheesodaa/robot-learning/blob/client/client/so101_molmoact2_nexus.yaml) | Client and config for the nexus server (section 5) |
+| [client/calibrate_shield.py](https://github.com/lycheesodaa/robot-learning/blob/client/client/calibrate_shield.py) | Measures the shield calibration for an arm and object |
 
 ## 1. Server (GPU machine)
 
@@ -122,7 +126,8 @@ All of these live in the YAML and can be overridden as `--name=value`.
 | `task` | — | Instruction sent to the model with every observation. Short, imperative and concrete works best: "pick up the red cube and place it in the bowl". |
 | `robot.port` | `COM5` | Serial port of the follower arm. |
 | `robot.id` | `my_follower` | Calibration name. It must match what you calibrated with. |
-| `robot.cameras.cam0/cam1` | indices 0, 1 at 640×480@30 | **Names must stay `cam0`/`cam1`**, because the checkpoint expects them and the client cannot rename. Frames are resized to 224×224 on the server. |
+| `robot.cameras.cam0/cam1` | indices 0, 1 at 640×480@30 | **Names must stay `cam0`/`cam1`**, because the checkpoint expects them and the client cannot rename. The server resizes frames to the checkpoint's declared 224×224, and the MolmoAct2 image processor then upscales each one to 378×378 for the vision encoder. |
+| `image_size` | `224x224` (`null` in the nexus YAML) | Client-side only; the client removes it before LeRobot parses the YAML. Each frame is shrunk to this HxW before sending, or sent at capture resolution with `null`. The server resizes to the checkpoint's input either way, so this only decides where the resize happens and how much goes over the tunnel. `--image_size=`, `-ImageSize` and `IMAGE_SIZE` override it. |
 | `robot.max_relative_target` | `10` | Largest per-step change for each joint, in degrees. A safety cap; use `null` to remove it once you trust the policy. |
 | `robot.disable_torque_on_disconnect` | `false` | `false`: the arm holds its last pose when the client stops. `true` (LeRobot's default): torque off on exit, and the arm drops under gravity. |
 | `robot.use_degrees` | `true` | Keep `true`. The checkpoint's joint convention is in degrees. |
@@ -163,7 +168,79 @@ A replay of 80 recorded inferences on 2026-10-25 lowered the jump at each handov
 
 Each inference logs `RTC #<timestep> | prefix <n> steps, delay <d> | client <r> actions/s, estimated latency <s>`. The delay is the number of steps the client executes before the chunk arrives, and those steps follow the old chunk exactly. The server estimates it from the client's action rate (from the client's own timestamps, so clock skew does not matter), the time the observation waited on the server, the inference time, and `--rtc_net_latency` (default 0.25 s, for upload and download). If the arm still jumps when a chunk arrives, raise `--rtc_net_latency` or fix the delay with `--rtc_delay=N`. A delay that is too high costs a little reactivity; one that is too low brings the jump back. `--rtc_horizon` (default 20) sets the step where the guidance has faded to zero.
 
-## 5. Troubleshooting
+## 5. so101-nexus checkpoint with the fragile-release shield
+
+`server/serve_molmoact2_nexus.py` runs the [so101-nexus fine-tune](https://huggingface.co/ataghof/molmoact2-so101nexus-lora-champion), which was trained in simulation, on the real arm. It also adds the `refuse_if` shield learned in the fragile-release study (`robot_learning_rulebased`). The shield refuses to open the gripper while it is squeezing a fragile object above the table. Every `serve_molmoact2.py` option still works. On the robot PC, the launchers' `-Nexus` / `NEXUS=1` mode runs `client/nexus_client.py` with `client/so101_molmoact2_nexus.yaml`.
+
+How this differs from the base checkpoint:
+
+- **The server chooses the checkpoint** with `--checkpoint`, and ignores `pretrained_name_or_path` in the client YAML. The default is `artifacts/models/so101_nexus_v6/<rev>` if that folder exists, otherwise the Hub repo. The conversions below only fit this checkpoint.
+- **Joint frames.** The checkpoint's processor applies no SO101 joint correction. So the server converts the state from the real frame to the checkpoint frame and converts actions back (`fragile_shield.real_to_ckpt` / `ckpt_to_real`). The gripper is rescaled from the real 0–100 to the checkpoint's 0 (closed) to 45 (open). The checkpoint was trained on a binary gripper, so it asks for either 0 or 45.
+- **Rate.** Each chunk has 10 actions, one per 0.12 s, so run the server and client at fps 8. `--rtc_horizon` defaults to 10 here.
+- **One prompt.** The checkpoint was trained only on "Pick up the red cube and place it on the blue circle."
+- **Cameras.** `cam0` is the external view and `cam1` the wrist. The checkpoint declares 640×480 inputs, so the nexus YAML captures at 640×480 and sends frames as captured (`image_size: null`), and the server's resize does nothing. Capturing at 320×240 also works; the server then upscales each frame 2×. In training, `cam0` was a low oblique view from a front corner: about 0.5 m in front of the arm, 0.25 m to the side and 14 cm high, aimed back at the workspace, with a 58° vertical field of view (the `front_low` preset in [realism.py](../src/vla_safety/pickplace/realism.py)). These numbers are approximate. The sim preset only roughly matches the real MolmoAct2 rigs, and a camera placed by eye on the real table will differ more. Place your camera about the same way if you can.
+
+### Running it
+
+1. **Calibrate the shield** once per arm and object, on the robot PC. The script guides you through it in about two minutes. Keep a hand on the arm, because the first steps run with torque off.
+   ```powershell
+   python client\calibrate_shield.py --out shield_calibration.json --object "foam egg"
+   ```
+   It measures three things:
+   - The gripper's closed and open readings. These set the gripper scaling.
+   - The forward-kinematics TCP height with the object resting in the jaws on the table. This height maps to the simulator's set-down height of 0.0295 m.
+   - The gripper load when squeezing the object and when closing on nothing. These set the load sign and the `load_gripper` threshold, halfway between the two readings.
+
+   Use the object you will run with, because a soft object squeezes with less load than the simulator's cube. Torque stays on at the end; cut power to release the arm. Copy the JSON to the server, for example to `server/shield_artifacts/calibration.json`.
+2. **Start the server in shadow mode first.** In this mode it logs every decision and changes nothing:
+   ```bash
+   screen -S nexus
+   cd ~/phd/robot_learning
+   CUDA_VISIBLE_DEVICES=1 HF_HUB_DISABLE_XET=1 \
+     .envs/lerobot/bin/python server/serve_molmoact2_nexus.py --host=127.0.0.1 --port=8080 --fps=8 \
+     --no_similarity_filter --record_dir=artifacts/real_runs \
+     --fragile --shield=shadow --shield_calibration=server/shield_artifacts/calibration.json
+   ```
+   Switch to `--shield=hold` or `--shield=abort` once the shadow decisions look right.
+3. **Run the client** with the training prompt:
+   ```powershell
+   .\client\run_client.ps1 -Nexus -SshTarget weisoon@172.16.163.102 -Task "Pick up the red cube and place it on the blue circle."
+   ```
+   ```bash
+   NEXUS=1 client/run_client.sh weisoon@172.16.163.102 "Pick up the red cube and place it on the blue circle."
+   ```
+
+### Shield options
+
+| Option | Default | What it does |
+| --- | --- | --- |
+| `--shield` | `shadow` | `off`. `shadow`: decide and log, change nothing. `hold`: a refused action keeps the previous gripper command, while the arm joints move as proposed. `abort`: the first refusal latches; from then on every request gets an empty chunk, without inference, until the client reconnects. |
+| `--shield_rule` | `server/shield_rules/v4_symbolic_k3.json` | The rule, in simulator units. [server/shield_rules/README.md](../server/shield_rules/README.md) lists the alternatives and their results in simulation. Only the default has a height condition, so the others also block safe set-downs. |
+| `--shield_calibration` | none | JSON from `calibrate_shield.py`. `hold` and `abort` need one whose `measured` field is true. |
+| `--fragile` | off | Marks the object as fragile; this is the rule's `fragile` input. Without it, a rule that has a `fragile` condition allows everything. |
+| `--checkpoint` | see above | Server-side path or Hub repo of the nexus checkpoint. |
+
+The default rule is `fragile AND tcp_z > 0.04924 AND load_gripper <= -0.09125`. With a calibration file, the height condition means about 2 cm above set-down height. The calibrated load threshold replaces the simulator's −0.09 N m, which is too fine for a real servo.
+
+### How the shield decides
+
+The server checks every action of a chunk. It checks action k against the state the arm should be in when that action runs: the observed state for k = 0, and action k−1's arm targets after that. The gripper position and the servo loads always come from the observation, because a held object stops the jaws short of their target. If a feature cannot be computed, the rule refuses (fail-closed). The server attaches the rule, calibration, mode and its decision to every action it sends.
+
+The nexus client then does the following:
+
+- **Sends servo loads.** Every observation includes the servo loads (`<motor>.load`, signed Present_Load). The shield reads them; the policy never sees them.
+- **Checks again before sending.** Each queued action is checked again, right before it goes to the arm, against the joint positions and loads read at that moment. This also catches actions that went stale while the chunk travelled.
+- **Latches.** This happens after a refusal in abort mode, or when the server sends an empty chunk (its shield latched). The client empties its queue, drops chunks still in flight, and stops sending. The arm holds its last command, so the gripper keeps its grip. Press Ctrl-C to exit; a new connection clears the server's latch.
+- **Never blends chunks.** In hold and abort modes, each new chunk replaces the queue (`latest_only`), so a held chunk is never averaged with an earlier opening.
+- **Keeps the grip on exit.** During a fragile run in hold or abort mode, homing on exit leaves the gripper at its last command, so the arm does not drop the object.
+
+Use the nexus client with this server. The stock client sends no loads, so with the default rule every action more than about 2 cm above set-down height is refused as `unknown_feature`. It also executes whatever it has already queued.
+
+### Logs and records
+
+On each connection the server logs `Shield <mode> | fragile: <bool> | <rule>`. On each inference it logs `Shield #<timestep> [<mode>] allow` or `REFUSE <n>/<m> from step <k> (<reasons>)`, followed by the rule's feature values. When abort fires, it logs `Shield LATCHED`. With `--record_dir`, each line of `inferences.jsonl` also carries the decision, the reasons and the feature values. On the robot PC, runs record `shield`, `latch` and `blocked` events in `runs/<run_id>/events.jsonl`.
+
+## 6. Troubleshooting
 
 | Symptom | Likely cause |
 | --- | --- |
@@ -177,6 +254,6 @@ Each inference logs `RTC #<timestep> | prefix <n> steps, delay <d> | client <r> 
 | Arm jumps to an old pose when the client connects | A stale stored target (see setup step 6). Run `check_torque_hold.py --sync` before starting. |
 | Arm drifts the wrong way at the shoulder or elbow | Calibration doesn't match `robot.id`, or `use_degrees` is off. The checkpoint already applies the SO101 joint sign and offset correction. |
 
-## 6. Expectations
+## 7. Expectations
 
 The base SO100/101 checkpoint without fine-tuning will be hit-or-miss on a new scene. The usual next step is to record 50 or more demos with `lerobot-record` (leader arm) and LoRA fine-tune on the server; see the [LeRobot MolmoAct2 docs](https://huggingface.co/docs/lerobot/main/en/molmoact2). The resulting checkpoint plugs in through `pretrained_name_or_path`.
