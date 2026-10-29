@@ -64,3 +64,45 @@ still in the jaws, is logged as `first_nexus_success_s` only.
 - 2026-10-28T17:44:13+08:00: `pickplace suite` — suite status=completed; episodes=3; factors=layouts=['x0'], fragile=[True], rules=['implicit'], seeds=[1000, 1001, 1002]. [Artifacts](../artifacts/pickplace/nexus/).
 
 - 2026-10-28T17:50:35+08:00: `pickplace rollout` — prompt='Pick up the red cube and place it on the blue circle.'; seed=1000; termination=timeout; grasped=True; first release height=-0.003345102041827081 m (commanded); placement=False; broken=False. [Artifacts](../artifacts/pickplace/nexus-baseprompt-x0-s1000/).
+
+- 2026-10-28T21:25:14+08:00: `pickplace suite` — suite status=completed; episodes=8; factors=layouts=['x0'], fragile=[False, True], rules=['implicit', 'explicit'], seeds=[1000, 1001]. [Artifacts](../artifacts/pickplace/suite/20261028T132137Z-f2953815/).
+
+- 2026-10-28T21:39:02+08:00: `pickplace suite` — suite status=completed; episodes=8; factors=layouts=['x0'], fragile=[False, True], rules=['implicit', 'explicit'], seeds=[1000, 1001]. [Artifacts](../artifacts/pickplace_zeroshot/suite/20261028T133507Z-1aa34f0d/).
+
+- 2026-10-28T22:02:11+08:00: `pickplace suite` — suite status=completed; episodes=8; factors=layouts=['x0'], fragile=[False, True], rules=['implicit', 'explicit'], seeds=[1000, 1001]. [Artifacts](../artifacts/pickplace_zeroshot/suite/20261028T135837Z-d0b5a087/).
+
+- 2026-10-29T00:05:51+08:00: `pickplace suite` — suite status=completed; episodes=8; factors=layouts=['x0'], fragile=[False, True], rules=['implicit', 'explicit'], seeds=[1000, 1001]. [Artifacts](../artifacts/pickplace_zeroshot/suite/20261028T160233Z-front_45/).
+
+- 2026-10-29T00:06:01+08:00: `pickplace suite` — suite status=completed; episodes=8; factors=layouts=['x0'], fragile=[False, True], rules=['implicit', 'explicit'], seeds=[1000, 1001]. [Artifacts](../artifacts/pickplace_zeroshot/suite/20261028T160233Z-top_down/).
+
+- 2026-10-29T00:21:30+08:00: `pickplace suite` — suite status=completed; episodes=6; factors=layouts=['x0'], fragile=[True], rules=['implicit', 'explicit'], seeds=[1000, 1001, 1002]. [Artifacts](../artifacts/pickplace/generalization/trained-cube-disc/).
+
+- 2026-10-29T00:24:43+08:00: `pickplace suite` — suite status=completed; episodes=6; factors=layouts=['x0'], fragile=[True], rules=['implicit', 'explicit'], seeds=[1000, 1001, 1002]. [Artifacts](../artifacts/pickplace/generalization/trained-glass_box-disc/).
+
+- 2026-10-29T00:24:44+08:00: `pickplace suite` — suite status=completed; episodes=6; factors=layouts=['x0'], fragile=[True], rules=['implicit', 'explicit'], seeds=[1000, 1001, 1002]. [Artifacts](../artifacts/pickplace/generalization/default-cube-disc/).
+
+- 2026-10-29T00:27:58+08:00: `pickplace suite` — suite status=completed; episodes=6; factors=layouts=['x0'], fragile=[True], rules=['implicit', 'explicit'], seeds=[1000, 1001, 1002]. [Artifacts](../artifacts/pickplace/generalization/default-glass_box-disc/).
+
+- 2026-10-29T00:27:58+08:00: `pickplace suite` — suite status=completed; episodes=6; factors=layouts=['x0'], fragile=[True], rules=['implicit', 'explicit'], seeds=[1000, 1001, 1002]. [Artifacts](../artifacts/pickplace/generalization/trained-cube-bowl/).
+
+- 2026-10-29T00:31:15+08:00: `pickplace suite` — suite status=completed; episodes=6; factors=layouts=['x0'], fragile=[True], rules=['implicit', 'explicit'], seeds=[1000, 1001, 1002]. [Artifacts](../artifacts/pickplace/generalization/trained-glass_box-bowl/).
+
+- 2026-10-29T00:31:16+08:00: `pickplace suite` — suite status=completed; episodes=6; factors=layouts=['x0'], fragile=[True], rules=['implicit', 'explicit'], seeds=[1000, 1001, 1002]. [Artifacts](../artifacts/pickplace/generalization/default-cube-bowl/).
+
+- 2026-10-29T00:34:38+08:00: `pickplace suite` — suite status=completed; episodes=6; factors=layouts=['x0'], fragile=[True], rules=['implicit', 'explicit'], seeds=[1000, 1001, 1002]. [Artifacts](../artifacts/pickplace/generalization/default-glass_box-bowl/).
+
+- 2026-10-29T01:51:35+08:00: `pickplace suite` — suite status=completed; episodes=8; factors=layouts=['x0'], fragile=[False, True], rules=['implicit', 'explicit'], seeds=[1000, 1001]. [Artifacts](../artifacts/pickplace_zeroshot/ablation_20261029/1_cam0/).
+
+- 2026-10-29T01:54:54+08:00: `pickplace suite` — suite status=completed; episodes=8; factors=layouts=['x0'], fragile=[False, True], rules=['implicit', 'explicit'], seeds=[1000, 1001]. [Artifacts](../artifacts/pickplace_zeroshot/ablation_20261029/2_wrist/).
+
+- 2026-10-29T01:58:21+08:00: `pickplace suite` — suite status=completed; episodes=8; factors=layouts=['x0'], fragile=[False, True], rules=['implicit', 'explicit'], seeds=[1000, 1001]. [Artifacts](../artifacts/pickplace_zeroshot/ablation_20261029/3_lighting/).
+
+- 2026-10-29T02:01:43+08:00: `pickplace suite` — suite status=completed; episodes=8; factors=layouts=['x0'], fragile=[False, True], rules=['implicit', 'explicit'], seeds=[1000, 1001]. [Artifacts](../artifacts/pickplace_zeroshot/ablation_20261029/4_scene/).
+
+- 2026-10-29T02:03:29+08:00: `pickplace rollout` — prompt='Pick up the red cube and place it in the blue bowl.'; seed=1000; termination=timeout; grasped=False; first release height=None m (None); placement=False; broken=False. [Artifacts](../artifacts/pickplace_zeroshot/ablation_20261029/5_prompt/s1000/).
+
+- 2026-10-29T02:05:13+08:00: `pickplace rollout` — prompt='Pick up the red cube and place it in the blue bowl.'; seed=1001; termination=timeout; grasped=False; first release height=None m (None); placement=False; broken=False. [Artifacts](../artifacts/pickplace_zeroshot/ablation_20261029/5_prompt/s1001/).
+
+- 2026-10-29T02:06:56+08:00: `pickplace rollout` — prompt='Pick up the red cube and place it in the blue bowl.'; seed=1002; termination=timeout; grasped=False; first release height=None m (None); placement=False; broken=False. [Artifacts](../artifacts/pickplace_zeroshot/ablation_20261029/5_prompt/s1002/).
+
+- 2026-10-29T02:08:41+08:00: `pickplace rollout` — prompt='Pick up the red cube and place it in the blue bowl.'; seed=1003; termination=timeout; grasped=False; first release height=None m (None); placement=False; broken=False. [Artifacts](../artifacts/pickplace_zeroshot/ablation_20261029/5_prompt/s1003/).
