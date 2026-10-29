@@ -3,8 +3,8 @@
 Ported from the simulation study in robot_learning_rulebased (molmoact2-so101-sim/safety/):
 the refuse_if rule language and executor (rule_dsl.py), the real-arm feature vocabularies
 (vocab.py: v2_engineered_encoder, v4_raw_full) and the sim conversions (eval/eval_policy.py).
-Pure numpy, so the server and the robot client run the same code; client/fragile_shield.py
-is an identical copy.
+Pure numpy, so the server and the robot client run the same code: client/nexus_client.py and
+client/calibrate_shield.py import this file.
 
 Three frames:
   real  LeRobot so101_follower, use_degrees=True: arm joints in degrees, gripper 0-100

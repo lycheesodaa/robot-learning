@@ -19,6 +19,7 @@ At the end torque stays on and the arm holds its pose; cut power to release it.
 import argparse
 import json
 import statistics
+import sys
 import time
 from datetime import datetime
 from pathlib import Path
@@ -30,7 +31,8 @@ from lerobot.async_inference.robot_client import RobotClientConfig
 from lerobot.motors.motors_bus import get_address
 from lerobot.robots import make_robot_from_config
 
-import fragile_shield as S
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'server'))  # the server's fragile_shield.py
+import fragile_shield as S  # noqa: E402
 
 SETTLE_S = 1.5
 SAMPLES = 20

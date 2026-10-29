@@ -29,6 +29,7 @@ import sys
 import threading
 import time
 from contextlib import nullcontext
+from pathlib import Path
 from queue import Queue
 
 import draccus
@@ -37,10 +38,11 @@ import numpy as np
 from lerobot.async_inference.configs import RobotClientConfig
 from lerobot.utils.import_utils import register_third_party_plugins
 
-import fragile_shield as S
-import home_on_exit
-import resize_client
-import viz_client
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "server"))  # the server's fragile_shield.py
+import fragile_shield as S  # noqa: E402
+import home_on_exit  # noqa: E402
+import resize_client  # noqa: E402
+import viz_client  # noqa: E402
 
 MAX_VELOCITY_DT = 1.0  # s; an older previous reading gives no velocity
 

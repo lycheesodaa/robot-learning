@@ -182,5 +182,4 @@ Runs record `shield`, `latch` and `blocked` events in `events.jsonl`. The server
 | `client/check_torque_hold.py` | Checks whether turning on torque would make the arm jump; `--sync` removes the risk |
 | `client/home_on_exit.py` | Returns the arm to its start pose whenever the client stops |
 | `client/nexus_client.py`, `client/so101_molmoact2_nexus.yaml` | Client and config for the so101-nexus server with the fragile-release shield |
-| `client/fragile_shield.py` | Shield rules, features and calibration; a copy of `server/fragile_shield.py`; keep the two identical |
 | `client/calibrate_shield.py` | Measures the gripper scaling, set-down height and squeeze load the shield needs |
