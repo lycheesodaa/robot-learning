@@ -1,1 +1,3 @@
+# GPU server: runs MolmoAct2 (serve_molmoact2.py, serve_molmoact2_nexus.py).
+# pip install -r server/requirements.txt  (install a CUDA build of torch first if pip's default doesn't match your driver)
 lerobot[async,molmoact2]==0.6.1

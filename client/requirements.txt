@@ -1,0 +1,11 @@
+# Robot PC: drives the arm and cameras and talks to the GPU server; it never runs the policy.
+# pip install -r client/requirements.txt
+#
+# LeRobot requires torch and torchvision, so they cannot be left out; the CPU-only builds skip
+# the CUDA libraries (several GB on Linux). The +cpu wheels outrank the PyPI ones for the same
+# version, so pip takes them where they exist (Windows, Linux) and PyPI's otherwise (macOS, where
+# PyPI torch is CPU-only anyway). opencv-python-headless and pyyaml come with lerobot.
+--extra-index-url https://download.pytorch.org/whl/cpu
+lerobot[async,feetech]==0.6.1
+torch==2.11.0
+torchvision==0.26.0

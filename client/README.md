@@ -36,7 +36,7 @@ a local client drives the arm. The two talk over gRPC through an SSH tunnel.
 | | Robot PC | GPU server |
 |---|---|---|
 | Python | 3.12+ (developed on 3.13) | 3.12+ |
-| Packages | [requirements.txt](../requirements.txt) | [server/requirements.txt](../server/requirements.txt) |
+| Packages | [client/requirements.txt](requirements.txt) (CPU-only torch) | [server/requirements.txt](../server/requirements.txt) |
 | Also needs | OpenSSH client (`ssh` on PATH) | NVIDIA driver plus a CUDA build of PyTorch, and access to the Hugging Face Hub (or a local copy of the checkpoint) |
 
 ### Robot PC setup
@@ -44,7 +44,7 @@ a local client drives the arm. The two talk over gRPC through an SSH tunnel.
 ```powershell
 python -m venv venv
 .\venv\Scripts\Activate.ps1          # Linux/macOS: source venv/bin/activate
-pip install -r requirements.txt
+pip install -r client/requirements.txt
 ```
 
 Then set up the arm and cameras:

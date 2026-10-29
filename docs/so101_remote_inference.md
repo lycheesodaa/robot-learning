@@ -19,6 +19,7 @@ The server files are in `server/` and the robot PC files in `client/` ([client/R
 | [server/serve_molmoact2.py](../server/serve_molmoact2.py) | Stock LeRobot policy server with `molmoact2` added to its allow-list; takes the same options |
 | [server/smoke_client.py](../server/smoke_client.py) | Robot-free loopback test: sends the official sample images and state, prints the action chunk |
 | [server/requirements.txt](../server/requirements.txt) | Server packages, for a fresh env outside `.envs/lerobot` |
+| [client/requirements.txt](../client/requirements.txt) | Robot PC packages: LeRobot with the Feetech and async extras, and CPU-only torch |
 | [server/serve_molmoact2_nexus.py](../server/serve_molmoact2_nexus.py) | Serves the so101-nexus fine-tune with the fragile-release shield (section 5) |
 | [server/fragile_shield.py](../server/fragile_shield.py), [server/shield_rules/](../server/shield_rules/) | Shield rule language, forward kinematics and real-to-sim features; the learned rules |
 | [client/so101_molmoact2.yaml](../client/so101_molmoact2.yaml) | All client settings (robot, cameras, checkpoint, chunking); copy it per setup |
@@ -58,7 +59,7 @@ Check the server without a robot, from a second shell on the server:
 
 ## 2. Robot PC: one-time setup
 
-1. **Python env.** Activate it (Windows: `.\venv\Scripts\Activate.ps1`), then run `pip install "lerobot[feetech,async,hardware]==0.6.1"`.
+1. **Python env.** Activate it (Windows: `.\venv\Scripts\Activate.ps1`), then run `pip install -r client/requirements.txt`. It installs CPU-only torch, because the robot PC never runs the policy.
 2. **SSH key login** to the server, so the tunnel doesn't stop to ask for a password:
    ```powershell
    ssh-keygen -t ed25519                     # accept defaults
