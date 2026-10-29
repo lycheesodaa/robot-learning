@@ -15,13 +15,14 @@
   # so101-nexus checkpoint with the fragile-release shield (server/serve_molmoact2_nexus.py).
   .\client\run_client.ps1 -Nexus -SshTarget gpu-box -Task "Pick up the red cube and place it on the blue circle."
 #>
+[CmdletBinding(PositionalBinding = $false)]   # loose args like --robot.port=COM7 go to $ClientArgs, not -Config
 param(
     [Parameter(Mandatory)] [string] $SshTarget,   # user@host, or a Host alias from ~/.ssh/config
     [Parameter(Mandatory)] [string] $Task,
     [string] $Config,        # default: so101_molmoact2.yaml, or so101_molmoact2_nexus.yaml with -Nexus
     [int] $LocalPort = 8080,
     [int] $RemotePort = 8080,
-    [string] $Python = 'python',
+    [string] $Python,        # default: the repo's venv from setup_client.ps1 if present, else python on PATH
     [string] $ImageSize,     # HxW frames are shrunk to before sending; '' sends full frames. Default: image_size in the config
     [int] $VizPort = 8765,   # live viewer at http://127.0.0.1:<VizPort>/; runs are saved under .\runs
     [switch] $NoViz,         # run the plain robot_client instead (no recording, no viewer; frames still resized)
@@ -31,6 +32,11 @@ param(
 )
 $ErrorActionPreference = 'Stop'
 if ($Nexus -and $NoViz) { throw '-Nexus needs the recording client; drop -NoViz.' }
+if (-not $Python) {
+    $venvPython = Join-Path (Split-Path $PSScriptRoot) 'venv\Scripts\python.exe'
+    $Python = if (Test-Path $venvPython) { $venvPython } else { 'python' }
+}
+if (-not (Get-Command ssh -ErrorAction SilentlyContinue)) { throw 'ssh not found on PATH; install the Windows OpenSSH client.' }
 if (-not $Config) { $Config = Join-Path $PSScriptRoot $(if ($Nexus) { 'so101_molmoact2_nexus.yaml' } else { 'so101_molmoact2.yaml' }) }
 
 $listening = Get-NetTCPConnection -LocalPort $LocalPort -State Listen -ErrorAction SilentlyContinue

@@ -31,7 +31,9 @@ The server files are in `server/` and the robot PC files in `client/` ([client/R
 
 ## 1. Server (GPU machine)
 
-One-time: the env is `.envs/lerobot` (`lerobot[molmoact2,async]==0.6.1`). Elsewhere, run `pip install "lerobot[molmoact2,async]==0.6.1"` in a Python 3.12 env.
+One-time: the env is `.envs/lerobot` (`lerobot[molmoact2,async]==0.6.1`). `./setup_server.sh` creates it on a new machine. Elsewhere, run `pip install "lerobot[molmoact2,async]==0.6.1"` in a Python 3.12 env.
+
+`./run_server.sh --gpu 1` runs the command below, and `./run_server.sh --nexus` runs the one in section 5. Use `./check_server.sh` for the loopback check. `--help` lists the options. The commands are spelled out here so you can see what the scripts do.
 
 Start the server in `screen` so it survives your SSH session:
 
@@ -59,7 +61,7 @@ Check the server without a robot, from a second shell on the server:
 
 ## 2. Robot PC: one-time setup
 
-1. **Python env.** Activate it (Windows: `.\venv\Scripts\Activate.ps1`), then run `pip install -r client/requirements.txt`. It installs CPU-only torch, because the robot PC never runs the policy.
+1. **Python env.** Run `.\setup_client.ps1` (Linux/macOS: `./setup_client.sh`). It creates `venv` and installs `client/requirements.txt` there, with CPU-only torch, because the robot PC never runs the policy. The launchers use this `venv` automatically. Activate it (Windows: `.\venv\Scripts\Activate.ps1`) for the `lerobot-*` tools below.
 2. **SSH key login** to the server, so the tunnel doesn't stop to ask for a password:
    ```powershell
    ssh-keygen -t ed25519                     # accept defaults
