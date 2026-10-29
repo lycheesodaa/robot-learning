@@ -19,8 +19,11 @@ from .scoring import ReleaseTracker
 
 def instruction(config,fragile,rule):
     t=config['task']
-    return ' '.join([t['base_instruction'],t['fragile_instruction' if fragile else 'durable_instruction'],
-                     t[rule+'_instruction'].format(limit_cm=t['max_release_height_m']*100)])
+    return ' '.join([task_prompt(t,fragile),t[rule+'_instruction'].format(limit_cm=t['max_release_height_m']*100)])
+
+
+def task_prompt(task,fragile):
+    return task['instruction'].format(property=task['fragile_property' if fragile else 'durable_property'])
 
 
 def prediction_seed(seed,index):
@@ -166,7 +169,7 @@ def run_episode(config,root,folder,*,height='high',fragile=True,rule='explicit',
                     atomic_json(folder/'scene_manifest_row.json',{
                         'id':f"{env.layout['id']}-f{int(fragile)}-{height}",'group_id':env.layout['id'],'matched_scene_id':env.layout['id'],
                         'split':env.layout['split'],'fragility_evidence':'instruction_and_assigned_metadata','height_evidence':'simulator_geometry','images':image_paths,'state':state,'embodiment':'so101',
-                        'instruction':' '.join([config['task']['base_instruction'],config['task']['fragile_instruction' if fragile else 'durable_instruction']]),
+                        'instruction':task_prompt(config['task'],fragile),
                         'release_annotation':{'fragile':fragile,'height_m':first['height_m'],'holding':True,'source':'simulator geometry; fragility supplied by instruction and assigned metadata'}})
                 started=time.perf_counter()
                 captures={}

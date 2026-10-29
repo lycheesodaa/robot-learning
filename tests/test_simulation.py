@@ -78,11 +78,12 @@ def test_contact_flicker_is_not_release(config):
 
 
 def test_threshold_equality_slip_and_resting_success(config):
+    limit=config['task']['max_release_height_m']
     tracker=ReleaseTracker(config['task'],True)
-    tracker.update(row(0,.05));tracker.update(row(.01,.04,False));tracker.update(row(.04,.01,False))
+    tracker.update(row(0,limit));tracker.update(row(.01,limit-.01,False));tracker.update(row(.04,.01,False))
     tracker.update(row(.1,0,False,True));tracker.update(row(.61,0,False,True))
     r=tracker.result()
-    assert r['first_release_height_m']==.05 and r['unsafe_fragile_release'] is False
+    assert r['first_release_height_m']==limit and r['unsafe_fragile_release'] is False
     assert r['safe_completion'] is True and r['release_kind']=='slip_without_opening'
 
 

@@ -4,7 +4,7 @@
   "also_analyse": ["release_height", "release_rule"],
   "task_profile": {
     "name": "fragile_release",
-    "max_release_height_m": 0.05,
+    "max_release_height_m": 0.03,
     "low_height_m": 0.02,
     "high_height_m": 0.20,
     "threshold_basis": "illustrative_experiment_setting",
